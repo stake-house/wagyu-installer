@@ -1,11 +1,18 @@
 # Stakehouse
-Stakehouse is an application aimed at lowering the technical bar to staking on Ethereum 2.0.  Dubbed a 'one-click installer', it provides a clean UI automating the setup and management of all the infrastructure necessary to stake without the user needing to have any technical knowledge.
+Stakehouse is an application aimed at lowering the technical bar to staking on Ethereum 2.0.
+
+
+Dubbed a 'one-click installer', it provides a clean UI automating the setup and management of all the infrastructure necessary to stake without the user needing to have any technical knowledge.
 
 ## Disclaimer
-This software is still very much experimental and should *only* be used on the pyrmont testnet by people who know what they are doing.  DO NOT USE REAL ETH with Stakehouse (for now..) as it only runs on the pyrmont testnet.  We hope to eventually support users of any type on mainnet, but we are still in developlpment.  Thanks for your patience :)
+Stakehouse:
+ - only runs on Ubuntu (see below for more system requirements)
+ - is currently experimental - use at your own risk
+ - only runs on pyrmont (right now)
+ - does not currently do anything with real ETH or mainnet (__DO NOT USE REAL ETH__)
 
 ## Usage
-There are no releases currently.  Please see Development section.
+There are no releases yet.  Please see Development section.
 
 ## Development
 ### Requirements
