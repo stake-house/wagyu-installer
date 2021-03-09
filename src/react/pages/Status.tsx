@@ -124,8 +124,7 @@ const Status = () => {
     } else if (eth1Syncing) {
       return 1;
     } else {
-      // If container is up but there are no peers, it's not online yet
-      return eth1PeerCount > 0 ? 0 : 2;
+      return 0;
     }
   }
 

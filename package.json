@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.react.config.js --config webpack.electron.config.js",
-    "build:watch": "npm run build -- --watch",
+    "build:watch": "yarn build -- --watch",
     "start": "electron ./dist/electron/index.js",
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development && electron .",
     "dev:react": "NODE_ENV=development webpack-serve --config webpack.react.config.js --mode development"
