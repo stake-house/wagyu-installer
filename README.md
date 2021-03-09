@@ -4,6 +4,8 @@ Stakehouse is an application aimed at lowering the technical bar to staking on E
 
 Dubbed a 'one-click installer', it provides a clean UI automating the setup and management of all the infrastructure necessary to stake without the user needing to have any technical knowledge.
 
+![stakehouse preview](https://share.getcloudapp.com/ApuRokYG)
+
 ## Disclaimer
 Stakehouse:
  - only runs on Ubuntu (see below for more system requirements)
