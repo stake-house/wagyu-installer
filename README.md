@@ -54,7 +54,7 @@ Theres plenty left to do with Stakehouse.  If you'd like to help out, please giv
 | Support additional operating systems (depends on Rocket Pool support as well) | High | Large |  |
 | Support picking Eth2 client (need to tie into client specific status monitoring) | High | Large |  |
 | Improve install page/dynamic graphic.  Add more incremental statuses? | Medium | Small |  |
-| Stop/start buttons for clients on status page. | Medium | Small |  |
+| Stop/start buttons for clients on status page. | Medium | Small | grasponcrypto.eth |
 | Update button for clients on status page. | Medium | Medium |  |
 | Clean up logging/set up proper logging | High | Small |  |
 | "Dry run" mode for testing/demos not on Ubuntu (does not run any actual commands) | High | Medium |  |
