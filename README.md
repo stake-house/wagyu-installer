@@ -4,7 +4,7 @@ Stakehouse is an application aimed at lowering the technical bar to staking on E
 
 Dubbed a 'one-click installer', it provides a clean UI automating the setup and management of all the infrastructure necessary to stake without the user needing to have any technical knowledge.
 
-![stakehouse preview](https://www.youtube.com/watch?v=-KKeZwI8EII&ab_channel=ColfaxSelby)
+![stakehouse preview](https://youtu.be/-KKeZwI8EII)
 
 ## Disclaimer
 Stakehouse:
