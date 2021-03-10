@@ -193,7 +193,7 @@ const Installing = ({ history }: {history: History}) => {
           </InputContainer>
           <br />
           <br />
-          *Note: at this stage we cannot handle password retires, so please get it right ;)
+          *Note: at this stage we cannot handle password retries, so please get it right ;)
         </Content>
       }
       <FooterContainer>
