@@ -72,7 +72,7 @@ Theres plenty left to do with Stakehouse.  If you'd like to help out, please giv
 | TODOs in code | Various | Various | n/a |
 
 ## License
-TBD
+[GPL](LICENSE)
 
 ## Credits
  - Stakehouse uses the [Rocket Pool](https://www.rocketpool.net/) installer to manage eth1/eth2 clients.
