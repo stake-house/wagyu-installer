@@ -191,11 +191,16 @@ const Status = () => {
     shell.openExternal("https://www.reddit.com/r/ethstaker/comments/ij56ox/best_way_to_get_goerli_ether/");
   }
 
+  const sendToEthereumStudymaster = () => {
+    shell.openExternal("https://ethereumstudymaster.com/");
+  }
+
   const renderResources = () => {
     return (
       <ul>
         <li>Join the EthStaker <StyledLink onClick={sendToEthStakerDiscord}>discord</StyledLink></li>
         <li>Check out the EthStaker <StyledLink onClick={sendToEthStakerSubreddit}>subreddit</StyledLink></li>
+        <li>Join the <StyledLink onClick={sendToEthereumStudymaster}>Ethereum Studymaster</StyledLink> program</li>
         <li>Grab some <StyledLink onClick={sendToGetGoerliEth}>Goerli ETH</StyledLink></li>
         <li>Familiarize yourself with <StyledLink onClick={sendToGoerliEtherscan}>etherscan</StyledLink> and <StyledLink onClick={sendToPyrmontBeaconchain}>beaconcha.in</StyledLink> </li>
       </ul>
