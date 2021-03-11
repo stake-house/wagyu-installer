@@ -7,10 +7,26 @@ import { Writable } from 'stream';
 // TODO: remove console.log
 
 // TODO: make this work for different operating systems
-const TERMINAL_COMMAND = "/usr/bin/gnome-terminal";
+const UBUNTU_TERMINAL_COMMAND = "/usr/bin/gnome-terminal";
+
+const executeCommandAsync = async (cmd: string): Promise<any> => {
+  console.log("running command async with: " + cmd);
+
+  return new Promise((resolve, reject) => {
+    const child = exec(cmd);
+
+    child.once('exit', function (code) {
+      resolve(code);
+    });
+    
+    child.on('error', function (err) {
+      reject(err);
+    });
+  });
+}
 
 const executeCommandInNewTerminal = (cmd: string): number => {
-  return executeCommandSync(TERMINAL_COMMAND + " -- bash -c '" + cmd + "'");
+  return executeCommandSync(UBUNTU_TERMINAL_COMMAND + " -- bash -c '" + cmd + "'");
 }
 
 const executeCommandSync = (cmd: string): number => {
@@ -29,11 +45,6 @@ const executeCommandSync = (cmd: string): number => {
     console.log(error.message);
     return error.status;
   }
-}
-
-//TODO: add error handling
-const getFileFullPath = (file: string): string => {
-  return executeCommandSyncReturnStdout("readlink -f " + file).trim();
 }
 
 const executeCommandSyncReturnStdout = (cmd: string): string => {
@@ -72,34 +83,6 @@ const executeCommandWithPromptsAsync = (cmd: string, args: string[], responses: 
   });
 }
 
-const executeCommandAsync = async (cmd: string): Promise<any> => {
-  console.log("running command async with: " + cmd);
-
-  return new Promise((resolve, reject) => {
-    const child = exec(cmd);
-
-    child.once('exit', function (code) {
-      resolve(code);
-    });
-    
-    child.on('error', function (err) {
-      reject(err);
-    });
-  });
-}
-
-const doesFileExist = (filename: string): boolean => {
-  const cmd = "test -f " + filename;
-  const result = executeCommandSync(cmd);
-  return result == 0;
-};
-
-const which = (tool: string): boolean => {
-  const cmd = "which " + tool;
-  const result = executeCommandSync(cmd);
-  return result == 0;
-}
-
 // TODO: using this sync wait to get the prompt responses to work properly is
 // probably not the best - come up with alternative solution
 const syncWait = (ms: number) => {
@@ -118,12 +101,9 @@ async function writeToWritable(writable: Writable, responses: string[]) {
 }
 
 export {
-  doesFileExist,
   executeCommandAsync,
   executeCommandInNewTerminal,
   executeCommandSync,
   executeCommandSyncReturnStdout,
   executeCommandWithPromptsAsync,
-  getFileFullPath,
-  which
 };

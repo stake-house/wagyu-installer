@@ -8,7 +8,7 @@ import { isRocketPoolInstalled, queryEth1Status } from "../commands/RocketPool";
 
 import Footer from "../components/Footer";
 import styled from "styled-components";
-import { which } from "../commands/ExecuteCommand";
+import { which } from "../commands/BashUtils";
 
 const Container = styled.div`
   display: flex;
