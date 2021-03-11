@@ -9,6 +9,7 @@ import { Writable } from 'stream';
 // TODO: make this work for different operating systems
 const UBUNTU_TERMINAL_COMMAND = "/usr/bin/gnome-terminal";
 
+
 const executeCommandAsync = async (cmd: string): Promise<any> => {
   console.log("running command async with: " + cmd);
 

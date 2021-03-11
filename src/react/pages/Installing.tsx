@@ -31,7 +31,6 @@ const LandingHeader = styled.div`
   flex-grow:1;
 `;
 
-
 const Content = styled.div`
   color: ${MainContent};
   margin-top: 20;
@@ -133,19 +132,11 @@ const Installing = ({ history }: {history: History}) => {
     setPassword(event.target.value);
   }
 
-  const installCallback = (success: boolean) => {
-    if (success) {
-      // redirect to status
-      console.log("install succeeded")
-      
-      // wait 5 seconds before redirecting to make sure everythings up
-      setTimeout(() => {
-        history.push('/status');
-      }, 5000);
-    } else {
-      console.log("install failed");
-      history.push("/installfailed");
-    }
+  const handleKeyPressed = (event: { keyCode: any; which: any; }) => {
+    var code = event.keyCode || event.which;
+    if(code === ENTER_KEYCODE) {
+        handleSubmitPassword();
+    } 
   }
 
   const handleSubmitPassword = () => {
@@ -160,11 +151,18 @@ const Installing = ({ history }: {history: History}) => {
     }, 2000);
   }
 
-  const handleKeyPressed = (event: { keyCode: any; which: any; }) => {
-    var code = event.keyCode || event.which;
-    if(code === ENTER_KEYCODE) {
-        handleSubmitPassword();
-    } 
+  const installCallback = (success: boolean) => {
+    if (success) {
+      console.log("install succeeded")
+      
+      // wait 5 seconds before redirecting to make sure everythings up
+      setTimeout(() => {
+        history.push('/status');
+      }, 5000);
+    } else {
+      console.log("install failed");
+      history.push("/installfailed");
+    }
   }
 
   return (

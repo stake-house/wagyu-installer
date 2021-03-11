@@ -6,8 +6,6 @@ import { Docker } from "node-docker-api";
 import fs from "fs";
 import yaml from "js-yaml";
 
-const docker = new Docker({ socketPath: '/var/run/docker.sock' });
-
 const ROCKET_POOL_EXECUTABLE = "~/bin/rocketpool";
 const ROCKET_POOL_DIR = "~/.rocketpool"
 const ROCKET_POOL_INSTALL_COMMAND = "curl -L https://github.com/rocket-pool/smartnode-install/releases/latest/download/rocketpool-cli-linux-amd64 --create-dirs -o " + ROCKET_POOL_EXECUTABLE + " && chmod +x " + ROCKET_POOL_EXECUTABLE;
@@ -22,6 +20,8 @@ const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.pe
 
 type Callback = (success: boolean) => void;
 type NodeStatusCallback = (status: number) => void;
+
+const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
 // TODO: make this better, it is pretty brittle and peeks into the RP settings implementation
 // this is required because we select the client at random, so we need to show the user what is running
