@@ -1,17 +1,17 @@
-import { doesFileExist, executeCommandAsync, executeCommandInNewTerminal, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync, getFileFullPath } from "./ExecuteCommand";
+import { doesFileExist, readlink } from "./BashUtils";
+import { executeCommandAsync, executeCommandInNewTerminal, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
 
 import { Container } from 'node-docker-api/lib/container';
 import { Docker } from "node-docker-api";
 import fs from "fs";
 import yaml from "js-yaml";
 
-const docker = new Docker({ socketPath: '/var/run/docker.sock' });
-
 const ROCKET_POOL_EXECUTABLE = "~/bin/rocketpool";
 const ROCKET_POOL_DIR = "~/.rocketpool"
 const ROCKET_POOL_INSTALL_COMMAND = "curl -L https://github.com/rocket-pool/smartnode-install/releases/latest/download/rocketpool-cli-linux-amd64 --create-dirs -o " + ROCKET_POOL_EXECUTABLE + " && chmod +x " + ROCKET_POOL_EXECUTABLE;
-const GETH_SYNC_STATUS_CMD = "docker exec rocketpool_eth1 geth --exec 'eth.syncing' attach ipc:ethclient/geth/geth.ipc";
-const GETH_PEERS_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.peers.length' attach ipc:ethclient/geth/geth.ipc";
+
+const GETH_SYNC_STATUS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'eth.syncing' attach ipc:ethclient/geth/geth.ipc";
+const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.peers.length' attach ipc:ethclient/geth/geth.ipc";
 
 // TODO: make an installer interface and implement it here, so we can easily extend
 // to utilize multiple different installers
@@ -21,9 +21,13 @@ const GETH_PEERS_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.peers.len
 type Callback = (success: boolean) => void;
 type NodeStatusCallback = (status: number) => void;
 
+const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+
+// TODO: make this better, it is pretty brittle and peeks into the RP settings implementation
+// this is required because we select the client at random, so we need to show the user what is running
 const getEth2ClientName = (): string => {
   try {
-    const rpSettings: any = yaml.load(fs.readFileSync(getFileFullPath(ROCKET_POOL_DIR + '/settings.yml'), 'utf8'));
+    const rpSettings: any = yaml.load(fs.readFileSync(readlink(ROCKET_POOL_DIR + '/settings.yml'), 'utf8'));
     const selectedClient = rpSettings["chains"]["eth2"]["client"]["selected"];
 
     return selectedClient;
@@ -31,12 +35,6 @@ const getEth2ClientName = (): string => {
     console.log(e);
     return "";
   }
-}
-
-console.log(getEth2ClientName());
-
-const isRocketPoolInstalled = (): boolean => {
-  return doesFileExist(ROCKET_POOL_EXECUTABLE)
 }
 
 const installAndStartRocketPool = async (password: string, callback: Callback) => {
@@ -48,7 +46,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
   }
 
   // For some reason executeCommandWithPromptsAsync needs the full path, so fetching it here
-  const rocketPoolExecutableFullPath = getFileFullPath(ROCKET_POOL_EXECUTABLE);
+  const rocketPoolExecutableFullPath = readlink(ROCKET_POOL_EXECUTABLE);
   console.log("full path");
   console.log(rocketPoolExecutableFullPath);
 
@@ -74,7 +72,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     return;
   }
 
-  // Just in case nodes were running - pick up new config.
+  // Just in case nodes were running - pick up new config (might happen anyway on start, not sure)
   const stopNodesRc = stopNodes();
   if (stopNodesRc != 0) {
     console.log("stop nodes failed");
@@ -90,12 +88,8 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
   callback(true);
 }
 
-const startNodes = (): number => {
-  return executeCommandSync(ROCKET_POOL_EXECUTABLE + " service start");
-}
-
-const stopNodes = (): number => {
-  return executeCommandSync(ROCKET_POOL_EXECUTABLE + " service stop -y");
+const isRocketPoolInstalled = (): boolean => {
+  return doesFileExist(ROCKET_POOL_EXECUTABLE)
 }
 
 const openEth1Logs = () => {
@@ -120,6 +114,37 @@ const openEth2ValidatorLogs = () => {
     console.log("failed to open eth2 validator logs");
     return;
   }
+}
+
+const startNodes = (): number => {
+  return executeCommandSync(ROCKET_POOL_EXECUTABLE + " service start");
+}
+
+const stopNodes = (): number => {
+  return executeCommandSync(ROCKET_POOL_EXECUTABLE + " service stop -y");
+}
+
+const queryEth1PeerCount = (): number => {
+  const numPeers = executeCommandSyncReturnStdout(GETH_PEERS_DOCKER_CMD);
+  const numPeersNumber = parseInt(numPeers.trim());
+  return isNaN(numPeersNumber) ? 0 : numPeersNumber;
+}
+
+const queryEth1Status = (nodeStatusCallback: NodeStatusCallback) => {
+  dockerContainerStatus("rocketpool_eth1", nodeStatusCallback);
+}
+
+const queryEth1Syncing = (): boolean => {
+  const syncValue = executeCommandSyncReturnStdout(GETH_SYNC_STATUS_DOCKER_CMD);
+  return !syncValue.includes("false");
+}
+
+const queryEth2BeaconStatus = (nodeStatusCallback: NodeStatusCallback) => {
+  dockerContainerStatus("rocketpool_eth2", nodeStatusCallback);
+}
+
+const queryEth2ValidatorStatus = (nodeStatusCallback: NodeStatusCallback) => {
+  dockerContainerStatus("rocketpool_validator", nodeStatusCallback);
 }
 
 // TODO: make this better - it is very fragile
@@ -147,33 +172,10 @@ const dockerContainerStatus = async (containerName: string, nodeStatusCallback: 
     })
 }
 
-const queryEth1Status = (nodeStatusCallback: NodeStatusCallback) => {
-  dockerContainerStatus("rocketpool_eth1", nodeStatusCallback);
-}
-
-const queryEth2BeaconStatus = (nodeStatusCallback: NodeStatusCallback) => {
-  dockerContainerStatus("rocketpool_eth2", nodeStatusCallback);
-}
-
-const queryEth2ValidatorStatus = (nodeStatusCallback: NodeStatusCallback) => {
-  dockerContainerStatus("rocketpool_validator", nodeStatusCallback);
-}
-
-const queryEth1Syncing = (): boolean => {
-  const syncValue = executeCommandSyncReturnStdout(GETH_SYNC_STATUS_CMD);
-  return !syncValue.includes("false");
-}
-
-const queryEth1PeerCount = (): number => {
-  const numPeers = executeCommandSyncReturnStdout(GETH_PEERS_CMD);
-  const numPeersNumber = parseInt(numPeers.trim());
-  return isNaN(numPeersNumber) ? 0 : numPeersNumber;
-}
-
 export {
   getEth2ClientName,
-  isRocketPoolInstalled,
   installAndStartRocketPool,
+  isRocketPoolInstalled,
   openEth1Logs,
   openEth2BeaconLogs,
   openEth2ValidatorLogs,

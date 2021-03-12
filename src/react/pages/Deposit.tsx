@@ -27,7 +27,6 @@ const LandingHeader = styled.div`
   flex-grow:1;
 `;
 
-
 const Content = styled.div`
   color: ${MainContent};
   margin-top: 20;

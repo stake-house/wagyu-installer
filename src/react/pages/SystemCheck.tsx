@@ -4,11 +4,11 @@ import {
   MainContent
 } from "../colors";
 import React, { useEffect, useState } from "react";
-import { isRocketPoolInstalled, queryEth1Status } from "../commands/RocketPool";
 
 import Footer from "../components/Footer";
+import { isRocketPoolInstalled } from "../commands/RocketPool";
 import styled from "styled-components";
-import { which } from "../commands/ExecuteCommand";
+import { which } from "../commands/BashUtils";
 
 const Container = styled.div`
   display: flex;
@@ -52,12 +52,10 @@ const ResultsTable = styled.table`
 const SystemCheck = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const [arbitraryTest, setArbitraryTest] = useState(false);
+  const [arbitraryTest, setArbitraryTest] = useState(true);
   const [curlInstalled, setCurlInstalled] = useState(false);
   const [rocketPoolInstalled, setRocketPoolInstalled] = useState(false);
   const [systemStatus, setSystemStatus] = useState(false);
-
-  const [eth1Status, setEth1Status] = useState(2);
 
   useEffect(() => {
     runSystemCheck();
