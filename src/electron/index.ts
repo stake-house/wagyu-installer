@@ -5,7 +5,7 @@ app.on("ready", () => {
   const window = new BrowserWindow({
     width: 900,
     height: 720,
-    icon: 'src/ethstaker_icon_1.png',
+    icon: 'src/images/ethstaker_icon_1.png',
 
     webPreferences: {
       nodeIntegration: true,
