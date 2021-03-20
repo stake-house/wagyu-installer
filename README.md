@@ -30,7 +30,12 @@ Stakehouse is a React app running in Electron and currently *only runs on Ubuntu
  - `yarn run build:watch` in one terminal - this continually watches and builds your ts code and puts it in `./dist`
  - `yarn start` in another terminal - this runs your app (the code in `./dist`)
 
-_If you make changes, save them and they will automatically build.  In order to get them to show in the app press `ctrl+r` or `cmd+r`_
+_If you make changes, save them and they will automatically build.  In order to get them to show in the app press `ctrl+r` or `cmd+r`_  
+
+NOTE: In Ubuntu 20.04 I had to install yarn using npm.  The following commands got it working.  
+  `sudo apt remove cmdtest yarn`  
+  `sudo apt install npm`  
+  `sudo npm install -g yarn`  
 
 ## Support
 Reach out to the EthStaker community:
