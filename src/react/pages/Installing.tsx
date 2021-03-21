@@ -10,7 +10,8 @@ import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 
 import { History } from "history";
-import { installAndStartRocketPool } from "../commands/RocketPool";
+import { installAndStartRocketPool, installCurl } from "../commands/RocketPool";
+import { which } from "../commands/BashUtils";
 
 const ENTER_KEYCODE = 13;
 
@@ -136,7 +137,7 @@ const Installing = ({ history }: {history: History}) => {
     var code = event.keyCode || event.which;
     if(code === ENTER_KEYCODE) {
         handleSubmitPassword();
-    } 
+    }
   }
 
   const handleSubmitPassword = () => {
@@ -145,16 +146,34 @@ const Installing = ({ history }: {history: History}) => {
 
     setInstallInProgress(true);
 
+    // install curl if not there
+    if (which("curl")) {
+      console.log("curl installed, continuing to RocketPool installation...");
+    } else {
+      console.log("curl not installed, installing that now...");
+      installCurl(password, curlInstallCallback);
+    }
+
     // Without this setTimeout, there was a pause before the screen would update saying Installing...
     setTimeout(() => {
       installAndStartRocketPool(password, installCallback);
     }, 2000);
   }
 
+  const curlInstallCallback = (success: boolean) => {
+    if (success) {
+      console.log("curl installed");
+      history.push("/installing");
+    } else {
+      console.log("curl install failed");
+      history.push("/installfailed");
+    }
+  }
+
   const installCallback = (success: boolean) => {
     if (success) {
       console.log("install succeeded")
-      
+
       // wait 5 seconds before redirecting to make sure everythings up
       setTimeout(() => {
         history.push('/status');

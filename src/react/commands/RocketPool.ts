@@ -37,6 +37,15 @@ const getEth2ClientName = (): string => {
   }
 }
 
+const installCurl = (password: string, callback: Callback) => {
+  const curlRc = executeCommandSync("echo " + password + " | sudo -S apt update -y && sudo -S apt install curl -y");
+  if (curlRc != 0) {
+    console.log("curl failed to install");
+    callback(false);
+    return;
+  }
+}
+
 const installAndStartRocketPool = async (password: string, callback: Callback) => {
   const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
   if (cliRc != 0) {
@@ -174,6 +183,7 @@ const dockerContainerStatus = async (containerName: string, nodeStatusCallback: 
 
 export {
   getEth2ClientName,
+  installCurl,
   installAndStartRocketPool,
   isRocketPoolInstalled,
   openEth1Logs,
