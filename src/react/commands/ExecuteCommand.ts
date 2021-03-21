@@ -19,7 +19,7 @@ const executeCommandAsync = async (cmd: string): Promise<any> => {
     child.once('exit', function (code) {
       resolve(code);
     });
-
+    
     child.on('error', function (err) {
       reject(err);
     });
@@ -36,7 +36,7 @@ const executeCommandSync = (cmd: string): number => {
   try {
     execSync(cmd);
     return 0;
-  }
+  } 
   catch (error) {
     // TODO: more robust error handling
     error.status;
@@ -53,7 +53,7 @@ const executeCommandSyncReturnStdout = (cmd: string): string => {
 
   try {
     return execSync(cmd).toString();
-  }
+  } 
   catch (error) {
     // TODO: more robust error handling
     error.status;
@@ -77,7 +77,7 @@ const executeCommandWithPromptsAsync = (cmd: string, args: string[], responses: 
     child.once('exit', function (code) {
       resolve(code);
     });
-
+    
     child.on('error', function (err) {
       reject(err);
     });
