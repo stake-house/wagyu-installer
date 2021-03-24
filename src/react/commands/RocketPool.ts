@@ -50,7 +50,13 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
   console.log("full path");
   console.log(rocketPoolExecutableFullPath);
 
-  const serviceRc = await executeCommandAsync("echo " + password + " | sudo -S " + rocketPoolExecutableFullPath + " --allow-root service install --yes --network pyrmont");
+  // const serviceRc = await executeCommandAsync("echo " + password + " | sudo -S " + rocketPoolExecutableFullPath + " --allow-root service install --yes --network pyrmont");
+  // if (serviceRc != 0) {
+  //   console.log("service install failed to install");
+  //   callback(false);
+  //   return;
+  // }
+  const serviceRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "install", "--yes", "--network", "pyrmont"], [password]);
   if (serviceRc != 0) {
     console.log("service install failed to install");
     callback(false);
