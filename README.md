@@ -51,10 +51,10 @@ Theres plenty left to do with Stakehouse.  If you'd like to help out, please giv
 | ----------- | -------- | ---- | ------- |
 | Audit/reprioritize TODOs below to reflect best path forward | High | Medium |  |
 | Migrate these TODOs to Github Issues | High | Medium |  |
-| MVP UX audit - suggest immediate changes | High | Small | Butta |
+| MVP UX audit - identify immediate improvements needed | High | Small | Butta |
 
 ### Engineering
-New Features
+__New Features__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
 | Bundling of executable for users to download and open app | High | Small | colfax |
@@ -75,7 +75,7 @@ New Features
 | TODOs in code | Various | Various | n/a |
 
 
-Cosmetic
+__Cosmetic__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
 | Improve install page/dynamic graphic.  Add more incremental statuses? | Medium | Small |  |
@@ -84,7 +84,7 @@ Cosmetic
 | Make status indicators flash/dynamic in some way | Medium | Small |  |
 
 
-Engineering
+__Engineering__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
 | General React audit by someone who is a more experienced React developer, including usage of child_process, error handling, etc | High | Medium |  |
