@@ -58,7 +58,7 @@ __New Features__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
 | Bundling of executable for users to download and open app | High | Small | colfax |
-| Check for Rocket Pool installation at load and redirect immediately to /status if installed | High | Small |  |
+| Check for Rocket Pool installation at load and redirect immediately to /status if installed | High | Small | Remy |
 | Improve status monitoring logic, add Eth2 beacon syncing status | High | Medium |  |
 | Eth2 Validator status - is it validating or not? Even if the validator is running | High | Small |  |
 | Support additional operating systems (depends on Rocket Pool support as well) | High | Large |  |
