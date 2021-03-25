@@ -38,6 +38,14 @@ const getEth2ClientName = (): string => {
 }
 
 const installAndStartRocketPool = async (password: string, callback: Callback) => {
+  // cache sudo credentials to be used for install later
+  const passwordRc = executeCommandSync("echo " + password + " | sudo -S true");
+  if (passwordRc != 0) {
+    console.log("password failed");
+    callback(false);
+    return;
+  }
+
   const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
   if (cliRc != 0) {
     console.log("cli failed to install");
@@ -51,7 +59,8 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
   console.log("full path");
   console.log(rocketPoolExecutableFullPath);
 
-  const serviceRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "install", "--yes", "--network", "pyrmont"], [password]);
+  const serviceRc = executeCommandSync(rocketPoolExecutableFullPath + " service install --yes --network pyrmont")
+  // const serviceRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "install", "--yes", "--network", "pyrmont"], [password]);
   if (serviceRc != 0) {
     console.log("service install failed");
     callback(false);
