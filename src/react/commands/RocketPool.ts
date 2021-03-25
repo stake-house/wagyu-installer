@@ -53,13 +53,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     return;
   }
 
-  // For some reason executeCommandWithPromptsAsync needs the full path, so fetching it here
-  // TODO: ^ this might have been because of the USER issue, installing as root, but might be fixed now
-  const rocketPoolExecutableFullPath = readlink(ROCKET_POOL_EXECUTABLE);
-  console.log("full path");
-  console.log(rocketPoolExecutableFullPath);
-
-  const serviceRc = executeCommandSync(rocketPoolExecutableFullPath + " service install --yes --network pyrmont")
+  const serviceRc = executeCommandSync(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont")
   // const serviceRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "install", "--yes", "--network", "pyrmont"], [password]);
   if (serviceRc != 0) {
     console.log("service install failed");
@@ -83,7 +77,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     "\n"   // graffiti
   ]
 
-  const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "config"], promptRepsonses);
+  const serviceConfigRc = await executeCommandWithPromptsAsync(ROCKET_POOL_EXECUTABLE, ["service", "config"], promptRepsonses);
   if (serviceConfigRc != 0) {
     console.log("service config failed");
     callback(false);
