@@ -35,6 +35,7 @@ const executeCommandSync = (cmd: string): number => {
 
   try {
     execSync(cmd);
+    syncWait(1000);
     return 0;
   } 
   catch (error) {

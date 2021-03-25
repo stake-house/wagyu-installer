@@ -7,6 +7,7 @@ import fs from "fs";
 import yaml from "js-yaml";
 
 const ROCKET_POOL_EXECUTABLE = "~/bin/rocketpool";
+const ROCKET_POOL = "rocketpool";
 const ROCKET_POOL_DIR = "~/.rocketpool"
 const ROCKET_POOL_INSTALL_COMMAND = "curl -L https://github.com/rocket-pool/smartnode-install/releases/latest/download/rocketpool-cli-linux-amd64 --create-dirs -o " + ROCKET_POOL_EXECUTABLE + " && chmod +x " + ROCKET_POOL_EXECUTABLE;
 
@@ -38,6 +39,20 @@ const getEth2ClientName = (): string => {
 }
 
 const installAndStartRocketPool = async (password: string, callback: Callback) => {
+  const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
+  if (cliRc != 0) {
+    console.log("cli failed to install");
+    callback(false);
+    return;
+  }
+
+  const sourceRc = executeCommandSync("source ~/.profile");
+  if (sourceRc != 0) {
+    console.log("source .profile failed");
+    callback(false);
+    return;
+  }
+
   // cache sudo credentials to be used for install later
   const passwordRc = executeCommandSync("echo " + password + " | sudo -S true");
   if (passwordRc != 0) {
@@ -46,14 +61,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     return;
   }
 
-  const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
-  if (cliRc != 0) {
-    console.log("cli failed to install");
-    callback(false);
-    return;
-  }
-
-  const serviceRc = executeCommandSync(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont")
+  const serviceRc = executeCommandSync(ROCKET_POOL + " service install --yes --network pyrmont")
   // const serviceRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "install", "--yes", "--network", "pyrmont"], [password]);
   if (serviceRc != 0) {
     console.log("service install failed");
@@ -77,7 +85,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     "\n"   // graffiti
   ]
 
-  const serviceConfigRc = await executeCommandWithPromptsAsync(ROCKET_POOL_EXECUTABLE, ["service", "config"], promptRepsonses);
+  const serviceConfigRc = await executeCommandWithPromptsAsync(ROCKET_POOL, ["service", "config"], promptRepsonses);
   if (serviceConfigRc != 0) {
     console.log("service config failed");
     callback(false);
