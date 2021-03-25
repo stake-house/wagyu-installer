@@ -46,7 +46,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     return;
   }
 
-  const sourceRc = executeCommandSync("source ~/.profile");
+  const sourceRc = executeCommandSync(". ~/.profile");
   if (sourceRc != 0) {
     console.log(". ~/.profile failed");
     callback(false);
