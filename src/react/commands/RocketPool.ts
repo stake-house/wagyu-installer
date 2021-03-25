@@ -41,7 +41,7 @@ const getEth2ClientName = (): string => {
 
 const installAndStartRocketPool = async (password: string, callback: Callback) => {
   // cache sudo credentials to be used for install later
-  const passwordRc = executeCommandSync("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'worked'");
+  const passwordRc = executeCommandSync("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'Authentication successful.'");
   if (passwordRc != 0) {
     console.log("password failed");
     callback(false);
@@ -56,7 +56,6 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
   }
 
   const serviceRc = executeCommandSync(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont")
-  // const serviceRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "install", "--yes", "--network", "pyrmont"], [password]);
   if (serviceRc != 0) {
     console.log("service install failed");
     callback(false);
@@ -71,7 +70,12 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     return;
   }
 
-  const promptRepsonses = [
+  // For some reason executeCommandWithPromptsAsync needs the full path, so fetching it here
+  const rocketPoolExecutableFullPath = readlink(ROCKET_POOL_EXECUTABLE);
+  console.log("full path");
+  console.log(rocketPoolExecutableFullPath);
+
+  const promptResponses = [
     "1\n", // which eth1 client? 1 geth, 2 infura, 3 custom
     "\n",  // ethstats label
     "\n",  // ethstats login
@@ -79,7 +83,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     "\n"   // graffiti
   ]
 
-  const serviceConfigRc = await executeCommandWithPromptsAsync(ROCKET_POOL_EXECUTABLE, ["service", "config"], promptRepsonses);
+  const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "config"], promptResponses);
   if (serviceConfigRc != 0) {
     console.log("service config failed");
     callback(false);
