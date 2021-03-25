@@ -6,6 +6,8 @@ import { Docker } from "node-docker-api";
 import fs from "fs";
 import yaml from "js-yaml";
 
+const ASKPASS_PATH = "src/scripts/askpass.sh";
+
 const ROCKET_POOL_EXECUTABLE = "~/bin/rocketpool";
 const ROCKET_POOL_DIR = "~/.rocketpool"
 const ROCKET_POOL_INSTALL_COMMAND = "curl -L https://github.com/rocket-pool/smartnode-install/releases/latest/download/rocketpool-cli-linux-amd64 --create-dirs -o " + ROCKET_POOL_EXECUTABLE + " && chmod +x " + ROCKET_POOL_EXECUTABLE;
@@ -38,17 +40,17 @@ const getEth2ClientName = (): string => {
 }
 
 const installAndStartRocketPool = async (password: string, callback: Callback) => {
-  const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
-  if (cliRc != 0) {
-    console.log("cli failed to install");
+  // cache sudo credentials to be used for install later
+  const passwordRc = executeCommandSync("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'worked'");
+  if (passwordRc != 0) {
+    console.log("password failed");
     callback(false);
     return;
   }
 
-  // cache sudo credentials to be used for install later
-  const passwordRc = executeCommandSync("echo " + password + " | sudo -S true");
-  if (passwordRc != 0) {
-    console.log("password failed");
+  const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
+  if (cliRc != 0) {
+    console.log("cli failed to install");
     callback(false);
     return;
   }

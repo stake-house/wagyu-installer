@@ -34,7 +34,7 @@ const executeCommandSync = (cmd: string): number => {
   console.log("running command sync with: " + cmd);
 
   try {
-    execSync(cmd);
+    execSync(cmd, {stdio: 'inherit'});
     syncWait(1000);
     return 0;
   } 
