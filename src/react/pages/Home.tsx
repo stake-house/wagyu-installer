@@ -9,7 +9,7 @@ import {
 
 import { Link, withRouter } from "react-router-dom";
 import React from "react";
-import { shell} from "electron";
+import { shell } from "electron";
 import styled from "styled-components";
 
 import { History } from "history";
