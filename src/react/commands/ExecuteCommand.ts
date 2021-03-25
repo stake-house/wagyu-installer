@@ -92,6 +92,7 @@ const syncWait = (ms: number) => {
 }
 
 async function writeToWritable(writable: Writable, responses: string[]) {
+  syncWait(1000);
   for (const response of responses) {
     console.log("writing '" + response + "'");
     await streamWrite(writable, response);

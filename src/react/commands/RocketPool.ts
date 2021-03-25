@@ -53,7 +53,15 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
 
   const serviceRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "install", "--yes", "--network", "pyrmont"], [password]);
   if (serviceRc != 0) {
-    console.log("service install failed to install");
+    console.log("service install failed");
+    callback(false);
+    return;
+  }
+
+  // set the docker group
+  const newgrpRc = executeCommandSync("newgrp docker");
+  if (newgrpRc != 0) {
+    console.log("newgrp failed");
     callback(false);
     return;
   }
