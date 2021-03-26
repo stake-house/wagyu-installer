@@ -99,7 +99,7 @@ const isRocketPoolInstalled = (): boolean => {
 }
 
 const openEth1Logs = () => {
-  const openEth1LogsRc = executeCommandInNewTerminal(ROCKET_POOL_EXECUTABLE + " service logs eth1");
+  const openEth1LogsRc = executeCommandInNewTerminal("sg docker '" + ROCKET_POOL_EXECUTABLE + " service logs eth1'");
   if (openEth1LogsRc != 0) {
     console.log("failed to open eth1 logs");
     return;
@@ -107,7 +107,7 @@ const openEth1Logs = () => {
 }
 
 const openEth2BeaconLogs = () => {
-  const openEth2BeaconLogsRc = executeCommandInNewTerminal(ROCKET_POOL_EXECUTABLE + " service logs eth2");
+  const openEth2BeaconLogsRc = executeCommandInNewTerminal("sg docker '" + ROCKET_POOL_EXECUTABLE + " service logs eth2'");
   if (openEth2BeaconLogsRc != 0) {
     console.log("failed to open eth2 beacon logs");
     return;
@@ -115,7 +115,7 @@ const openEth2BeaconLogs = () => {
 }
 
 const openEth2ValidatorLogs = () => {
-  const openEth2ValidatorLogsRc = executeCommandInNewTerminal(ROCKET_POOL_EXECUTABLE + " service logs validator");
+  const openEth2ValidatorLogsRc = executeCommandInNewTerminal("sg docker '" + ROCKET_POOL_EXECUTABLE + " service logs validator'");
   if (openEth2ValidatorLogsRc != 0) {
     console.log("failed to open eth2 validator logs");
     return;
