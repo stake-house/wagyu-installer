@@ -80,19 +80,20 @@ const LogsButton = styled.button`
 const NodeStatus: [string, string, string][] = [
   ["Online", "\u2B24", "green"],     // 0
   ["Syncing", "\u2B24", "yellow"],   // 1
-  ["Offline", "\u2B24", "red"]       // 2
+  ["Offline", "\u2B24", "red"],      // 2
+  ["Loading...", "", ""]                // 3
 ]
 
 // TODO: right after install, while nodes are starting up, this page says everything is "online"
 // while things are looking for peers.  Need to improve that logic.
 
 const Status = () => {
-  const [eth1ContainerStatus, setEth1ContainerStatus] = useState(2);
+  const [eth1ContainerStatus, setEth1ContainerStatus] = useState(3);
   const [eth1PeerCount, setEth1PeerCount] = useState(0);
   const [eth1Syncing, setEth1Syncing] = useState(false);
   const [eth2ClientName, setEth2ClientName] = useState("");
-  const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] = useState(2);
-  const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(2);
+  const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] = useState(3);
+  const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(3);
 
   useEffect(() => {
     setTimeout(() => {
@@ -121,7 +122,9 @@ const Status = () => {
   }
 
   const computeEth1Status = (): number => {
-    if (eth1ContainerStatus == 2) {
+    if (eth1ContainerStatus == 3) {
+      return 3;
+    } else if (eth1ContainerStatus == 2) {
       return 2;
     } else if (eth1Syncing) {
       return 1;
