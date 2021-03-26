@@ -103,7 +103,7 @@ const isRocketPoolInstalled = (): boolean => {
 }
 
 const openEth1Logs = () => {
-  const openEth1LogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth1"), "eth1 logs");
+  const openEth1LogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth1"), "eth1 (geth) logs");
   if (openEth1LogsRc != 0) {
     console.log("failed to open eth1 logs");
     return;
@@ -111,7 +111,7 @@ const openEth1Logs = () => {
 }
 
 const openEth2BeaconLogs = () => {
-  const openEth2BeaconLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth2"), "eth2 beacon node logs");
+  const openEth2BeaconLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth2"), "eth2 beacon node (" + getEth2ClientName() + ") logs");
   if (openEth2BeaconLogsRc != 0) {
     console.log("failed to open eth2 beacon logs");
     return;
@@ -119,7 +119,7 @@ const openEth2BeaconLogs = () => {
 }
 
 const openEth2ValidatorLogs = () => {
-  const openEth2ValidatorLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_validator"), "eth2 validator logs");
+  const openEth2ValidatorLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_validator"), "eth2 validator (" + getEth2ClientName() + ") logs");
   if (openEth2ValidatorLogsRc != 0) {
     console.log("failed to open eth2 validator logs");
     return;
