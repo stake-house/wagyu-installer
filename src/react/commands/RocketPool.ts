@@ -21,6 +21,10 @@ const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.pe
 type Callback = (success: boolean) => void;
 type NodeStatusCallback = (status: number) => void;
 
+const wrapCommandInDockerGroup = (command: string) => {
+  return "sg docker '" + command + "'";
+}
+
 // TODO: make this better, it is pretty brittle and peeks into the RP settings implementation
 // this is required because we select the client at random, so we need to show the user what is running
 const getEth2ClientName = (): string => {
@@ -99,7 +103,7 @@ const isRocketPoolInstalled = (): boolean => {
 }
 
 const openEth1Logs = () => {
-  const openEth1LogsRc = executeCommandInNewTerminal("sg docker '" + ROCKET_POOL_EXECUTABLE + " service logs eth1'");
+  const openEth1LogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth1"));
   if (openEth1LogsRc != 0) {
     console.log("failed to open eth1 logs");
     return;
@@ -107,7 +111,7 @@ const openEth1Logs = () => {
 }
 
 const openEth2BeaconLogs = () => {
-  const openEth2BeaconLogsRc = executeCommandInNewTerminal("sg docker '" + ROCKET_POOL_EXECUTABLE + " service logs eth2'");
+  const openEth2BeaconLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth2"));
   if (openEth2BeaconLogsRc != 0) {
     console.log("failed to open eth2 beacon logs");
     return;
@@ -115,7 +119,7 @@ const openEth2BeaconLogs = () => {
 }
 
 const openEth2ValidatorLogs = () => {
-  const openEth2ValidatorLogsRc = executeCommandInNewTerminal("sg docker '" + ROCKET_POOL_EXECUTABLE + " service logs validator'");
+  const openEth2ValidatorLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_validator"));
   if (openEth2ValidatorLogsRc != 0) {
     console.log("failed to open eth2 validator logs");
     return;
@@ -123,11 +127,11 @@ const openEth2ValidatorLogs = () => {
 }
 
 const startNodes = (): number => {
-  return executeCommandSync("sg docker '" + ROCKET_POOL_EXECUTABLE + " service start'");
+  return executeCommandSync(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service start"));
 }
 
 const stopNodes = (): number => {
-  return executeCommandSync("sg docker '" + ROCKET_POOL_EXECUTABLE + " service stop -y'");
+  return executeCommandSync(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service stop -y"));
 }
 
 const queryEth1PeerCount = (): number => {
@@ -155,7 +159,7 @@ const queryEth2ValidatorStatus = (nodeStatusCallback: NodeStatusCallback) => {
 
 // TODO: make this better - it is very fragile
 const dockerContainerStatus = async (containerName: string, nodeStatusCallback: NodeStatusCallback) => {
-  const containerId = executeCommandSyncReturnStdout("sg docker 'docker ps -q -f name=" + containerName + "'");
+  const containerId = executeCommandSyncReturnStdout(wrapCommandInDockerGroup("docker ps -q -f name=" + containerName));
 
   if (containerId.trim()) {
     nodeStatusCallback(0); // online
