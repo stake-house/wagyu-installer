@@ -95,9 +95,11 @@ const Status = () => {
   const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(2);
 
   useEffect(() => {
-    queryStatuses();
-    setEth2ClientName(getEth2ClientName());
-    setInterval(queryStatuses, 5000);
+    setTimeout(() => {
+      queryStatuses();
+      setEth2ClientName(getEth2ClientName());
+      setInterval(queryStatuses, 5000);
+    }, 500)
   }, []);
 
   const queryStatuses = () => {
