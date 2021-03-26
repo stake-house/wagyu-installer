@@ -1,8 +1,6 @@
 import { doesFileExist, readlink } from "./BashUtils";
-import { executeCommandAsync, executeCommandInNewTerminal, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
+import { executeCommandInNewTerminal, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
 
-import { Container } from 'node-docker-api/lib/container';
-import { Docker } from "node-docker-api";
 import fs from "fs";
 import yaml from "js-yaml";
 
@@ -22,8 +20,6 @@ const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.pe
 
 type Callback = (success: boolean) => void;
 type NodeStatusCallback = (status: number) => void;
-
-const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 
 // TODO: make this better, it is pretty brittle and peeks into the RP settings implementation
 // this is required because we select the client at random, so we need to show the user what is running
@@ -58,20 +54,6 @@ const installAndStartRocketPool = async (callback: Callback) => {
   const serviceRc = executeCommandSync(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont")
   if (serviceRc != 0) {
     console.log("service install failed");
-    callback(false);
-    return;
-  }
-
-  // set the docker group
-  // const newgrpRc = executeCommandSync("newgrp docker");
-  // if (newgrpRc != 0) {
-  //   console.log("newgrp failed");
-  //   callback(false);
-  //   return;
-  // }
-  const suRc = executeCommandSync("su - $USER");
-  if (suRc != 0) {
-    console.log("su - $USER failed");
     callback(false);
     return;
   }
@@ -141,11 +123,11 @@ const openEth2ValidatorLogs = () => {
 }
 
 const startNodes = (): number => {
-  return executeCommandSync(ROCKET_POOL_EXECUTABLE + " service start");
+  return executeCommandSync("sg docker '" + ROCKET_POOL_EXECUTABLE + " service start'");
 }
 
 const stopNodes = (): number => {
-  return executeCommandSync(ROCKET_POOL_EXECUTABLE + " service stop -y");
+  return executeCommandSync("sg docker '" + ROCKET_POOL_EXECUTABLE + " service stop -y'");
 }
 
 const queryEth1PeerCount = (): number => {
@@ -173,27 +155,13 @@ const queryEth2ValidatorStatus = (nodeStatusCallback: NodeStatusCallback) => {
 
 // TODO: make this better - it is very fragile
 const dockerContainerStatus = async (containerName: string, nodeStatusCallback: NodeStatusCallback) => {
-  docker.container.list().then(
-    (containers: Container[]) => {
-      const filteredContainers = containers.filter((container => {
-        const data: any = container.data;
-        return data["Names"][0].includes(containerName);
-      }))
+  const containerId = executeCommandSyncReturnStdout("sg docker 'docker ps -q -f name=" + containerName + "'");
 
-      if (filteredContainers.length == 0) {
-        nodeStatusCallback(2); // offline
-      } else {
-        const containerData: any = filteredContainers[0].data;
-        const containerState: string = containerData["State"];
-        if (containerState.includes("running")) {
-          nodeStatusCallback(0); // online
-        } else {
-          nodeStatusCallback(2); // offline
-        }
-      }
-    }).catch(() => {
-      nodeStatusCallback(2); // offline
-    })
+  if (containerId.trim()) {
+    nodeStatusCallback(0); // online
+  } else {
+    nodeStatusCallback(2); // offline
+  }
 }
 
 export {
