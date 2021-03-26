@@ -35,7 +35,6 @@ const executeCommandSync = (cmd: string): number => {
 
   try {
     execSync(cmd, {stdio: 'inherit'});
-    syncWait(1000);
     return 0;
   } 
   catch (error) {
