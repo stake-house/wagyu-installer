@@ -1,10 +1,10 @@
 import { doesFileExist, readlink } from "./BashUtils";
-import { executeCommandAsync, executeCommandInNewTerminal, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
+import { executeCommandInNewTerminal, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
 
-import { Container } from 'node-docker-api/lib/container';
-import { Docker } from "node-docker-api";
 import fs from "fs";
 import yaml from "js-yaml";
+
+const ASKPASS_PATH = "src/scripts/askpass.sh";
 
 const ROCKET_POOL_EXECUTABLE = "~/bin/rocketpool";
 const ROCKET_POOL_DIR = "~/.rocketpool"
@@ -21,7 +21,9 @@ const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.pe
 type Callback = (success: boolean) => void;
 type NodeStatusCallback = (status: number) => void;
 
-const docker = new Docker({ socketPath: '/var/run/docker.sock' });
+const wrapCommandInDockerGroup = (command: string) => {
+  return "sg docker \"" + command + "\"";
+}
 
 // TODO: make this better, it is pretty brittle and peeks into the RP settings implementation
 // this is required because we select the client at random, so we need to show the user what is running
@@ -37,10 +39,25 @@ const getEth2ClientName = (): string => {
   }
 }
 
-const installAndStartRocketPool = async (password: string, callback: Callback) => {
+const installAndStartRocketPool = async (callback: Callback) => {
+  // cache sudo credentials to be used for install later
+  const passwordRc = executeCommandSync("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'Authentication successful.'");
+  if (passwordRc != 0) {
+    console.log("password failed");
+    callback(false);
+    return;
+  }
+
   const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
   if (cliRc != 0) {
     console.log("cli failed to install");
+    callback(false);
+    return;
+  }
+
+  const serviceRc = executeCommandSync(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont")
+  if (serviceRc != 0) {
+    console.log("service install failed");
     callback(false);
     return;
   }
@@ -50,14 +67,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
   console.log("full path");
   console.log(rocketPoolExecutableFullPath);
 
-  const serviceRc = await executeCommandAsync("echo " + password + " | sudo -S " + rocketPoolExecutableFullPath + " --allow-root service install --yes --network pyrmont");
-  if (serviceRc != 0) {
-    console.log("service install failed to install");
-    callback(false);
-    return;
-  }
-
-  const promptRepsonses = [
+  const promptResponses = [
     "1\n", // which eth1 client? 1 geth, 2 infura, 3 custom
     "\n",  // ethstats label
     "\n",  // ethstats login
@@ -65,7 +75,7 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
     "\n"   // graffiti
   ]
 
-  const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "config"], promptRepsonses);
+  const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "config"], promptResponses);
   if (serviceConfigRc != 0) {
     console.log("service config failed");
     callback(false);
@@ -93,7 +103,7 @@ const isRocketPoolInstalled = (): boolean => {
 }
 
 const openEth1Logs = () => {
-  const openEth1LogsRc = executeCommandInNewTerminal(ROCKET_POOL_EXECUTABLE + " service logs eth1");
+  const openEth1LogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth1"), "eth1 (geth) logs");
   if (openEth1LogsRc != 0) {
     console.log("failed to open eth1 logs");
     return;
@@ -101,7 +111,7 @@ const openEth1Logs = () => {
 }
 
 const openEth2BeaconLogs = () => {
-  const openEth2BeaconLogsRc = executeCommandInNewTerminal(ROCKET_POOL_EXECUTABLE + " service logs eth2");
+  const openEth2BeaconLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth2"), "eth2 beacon node (" + getEth2ClientName() + ") logs");
   if (openEth2BeaconLogsRc != 0) {
     console.log("failed to open eth2 beacon logs");
     return;
@@ -109,7 +119,7 @@ const openEth2BeaconLogs = () => {
 }
 
 const openEth2ValidatorLogs = () => {
-  const openEth2ValidatorLogsRc = executeCommandInNewTerminal(ROCKET_POOL_EXECUTABLE + " service logs validator");
+  const openEth2ValidatorLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_validator"), "eth2 validator (" + getEth2ClientName() + ") logs");
   if (openEth2ValidatorLogsRc != 0) {
     console.log("failed to open eth2 validator logs");
     return;
@@ -117,15 +127,15 @@ const openEth2ValidatorLogs = () => {
 }
 
 const startNodes = (): number => {
-  return executeCommandSync(ROCKET_POOL_EXECUTABLE + " service start");
+  return executeCommandSync(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service start"));
 }
 
 const stopNodes = (): number => {
-  return executeCommandSync(ROCKET_POOL_EXECUTABLE + " service stop -y");
+  return executeCommandSync(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service stop -y"));
 }
 
 const queryEth1PeerCount = (): number => {
-  const numPeers = executeCommandSyncReturnStdout(GETH_PEERS_DOCKER_CMD);
+  const numPeers = executeCommandSyncReturnStdout(wrapCommandInDockerGroup(GETH_PEERS_DOCKER_CMD));
   const numPeersNumber = parseInt(numPeers.trim());
   return isNaN(numPeersNumber) ? 0 : numPeersNumber;
 }
@@ -135,7 +145,7 @@ const queryEth1Status = (nodeStatusCallback: NodeStatusCallback) => {
 }
 
 const queryEth1Syncing = (): boolean => {
-  const syncValue = executeCommandSyncReturnStdout(GETH_SYNC_STATUS_DOCKER_CMD);
+  const syncValue = executeCommandSyncReturnStdout(wrapCommandInDockerGroup(GETH_SYNC_STATUS_DOCKER_CMD));
   return !syncValue.includes("false");
 }
 
@@ -147,29 +157,14 @@ const queryEth2ValidatorStatus = (nodeStatusCallback: NodeStatusCallback) => {
   dockerContainerStatus("rocketpool_validator", nodeStatusCallback);
 }
 
-// TODO: make this better - it is very fragile
 const dockerContainerStatus = async (containerName: string, nodeStatusCallback: NodeStatusCallback) => {
-  docker.container.list().then(
-    (containers: Container[]) => {
-      const filteredContainers = containers.filter((container => {
-        const data: any = container.data;
-        return data["Names"][0].includes(containerName);
-      }))
+  const containerId = executeCommandSyncReturnStdout(wrapCommandInDockerGroup("docker ps -q -f name=" + containerName));
 
-      if (filteredContainers.length == 0) {
-        nodeStatusCallback(2); // offline
-      } else {
-        const containerData: any = filteredContainers[0].data;
-        const containerState: string = containerData["State"];
-        if (containerState.includes("running")) {
-          nodeStatusCallback(0); // online
-        } else {
-          nodeStatusCallback(2); // offline
-        }
-      }
-    }).catch(() => {
-      nodeStatusCallback(2); // offline
-    })
+  if (containerId.trim()) {
+    nodeStatusCallback(0); // online
+  } else {
+    nodeStatusCallback(2); // offline
+  }
 }
 
 export {

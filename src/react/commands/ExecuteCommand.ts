@@ -26,15 +26,15 @@ const executeCommandAsync = async (cmd: string): Promise<any> => {
   });
 }
 
-const executeCommandInNewTerminal = (cmd: string): number => {
-  return executeCommandSync(UBUNTU_TERMINAL_COMMAND + " -- bash -c '" + cmd + "'");
+const executeCommandInNewTerminal = (cmd: string, title: string): number => {
+  return executeCommandSync(UBUNTU_TERMINAL_COMMAND + " --title=\"" + title + "\" -- bash -c '" + cmd + "'");
 }
 
 const executeCommandSync = (cmd: string): number => {
   console.log("running command sync with: " + cmd);
 
   try {
-    execSync(cmd);
+    execSync(cmd, {stdio: 'inherit'});
     return 0;
   } 
   catch (error) {
@@ -92,6 +92,7 @@ const syncWait = (ms: number) => {
 }
 
 async function writeToWritable(writable: Writable, responses: string[]) {
+  syncWait(1000);
   for (const response of responses) {
     console.log("writing '" + response + "'");
     await streamWrite(writable, response);

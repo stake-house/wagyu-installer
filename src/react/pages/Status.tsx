@@ -80,24 +80,27 @@ const LogsButton = styled.button`
 const NodeStatus: [string, string, string][] = [
   ["Online", "\u2B24", "green"],     // 0
   ["Syncing", "\u2B24", "yellow"],   // 1
-  ["Offline", "\u2B24", "red"]       // 2
+  ["Offline", "\u2B24", "red"],      // 2
+  ["Loading...", "", ""]             // 3
 ]
 
 // TODO: right after install, while nodes are starting up, this page says everything is "online"
 // while things are looking for peers.  Need to improve that logic.
 
 const Status = () => {
-  const [eth1ContainerStatus, setEth1ContainerStatus] = useState(2);
+  const [eth1ContainerStatus, setEth1ContainerStatus] = useState(3);
   const [eth1PeerCount, setEth1PeerCount] = useState(0);
   const [eth1Syncing, setEth1Syncing] = useState(false);
   const [eth2ClientName, setEth2ClientName] = useState("");
-  const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] = useState(2);
-  const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(2);
+  const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] = useState(3);
+  const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(3);
 
   useEffect(() => {
-    queryStatuses();
-    setEth2ClientName(getEth2ClientName());
-    setInterval(queryStatuses, 5000);
+    setTimeout(() => {
+      queryStatuses();
+      setEth2ClientName(getEth2ClientName());
+      setInterval(queryStatuses, 5000);
+    }, 500)
   }, []);
 
   const queryStatuses = () => {
@@ -119,7 +122,9 @@ const Status = () => {
   }
 
   const computeEth1Status = (): number => {
-    if (eth1ContainerStatus == 2) {
+    if (eth1ContainerStatus == 3) {
+      return 3;
+    } else if (eth1ContainerStatus == 2) {
       return 2;
     } else if (eth1Syncing) {
       return 1;
@@ -149,19 +154,19 @@ const Status = () => {
         </thead>
         <tbody>
           <tr>
-            <td>Eth1 Node</td>
+            <td>Eth1 Node - geth</td>
             <td>{formatStatusIcon(computeEth1Status())} {NodeStatus[computeEth1Status()][0]}</td>
             <td>{eth1PeerCount}</td>
             <td><LogsButton onClick={openEth1Logs} disabled={eth1ContainerStatus == 2}>View Logs</LogsButton></td>
           </tr>
           <tr>
-            <td>Eth2 Beacon Node</td>
+            <td>Eth2 Beacon Node - {eth2ClientName}</td>
             <td>{formatStatusIcon(computeEth2BeaconStatus())} {NodeStatus[computeEth2BeaconStatus()][0]}</td>
             <td>-</td>
             <td><LogsButton onClick={openEth2BeaconLogs} disabled={eth2BeaconContainerStatus == 2}>View Logs</LogsButton></td>
           </tr>
           <tr>
-            <td>Eth2 Validator</td>
+            <td>Eth2 Validator - {eth2ClientName}</td>
             <td>{formatStatusIcon(computeEth2ValidatorStatus())} {NodeStatus[computeEth2ValidatorStatus()][0]}</td>
             <td>-</td>
             <td><LogsButton onClick={openEth2ValidatorLogs} disabled={eth2ValidatorContainerStatus == 2}>View Logs</LogsButton></td>
@@ -230,8 +235,6 @@ const Status = () => {
     return(
       <Content>
         { renderNodeStatusTable() }
-        <br />
-        Eth2 client: {eth2ClientName}
         <br />
         <br />
         *Note: "Syncing" state is only supported for Eth1.  Eth1 Beacon/Validator statuses are set based on docker status.
