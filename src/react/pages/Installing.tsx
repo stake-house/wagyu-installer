@@ -61,7 +61,9 @@ const LoadingSpinner = styled.div`
 const Installing = ({ history }: {history: History}) => {
 
   useEffect(() => {
-    installAndStartRocketPool(installCallback);
+    setTimeout(() => {
+      installAndStartRocketPool(installCallback);
+    }, 1000);
   }, [])
 
   const installCallback = (success: boolean) => {
@@ -85,7 +87,7 @@ const Installing = ({ history }: {history: History}) => {
           Installing...
           <br />
           <br />
-          May take up to 2 minutes.
+          May take 2-4 minutes depending on internet speed.
           <SpinnerContainer>
             <LoadingSpinner />
           </SpinnerContainer>

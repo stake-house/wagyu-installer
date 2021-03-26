@@ -149,7 +149,7 @@ const Status = () => {
         </thead>
         <tbody>
           <tr>
-            <td>Eth1 Node - Geth</td>
+            <td>Eth1 Node - geth</td>
             <td>{formatStatusIcon(computeEth1Status())} {NodeStatus[computeEth1Status()][0]}</td>
             <td>{eth1PeerCount}</td>
             <td><LogsButton onClick={openEth1Logs} disabled={eth1ContainerStatus == 2}>View Logs</LogsButton></td>
