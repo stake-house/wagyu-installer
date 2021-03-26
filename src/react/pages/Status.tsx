@@ -149,19 +149,19 @@ const Status = () => {
         </thead>
         <tbody>
           <tr>
-            <td>Eth1 Node</td>
+            <td>Eth1 Node - Geth</td>
             <td>{formatStatusIcon(computeEth1Status())} {NodeStatus[computeEth1Status()][0]}</td>
             <td>{eth1PeerCount}</td>
             <td><LogsButton onClick={openEth1Logs} disabled={eth1ContainerStatus == 2}>View Logs</LogsButton></td>
           </tr>
           <tr>
-            <td>Eth2 Beacon Node</td>
+            <td>Eth2 Beacon Node - {eth2ClientName}</td>
             <td>{formatStatusIcon(computeEth2BeaconStatus())} {NodeStatus[computeEth2BeaconStatus()][0]}</td>
             <td>-</td>
             <td><LogsButton onClick={openEth2BeaconLogs} disabled={eth2BeaconContainerStatus == 2}>View Logs</LogsButton></td>
           </tr>
           <tr>
-            <td>Eth2 Validator</td>
+            <td>Eth2 Validator - {eth2ClientName}</td>
             <td>{formatStatusIcon(computeEth2ValidatorStatus())} {NodeStatus[computeEth2ValidatorStatus()][0]}</td>
             <td>-</td>
             <td><LogsButton onClick={openEth2ValidatorLogs} disabled={eth2ValidatorContainerStatus == 2}>View Logs</LogsButton></td>
@@ -230,8 +230,6 @@ const Status = () => {
     return(
       <Content>
         { renderNodeStatusTable() }
-        <br />
-        Eth2 client: {eth2ClientName}
         <br />
         <br />
         *Note: "Syncing" state is only supported for Eth1.  Eth1 Beacon/Validator statuses are set based on docker status.

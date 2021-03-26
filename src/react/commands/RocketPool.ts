@@ -22,7 +22,7 @@ type Callback = (success: boolean) => void;
 type NodeStatusCallback = (status: number) => void;
 
 const wrapCommandInDockerGroup = (command: string) => {
-  return "sg docker '" + command + "'";
+  return "sg docker \"" + command + "\"";
 }
 
 // TODO: make this better, it is pretty brittle and peeks into the RP settings implementation
@@ -103,7 +103,7 @@ const isRocketPoolInstalled = (): boolean => {
 }
 
 const openEth1Logs = () => {
-  const openEth1LogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth1"));
+  const openEth1LogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth1"), "eth1 logs");
   if (openEth1LogsRc != 0) {
     console.log("failed to open eth1 logs");
     return;
@@ -111,7 +111,7 @@ const openEth1Logs = () => {
 }
 
 const openEth2BeaconLogs = () => {
-  const openEth2BeaconLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth2"));
+  const openEth2BeaconLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_eth2"), "eth2 beacon node logs");
   if (openEth2BeaconLogsRc != 0) {
     console.log("failed to open eth2 beacon logs");
     return;
@@ -119,7 +119,7 @@ const openEth2BeaconLogs = () => {
 }
 
 const openEth2ValidatorLogs = () => {
-  const openEth2ValidatorLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_validator"));
+  const openEth2ValidatorLogsRc = executeCommandInNewTerminal(wrapCommandInDockerGroup("docker container logs -f rocketpool_validator"), "eth2 validator logs");
   if (openEth2ValidatorLogsRc != 0) {
     console.log("failed to open eth2 validator logs");
     return;
@@ -135,7 +135,7 @@ const stopNodes = (): number => {
 }
 
 const queryEth1PeerCount = (): number => {
-  const numPeers = executeCommandSyncReturnStdout(GETH_PEERS_DOCKER_CMD);
+  const numPeers = executeCommandSyncReturnStdout(wrapCommandInDockerGroup(GETH_PEERS_DOCKER_CMD));
   const numPeersNumber = parseInt(numPeers.trim());
   return isNaN(numPeersNumber) ? 0 : numPeersNumber;
 }
@@ -145,7 +145,7 @@ const queryEth1Status = (nodeStatusCallback: NodeStatusCallback) => {
 }
 
 const queryEth1Syncing = (): boolean => {
-  const syncValue = executeCommandSyncReturnStdout(GETH_SYNC_STATUS_DOCKER_CMD);
+  const syncValue = executeCommandSyncReturnStdout(wrapCommandInDockerGroup(GETH_SYNC_STATUS_DOCKER_CMD));
   return !syncValue.includes("false");
 }
 

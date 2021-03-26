@@ -26,8 +26,8 @@ const executeCommandAsync = async (cmd: string): Promise<any> => {
   });
 }
 
-const executeCommandInNewTerminal = (cmd: string): number => {
-  return executeCommandSync(UBUNTU_TERMINAL_COMMAND + " -- bash -c '" + cmd + "'");
+const executeCommandInNewTerminal = (cmd: string, title: string): number => {
+  return executeCommandSync(UBUNTU_TERMINAL_COMMAND + " --title=" + title + " -- bash -c '" + cmd + "'");
 }
 
 const executeCommandSync = (cmd: string): number => {
