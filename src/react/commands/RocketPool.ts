@@ -157,7 +157,6 @@ const queryEth2ValidatorStatus = (nodeStatusCallback: NodeStatusCallback) => {
   dockerContainerStatus("rocketpool_validator", nodeStatusCallback);
 }
 
-// TODO: make this better - it is very fragile
 const dockerContainerStatus = async (containerName: string, nodeStatusCallback: NodeStatusCallback) => {
   const containerId = executeCommandSyncReturnStdout(wrapCommandInDockerGroup("docker ps -q -f name=" + containerName));
 

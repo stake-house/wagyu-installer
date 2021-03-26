@@ -81,7 +81,7 @@ const NodeStatus: [string, string, string][] = [
   ["Online", "\u2B24", "green"],     // 0
   ["Syncing", "\u2B24", "yellow"],   // 1
   ["Offline", "\u2B24", "red"],      // 2
-  ["Loading...", "", ""]                // 3
+  ["Loading...", "", ""]             // 3
 ]
 
 // TODO: right after install, while nodes are starting up, this page says everything is "online"
