@@ -63,9 +63,15 @@ const installAndStartRocketPool = async (password: string, callback: Callback) =
   }
 
   // set the docker group
-  const newgrpRc = executeCommandSync("newgrp docker");
-  if (newgrpRc != 0) {
-    console.log("newgrp failed");
+  // const newgrpRc = executeCommandSync("newgrp docker");
+  // if (newgrpRc != 0) {
+  //   console.log("newgrp failed");
+  //   callback(false);
+  //   return;
+  // }
+  const suRc = executeCommandSync("su - $USER");
+  if (suRc != 0) {
+    console.log("su - $USER failed");
     callback(false);
     return;
   }
