@@ -39,7 +39,7 @@ const getEth2ClientName = (): string => {
   }
 }
 
-const installAndStartRocketPool = async (password: string, callback: Callback) => {
+const installAndStartRocketPool = async (callback: Callback) => {
   // cache sudo credentials to be used for install later
   const passwordRc = executeCommandSync("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'Authentication successful.'");
   if (passwordRc != 0) {

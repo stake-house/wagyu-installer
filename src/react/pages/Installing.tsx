@@ -6,7 +6,7 @@ import {
   MainContent
 } from "../colors";
 import { Link, withRouter } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
 import { History } from "history";
@@ -38,10 +38,6 @@ const Content = styled.div`
   flex-grow: 6;
 `;
 
-const StyledInput = styled.input`
-  width: 100px;
-`;
-
 const rotate = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -62,94 +58,11 @@ const LoadingSpinner = styled.div`
   animation: ${rotate} 2s linear infinite;
 `;
 
-const FooterContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  align-self: flex-end;
-  height: 70;
-  flex-grow:1;
-  min-width:100vw;
-`;
-
-const InputContainer = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-`;
-
-const ContinueButton = styled.div`
-  color: ${Black};
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  align-self:flex-end;
-  height: 24;
-  background-color: ${Button};
-  padding: 16 24;
-  border-radius: 10%;
-  text-decoration: none;
-
-  transition: 250ms background-color ease;
-  cursor: pointer;
-  margin: 60;
-
-  &:hover {
-    background-color: ${ButtonHover};
-  }
-`;
-
-const StyledButton = styled(Link)`
-  color: ${Black};
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  align-self:flex-end;
-  height: 24;
-  background-color: ${Button};
-  padding: 16 24;
-  border-radius: 10%;
-  text-decoration: none;
-
-  transition: 250ms background-color ease;
-  cursor: pointer;
-  margin: 60;
-
-  &:hover {
-    background-color: ${ButtonHover};
-  }
-`;
-
 const Installing = ({ history }: {history: History}) => {
-  const [password, setPassword] = useState("");
-  const [installInProgress, setInstallInProgress] = useState(false);
 
-  const handleChangePassword = (event: { target: { value: React.SetStateAction<string>; }; }) => {
-    setPassword(event.target.value);
-  }
-
-  const handleKeyPressed = (event: { keyCode: any; which: any; }) => {
-    var code = event.keyCode || event.which;
-    if(code === ENTER_KEYCODE) {
-        handleSubmitPassword();
-    } 
-  }
-
-  const handleSubmitPassword = () => {
-    // TODO: handle wrong password
-    // TODO: handle empty password
-
-    setInstallInProgress(true);
-
-    // Without this setTimeout, there was a pause before the screen would update saying Installing...
-    setTimeout(() => {
-      installAndStartRocketPool(password, installCallback);
-    }, 2000);
-  }
+  useEffect(() => {
+    installAndStartRocketPool(installCallback);
+  }, [])
 
   const installCallback = (success: boolean) => {
     if (success) {
@@ -168,8 +81,6 @@ const Installing = ({ history }: {history: History}) => {
   return (
     <Container>
       <LandingHeader>Install</LandingHeader>
-
-      { installInProgress ?
         <Content>
           Installing...
           <br />
@@ -178,26 +89,7 @@ const Installing = ({ history }: {history: History}) => {
           <SpinnerContainer>
             <LoadingSpinner />
           </SpinnerContainer>
-        </Content> :
-        <Content>
-          In order to download the necessary software, we must have admin access to your computer.
-          <br />
-          <br />
-          Please enter you computer login password* below.  Don't worry, we'll keep it safe.
-          <br />
-          <br />
-          <InputContainer>
-            <StyledInput type="password" value={password} onChange={handleChangePassword} onKeyPress={handleKeyPressed} />
-          </InputContainer>
-          <br />
-          <br />
-          *Note: at this stage we cannot handle password retries, so please get it right ;)
         </Content>
-      }
-      <FooterContainer>
-        <StyledButton to="/systemcheck">Back</StyledButton>
-        <ContinueButton onClick={handleSubmitPassword}>Continue</ContinueButton>
-      </FooterContainer>
     </Container>
   )
 }
