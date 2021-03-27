@@ -7,14 +7,10 @@ import {
   Red
 } from "../colors";
 
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 import React from "react";
 import { shell } from "electron";
 import styled from "styled-components";
-
-import { History } from "history";
-
-import { isRocketPoolInstalled } from "../commands/RocketPool";
 
 const Container = styled.div`
   display: flex;
@@ -68,15 +64,13 @@ const Testnet = styled.b`
   color: ${Red}
 `;
 
-const Home = ({ history }: {history: History}) => {
-  if (isRocketPoolInstalled()) {
-    history.push('/status');
-  }
+// TODO: we should check here if rocketpool is installed, and if so, send the user to the status page
+// because that probably means the user is running this again after setting up
 
+const Home = () => {
   const sendToRocketpool = () => {
     shell.openExternal("https://www.rocketpool.net/");
   }
-
   return (
     <Container>
       <LandingHeader>Welcome to Stakehouse</LandingHeader>
@@ -103,4 +97,4 @@ const Home = ({ history }: {history: History}) => {
     </Container>
   );
 };
-export default withRouter(Home);
+export default Home;

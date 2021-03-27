@@ -9,6 +9,7 @@ import { Writable } from 'stream';
 // TODO: make this work for different operating systems
 const UBUNTU_TERMINAL_COMMAND = "/usr/bin/gnome-terminal";
 
+type StdoutCallback = (text: string) => void;
 
 const executeCommandAsync = async (cmd: string): Promise<any> => {
   console.log("running command async with: " + cmd);
@@ -65,7 +66,29 @@ const executeCommandSyncReturnStdout = (cmd: string): string => {
   }
 }
 
+const executeCommandStream = (cmd: string, stdoutCallback: StdoutCallback): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd, {
+      shell: true
+    });
+
+    child.stdout.on('data', (data: Buffer) => {
+      stdoutCallback(data.toString());
+    });
+
+    child.once('exit', function (code) {
+      resolve(code);
+    });
+
+    child.on('error', function (err) {
+      reject(err);
+    });
+  });
+}
+
+
 // good resource for this: https://2ality.com/2018/05/child-process-streams.html
+// TODO: refactor this to use shell:true so you dont need to separate args
 const executeCommandWithPromptsAsync = (cmd: string, args: string[], responses: string[]): Promise<any> => {
   console.log("running command with prompts async with: " + cmd + " and responses " + responses.join());
 
@@ -105,6 +128,7 @@ async function writeToWritable(writable: Writable, responses: string[]) {
 export {
   executeCommandAsync,
   executeCommandInNewTerminal,
+  executeCommandStream,
   executeCommandSync,
   executeCommandSyncReturnStdout,
   executeCommandWithPromptsAsync,

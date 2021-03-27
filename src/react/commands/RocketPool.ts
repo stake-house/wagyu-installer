@@ -1,5 +1,5 @@
 import { doesFileExist, readlink } from "./BashUtils";
-import { executeCommandInNewTerminal, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
+import { executeCommandInNewTerminal, executeCommandStream, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
 
 import fs from "fs";
 import yaml from "js-yaml";
@@ -20,6 +20,7 @@ const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.pe
 
 type Callback = (success: boolean) => void;
 type NodeStatusCallback = (status: number) => void;
+type StdoutCallback = (text: string[]) => void;
 
 const wrapCommandInDockerGroup = (command: string) => {
   return "sg docker \"" + command + "\"";
@@ -39,7 +40,31 @@ const getEth2ClientName = (): string => {
   }
 }
 
-const installAndStartRocketPool = async (callback: Callback) => {
+const testInstallCommand = async (callback: Callback, stdoutCallback: StdoutCallback) => {
+  const consoleMessages: string[] = [];
+
+  const internalStdoutCallback = (text: string) => {
+    console.log("internal cb with " + text);
+    consoleMessages.push(text);
+    stdoutCallback(consoleMessages);
+  }
+
+  await executeCommandStream("./src/scripts/test.sh && ./src/scripts/test2.sh", internalStdoutCallback);
+  await executeCommandStream("./src/scripts/test2.sh", internalStdoutCallback);
+  await executeCommandStream("./src/scripts/test.sh", internalStdoutCallback);
+  callback(true);
+}
+
+const installAndStartRocketPool = async (callback: Callback, stdoutCallback: StdoutCallback) => {
+  // Used for reporting back log messages to caller
+  // TODO: there has to be a better way to do this...
+  const consoleMessages: string[] = [];
+  const internalStdoutCallback = (text: string) => {
+    console.log("internal cb with " + text);
+    consoleMessages.push(text);
+    stdoutCallback(consoleMessages);
+  }
+
   // cache sudo credentials to be used for install later
   const passwordRc = executeCommandSync("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'Authentication successful.'");
   if (passwordRc != 0) {
@@ -48,14 +73,14 @@ const installAndStartRocketPool = async (callback: Callback) => {
     return;
   }
 
-  const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
+  const cliRc = await executeCommandStream(ROCKET_POOL_INSTALL_COMMAND, internalStdoutCallback);
   if (cliRc != 0) {
     console.log("cli failed to install");
     callback(false);
     return;
   }
 
-  const serviceRc = executeCommandSync(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont")
+  const serviceRc = await executeCommandStream(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont", internalStdoutCallback);
   if (serviceRc != 0) {
     console.log("service install failed");
     callback(false);
@@ -181,4 +206,5 @@ export {
   queryEth1Syncing,
   queryEth2BeaconStatus,
   queryEth2ValidatorStatus,
+  testInstallCommand,
 }

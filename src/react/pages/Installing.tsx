@@ -7,10 +7,10 @@ import {
 } from "../colors";
 import { Link, withRouter } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import { installAndStartRocketPool, testInstallCommand } from "../commands/RocketPool";
 import styled, { keyframes } from "styled-components";
 
 import { History } from "history";
-import { installAndStartRocketPool } from "../commands/RocketPool";
 
 const ENTER_KEYCODE = 13;
 
@@ -60,12 +60,19 @@ const LoadingSpinner = styled.div`
 `;
 
 const Installing = ({ history }: {history: History}) => {
+  const [stdoutText, setStdoutText] = useState([""]);
 
   useEffect(() => {
     setTimeout(() => {
-      installAndStartRocketPool(installCallback);
+      //testInstallCommand(installCallback, stdoutCallback);
+      installAndStartRocketPool(installCallback, stdoutCallback);
     }, 1000);
   }, [])
+
+  const stdoutCallback = (text: string[]) => {
+    console.log("installing cb with " + text.join());
+    setStdoutText(stdoutText.concat(text));
+  }
 
   const installCallback = (success: boolean) => {
     if (success) {
@@ -92,6 +99,12 @@ const Installing = ({ history }: {history: History}) => {
           <SpinnerContainer>
             <LoadingSpinner />
           </SpinnerContainer>
+
+          <ul>
+            {stdoutText.map((line) => {
+              return (<li>{line}</li>)
+            })}
+          </ul>
         </Content>
     </Container>
   )
