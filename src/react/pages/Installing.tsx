@@ -60,8 +60,8 @@ const LoadingSpinner = styled.div`
 `;
 
 const LogsContainer = styled.div`
-  height: 200px;
-  overflow-y: scroll;
+  height: 250px;
+  margin-top: 30px;
 `;
 
 const LogsList = styled.ul`
@@ -110,7 +110,7 @@ const Installing = ({ history }: {history: History}) => {
           </SpinnerContainer>
           <LogsContainer>
             <LogsList>
-              {stdoutText.map((line, i) => {
+              {stdoutText.slice(Math.max(stdoutText.length - 5, 0)).map((line, i) => {
                 return (<li key={i}>{line}</li>)
               })}
             </LogsList>
