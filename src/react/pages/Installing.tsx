@@ -59,6 +59,15 @@ const LoadingSpinner = styled.div`
   animation: ${rotate} 2s linear infinite;
 `;
 
+const LogsContainer = styled.div`
+  max-height: 100px;
+  overflow-y: scroll;
+`;
+
+const LogsList = styled.ul`
+  list-style: none;
+`;
+
 const Installing = ({ history }: {history: History}) => {
   const [stdoutText, setStdoutText] = useState([""]);
 
@@ -99,12 +108,13 @@ const Installing = ({ history }: {history: History}) => {
           <SpinnerContainer>
             <LoadingSpinner />
           </SpinnerContainer>
-
-          <ul>
-            {stdoutText.map((line) => {
-              return (<li>{line}</li>)
-            })}
-          </ul>
+          <LogsContainer>
+            <LogsList>
+              {stdoutText.map((line, i) => {
+                return (<li key={i}>{line}</li>)
+              })}
+            </LogsList>
+          </LogsContainer>
         </Content>
     </Container>
   )
