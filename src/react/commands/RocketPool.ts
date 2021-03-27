@@ -100,7 +100,7 @@ const installAndStartRocketPool = async (callback: Callback, stdoutCallback: Std
     "\n"   // graffiti
   ]
 
-  const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "config"], promptResponses);
+  const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath + " service config", promptResponses, internalStdoutCallback);
   if (serviceConfigRc != 0) {
     console.log("service config failed");
     callback(false);

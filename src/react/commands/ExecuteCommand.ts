@@ -88,12 +88,16 @@ const executeCommandStream = (cmd: string, stdoutCallback: StdoutCallback): Prom
 
 
 // good resource for this: https://2ality.com/2018/05/child-process-streams.html
-// TODO: refactor this to use shell:true so you dont need to separate args
-const executeCommandWithPromptsAsync = (cmd: string, args: string[], responses: string[]): Promise<any> => {
+const executeCommandWithPromptsAsync = (cmd: string, responses: string[], stdoutCallback: StdoutCallback): Promise<any> => {
   console.log("running command with prompts async with: " + cmd + " and responses " + responses.join());
 
   return new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, {stdio: ['pipe', process.stdout, process.stderr]});
+    // const child = spawn(cmd, {stdio: ['pipe', process.stdout, process.stderr]});
+    const child = spawn(cmd, {stdio: ['pipe']});
+
+    child.stdout.on('data', (data: Buffer) => {
+      stdoutCallback(data.toString());
+    });
 
     writeToWritable(child.stdin, responses);
 
