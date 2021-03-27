@@ -93,7 +93,10 @@ const executeCommandWithPromptsAsync = (cmd: string, responses: string[], stdout
 
   return new Promise((resolve, reject) => {
     // const child = spawn(cmd, {stdio: ['pipe', process.stdout, process.stderr]});
-    const child = spawn(cmd, {stdio: ['pipe']});
+    const child = spawn(cmd, {
+      stdio: ['pipe', 'pipe', process.stderr],
+      shell: true,
+    });
 
     child.stdout.on('data', (data: Buffer) => {
       stdoutCallback(data.toString());
