@@ -60,7 +60,7 @@ const LoadingSpinner = styled.div`
 `;
 
 const LogsContainer = styled.div`
-  max-height: 100px;
+  height: 200px;
   overflow-y: scroll;
 `;
 
