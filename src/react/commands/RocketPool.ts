@@ -108,13 +108,13 @@ const installAndStartRocketPool = async (callback: Callback, stdoutCallback: Std
   }
 
   // Just in case nodes were running - pick up new config (might happen anyway on start, not sure)
-  const stopNodesRc = await executeCommandStream(ROCKET_POOL_EXECUTABLE + " service start", internalStdoutCallback);
+  const stopNodesRc = await executeCommandStream(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service stop -y"), internalStdoutCallback);
   if (stopNodesRc != 0) {
     console.log("stop nodes failed");
     callback(false);
   }
 
-  const startNodesRc = await executeCommandStream(ROCKET_POOL_EXECUTABLE + " service stop -y", internalStdoutCallback);
+  const startNodesRc = await executeCommandStream(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service start"), internalStdoutCallback);
   if (startNodesRc != 0) {
     console.log("start nodes failed");
     callback(false);
