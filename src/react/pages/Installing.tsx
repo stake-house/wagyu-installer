@@ -62,6 +62,7 @@ const LoadingSpinner = styled.div`
 const LogsContainer = styled.div`
   height: 250px;
   margin-top: 30px;
+  overflow: hidden;
 `;
 
 const LogsList = styled.ul`
