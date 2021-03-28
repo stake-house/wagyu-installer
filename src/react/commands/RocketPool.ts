@@ -51,7 +51,7 @@ const installAndStartRocketPool = async (callback: Callback, stdoutCallback: Std
   }
 
   // cache sudo credentials to be used for install later
-  const passwordRc = executeCommandSync("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'Authentication successful.'");
+  const passwordRc = await executeCommandStream("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'Authentication successful.'", internalStdoutCallback);
   if (passwordRc != 0) {
     console.log("password failed");
     callback(false);
