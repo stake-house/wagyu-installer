@@ -7,10 +7,10 @@ import {
 } from "../colors";
 import { Link, withRouter } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { installAndStartRocketPool, testInstallCommand } from "../commands/RocketPool";
 import styled, { keyframes } from "styled-components";
 
 import { History } from "history";
+import { installAndStartRocketPool } from "../commands/RocketPool";
 
 const ENTER_KEYCODE = 13;
 
@@ -81,7 +81,6 @@ const Installing = ({ history }: {history: History}) => {
 
   useEffect(() => {
     setTimeout(() => {
-      //testInstallCommand(installCallback, stdoutCallback);
       installAndStartRocketPool(installCallback, stdoutCallback);
     }, 1000);
   }, [])

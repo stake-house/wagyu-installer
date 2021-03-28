@@ -40,21 +40,6 @@ const getEth2ClientName = (): string => {
   }
 }
 
-const testInstallCommand = async (callback: Callback, stdoutCallback: StdoutCallback) => {
-  const consoleMessages: string[] = [];
-
-  const internalStdoutCallback = (text: string) => {
-    console.log("internal cb with " + text);
-    consoleMessages.push(text);
-    stdoutCallback(consoleMessages);
-  }
-
-  await executeCommandStream("./src/scripts/test.sh && ./src/scripts/test2.sh", internalStdoutCallback);
-  await executeCommandStream("./src/scripts/test2.sh", internalStdoutCallback);
-  await executeCommandStream("./src/scripts/test.sh", internalStdoutCallback);
-  callback(true);
-}
-
 const installAndStartRocketPool = async (callback: Callback, stdoutCallback: StdoutCallback) => {
   // Used for reporting back log messages to caller
   // TODO: there has to be a better way to do this...
@@ -208,5 +193,4 @@ export {
   queryEth1Syncing,
   queryEth2BeaconStatus,
   queryEth2ValidatorStatus,
-  testInstallCommand,
 }
