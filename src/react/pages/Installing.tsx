@@ -61,12 +61,19 @@ const LoadingSpinner = styled.div`
 
 const LogsContainer = styled.div`
   height: 250px;
+  width: 100%;
   margin-top: 30px;
-  overflow: hidden;
 `;
 
 const LogsList = styled.ul`
   list-style: none;
+  padding-left: 0;
+`;
+
+const LogsListItem = styled.li`
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const Installing = ({ history }: {history: History}) => {
@@ -111,8 +118,8 @@ const Installing = ({ history }: {history: History}) => {
           </SpinnerContainer>
           <LogsContainer>
             <LogsList>
-              {stdoutText.slice(Math.max(stdoutText.length - 5, 0)).map((line, i) => {
-                return (<li key={i}>{line}</li>)
+              {stdoutText.slice(Math.max(stdoutText.length - 12, 0)).map((line, i) => {
+                return (<LogsListItem key={i}>{line}</LogsListItem>)
               })}
             </LogsList>
           </LogsContainer>
