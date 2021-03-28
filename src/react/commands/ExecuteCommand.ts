@@ -77,6 +77,10 @@ const executeCommandStream = (cmd: string, stdoutCallback: StdoutCallback): Prom
       stdoutCallback(data.toString());
     });
 
+    child.stderr.on('data', (data: Buffer) => {
+      stdoutCallback(data.toString());
+    });
+
     child.once('exit', function (code) {
       resolve(code);
     });
