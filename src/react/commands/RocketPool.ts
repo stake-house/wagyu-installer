@@ -45,7 +45,6 @@ const installAndStartRocketPool = async (callback: Callback, stdoutCallback: Std
   // TODO: there has to be a better way to do this...
   const consoleMessages: string[] = [];
   const internalStdoutCallback = (text: string) => {
-    console.log("internal cb with " + text);
     consoleMessages.push(text);
     stdoutCallback(consoleMessages);
   }
