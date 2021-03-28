@@ -97,7 +97,6 @@ const executeCommandWithPromptsAsync = (cmd: string, responses: string[], stdout
   console.log("running command with prompts async with: " + cmd + " and responses " + responses.join());
 
   return new Promise((resolve, reject) => {
-    // const child = spawn(cmd, {stdio: ['pipe', process.stdout, process.stderr]});
     const child = spawn(cmd, {
       stdio: ['pipe', 'pipe', process.stderr],
       shell: true,
