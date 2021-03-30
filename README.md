@@ -56,7 +56,6 @@ __New Features__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
 | Deposit screen - key generation, import validator keys, and set up validator properly | High | Large | colfax |
-| Stop/start buttons for clients on status page. | High | Small | grasponcrypto.eth |
 | Creating an executable for the application that users to download and click to open | High | Small |  |
 | Ability to update client version through a button on the status page. | High | Medium |  |
 | Eth2 Beacon Node status granualrity - stopped, syncing, online (currently only looks at docker status) | Low | Medium |  |
