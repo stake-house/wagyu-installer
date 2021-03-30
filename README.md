@@ -49,20 +49,16 @@ Theres plenty left to do with Stakehouse.  If you'd like to help out, please giv
 ### Product
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
-| (done) Audit/reprioritize TODOs below to reflect best path forward | High | Medium | Butta/colfax |
 | Migrate these TODOs to Github Issues | High | Medium | GreyWizard |
-| MVP UX audit - identify immediate improvements needed | High | Small | Butta |
 
 ### Engineering
 __New Features__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
-| (done) Check for Rocket Pool installation at load and redirect immediately to /status if installed | High | Small | Remy |
 | Deposit screen - key generation, import validator keys, and set up validator properly | High | Large | colfax |
 | Stop/start buttons for clients on status page. | High | Small | grasponcrypto.eth |
-| Eth2 Validator status - is it validating or not?  Must support all client types | High | Small |  |
 | Creating an executable for the application that users to download and click to open | High | Small |  |
-| Update button for clients on status page. | High | Medium |  |
+| Ability to update client version through a button on the status page. | High | Medium |  |
 | Eth2 Beacon Node status granualrity - stopped, syncing, online (currently only looks at docker status) | Low | Medium |  |
 | Support picking Eth2 client, not just random selection | Low | Large |  |
 | "Dry run" mode for testing/demos not on Ubuntu (does not run any actual commands) | Medium | Medium |  |
@@ -78,7 +74,6 @@ __New Features__
 __Cosmetic__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
-| Improve install page/dynamic graphic.  Add more incremental statuses? | Medium | Small | colfax |
 | If install fails, give a descriptive error message and troubleshooting steps. | Medium | Medium |  |
 | Make status indicators flash/dynamic in some way | Medium | Small |  |
 
