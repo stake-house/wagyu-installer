@@ -63,6 +63,7 @@ const LogsContainer = styled.div`
   height: 250px;
   width: 100%;
   margin-top: 30px;
+  overflow-y: auto;
 `;
 
 const LogsList = styled.ul`
@@ -117,7 +118,7 @@ const Installing = ({ history }: {history: History}) => {
           </SpinnerContainer>
           <LogsContainer>
             <LogsList>
-              {stdoutText.slice(Math.max(stdoutText.length - 12, 0)).map((line, i) => {
+              {stdoutText.map((line, i) => {
                 return (<LogsListItem key={i}>{line}</LogsListItem>)
               })}
             </LogsList>
