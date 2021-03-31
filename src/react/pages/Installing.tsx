@@ -62,7 +62,7 @@ const LoadingSpinner = styled.div`
 const LogsContainer = styled.div`
   height: 250px;
   width: 100%;
-  margin-top: 30px;
+  margin-top: 5px;
   overflow-y: auto;
   background-color: white;
   border-radius: 5px;
