@@ -6,7 +6,7 @@ import {
   MainContent
 } from "../colors";
 import { Link, withRouter } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
 import { History } from "history";
@@ -68,7 +68,6 @@ const LogsContainer = styled.div`
   border-radius: 5px;
   border-style: groove;
   color: black;
-  overflow-anchor: none;
 `;
 
 const LogsList = styled.ul`
@@ -83,18 +82,22 @@ const LogsListItem = styled.li`
 `;
 
 const LogsContainerAnchor = styled.div`
-  overflow-anchor: auto;
-  height: 1px;
 `;
 
 const Installing = ({ history }: {history: History}) => {
+  const anchorRef = useRef(document.createElement("div"));
+
   const [stdoutText, setStdoutText] = useState([""]);
 
   useEffect(() => {
     setTimeout(() => {
       installAndStartRocketPool(installCallback, stdoutCallback);
     }, 1000);
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    anchorRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [stdoutText]);
 
   const stdoutCallback = (text: string[]) => {
     console.log("installing cb with " + text.join());
@@ -134,7 +137,7 @@ const Installing = ({ history }: {history: History}) => {
                 return (<LogsListItem key={i}>{line}</LogsListItem>)
               })}
             </LogsList>
-            <LogsContainerAnchor />
+            <LogsContainerAnchor ref={anchorRef}></LogsContainerAnchor>
           </LogsContainer>
         </Content>
     </Container>
