@@ -8,7 +8,7 @@ const ASKPASS_PATH = "src/scripts/askpass.sh";
 
 const ROCKET_POOL_EXECUTABLE = "~/bin/rocketpool";
 const ROCKET_POOL_DIR = "~/.rocketpool"
-const ROCKET_POOL_INSTALL_COMMAND = "curl -L https://github.com/rocket-pool/smartnode-install/releases/latest/download/rocketpool-cli-linux-amd64 --create-dirs -o " + ROCKET_POOL_EXECUTABLE + " && chmod +x " + ROCKET_POOL_EXECUTABLE;
+const ROCKET_POOL_INSTALL_COMMAND = "mkdir -p ~/bin && wget https://github.com/rocket-pool/smartnode-install/releases/latest/download/rocketpool-cli-linux-amd64 -O " + ROCKET_POOL_EXECUTABLE + " && chmod +x " + ROCKET_POOL_EXECUTABLE;
 
 const GETH_SYNC_STATUS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'eth.syncing' attach ipc:ethclient/geth/geth.ipc";
 const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.peers.length' attach ipc:ethclient/geth/geth.ipc";

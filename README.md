@@ -49,51 +49,44 @@ Theres plenty left to do with Stakehouse.  If you'd like to help out, please giv
 ### Product
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
-| Audit/reprioritize TODOs below to reflect best path forward | High | Medium |  |
-| Migrate these TODOs to Github Issues | High | Medium |  |
-| MVP UX audit - identify immediate improvements needed | High | Small | Butta |
+| Migrate these TODOs to Github Issues | High | Medium | GreyWizard |
 
 ### Engineering
 __New Features__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
-| Bundling of executable for users to download and open app | High | Small | colfax |
-| Check for Rocket Pool installation at load and redirect immediately to /status if installed | High | Small | Remy |
-| Improve status monitoring logic, add Eth2 beacon syncing status | High | Medium |  |
-| Eth2 Validator status - is it validating or not? Even if the validator is running | High | Small |  |
-| Support additional operating systems (depends on Rocket Pool support as well) | High | Large |  |
-| Support picking Eth2 client (need to tie into client specific status monitoring) | High | Large |  |
-| Stop/start buttons for clients on status page. | Medium | Small | grasponcrypto.eth |
-| Update button for clients on status page. | Medium | Medium |  |
-| "Dry run" mode for testing/demos not on Ubuntu (does not run any actual commands) | High | Medium |  |
-| Deposit screen - import validator keys and set up validator properly | Medium | Large |  |
+| Deposit screen - key generation, import validator keys, and set up validator properly | High | Large | colfax |
+| Creating an executable for the application that users to download and click to open | High | Small |  |
+| Ability to update client version through a button on the status page. | High | Medium |  |
+| Eth2 Beacon Node status granualrity - stopped, syncing, online (currently only looks at docker status) | Low | Medium |  |
+| Support picking Eth2 client, not just random selection | Low | Large |  |
+| "Dry run" mode for testing/demos not on Ubuntu (does not run any actual commands) | Medium | Medium |  |
 | Display relevant info from Beaconcha.in on Status screen | Medium | Medium |  |
-| OS check to make sure it doesnt run if not on Ubuntu | High | Small |  |
-| More system check tests to see if the machine can run nodes | Medium | Medium |  |
-| Add port checking test hitting the port checker tool | Medium | Small |  |
-| Support setting up nodes on remote host | Low | Large |  |
+| OS check to make sure it doesnt run if not on Ubuntu | Low | Small |  |
+| More system check tests to see if the machine is powerful enough to run the nodes | Medium | Medium |  |
+| Add port checking test hitting the port checker tool | Low | Small |  |
+| Support running application on one host and setting up nodes on remote host | Low | Large |  |
+| Support additional operating systems (depends on Rocket Pool support as well) | Low | Large |  |
 | TODOs in code | Various | Various | n/a |
 
 
 __Cosmetic__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
-| Improve install page/dynamic graphic.  Add more incremental statuses? | Medium | Small |  |
-| If install fails, give a descriptive error message and troubleshooting steps. | High | Medium |  |
-| Add port checking test hitting the port checker tool | Medium | Small |  |
+| If install fails, give a descriptive error message and troubleshooting steps. | Medium | Medium |  |
 | Make status indicators flash/dynamic in some way | Medium | Small |  |
 
 
 __Engineering__
 | Description | Priority | Size | Asignee |
 | ----------- | -------- | ---- | ------- |
-| General React audit by someone who is a more experienced React developer, including usage of child_process, error handling, etc | High | Medium |  |
+| General React audit by someone who is a more experienced React developer, including usage of child_process, error handling, etc | Medium | Medium |  |
 | Installer "interface" implementation so it is extendable to handle multiple different installers | Medium | Large |  |
-| Alphabetize CSS | Medium | Small |  |
+| Alphabetize/clean up CSS | Medium | Small |  |
 | Fix DeprecationWarning on startup | Low | ? |  |
 | Create a proper loading state for each page which only renders once all data is loaded | Medium | Small |  |
-| Clean up logging/set up proper logging | High | Small |  |
-| General audit of error handling, edge cases | High | Medium |  |
+| Clean up logging/set up proper logging | Medium | Small |  |
+| General audit of error handling, edge cases | Medium | Medium |  |
 
 ## License
 [GPL](LICENSE)

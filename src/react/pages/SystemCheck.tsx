@@ -8,7 +8,6 @@ import React, { useEffect, useState } from "react";
 import Footer from "../components/Footer";
 import { isRocketPoolInstalled } from "../commands/RocketPool";
 import styled from "styled-components";
-import { which } from "../commands/BashUtils";
 
 const Container = styled.div`
   display: flex;
@@ -53,7 +52,6 @@ const SystemCheck = () => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const [arbitraryTest, setArbitraryTest] = useState(true);
-  const [curlInstalled, setCurlInstalled] = useState(false);
   const [rocketPoolInstalled, setRocketPoolInstalled] = useState(false);
   const [systemStatus, setSystemStatus] = useState(false);
 
@@ -64,11 +62,10 @@ const SystemCheck = () => {
   useEffect(() => {
     setSystemStatus(
       arbitraryTest &&
-      curlInstalled &&
       !rocketPoolInstalled
     );
-  }, [arbitraryTest, curlInstalled, rocketPoolInstalled]);
-  
+  }, [arbitraryTest, rocketPoolInstalled]);
+
   const runSystemCheck = () => {
     // TODO: do more validation here
     // TODO: check OS
@@ -76,7 +73,6 @@ const SystemCheck = () => {
     // TODO: check for anything that looks like an already running eth1/2 node
     // TODO: check ports
     setRocketPoolInstalled(isRocketPoolInstalled());
-    setCurlInstalled(which("curl"));
     setArbitraryTest(true);
 
     // TODO: add instructions/links for install/fix if a test fails
@@ -111,10 +107,6 @@ const SystemCheck = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>curl installed</td>
-            <td>{resultToIcon(curlInstalled)}</td>
-          </tr>
           <tr>
             <td>Rocket Pool <i>not</i> installed</td>
             <td>{resultToIcon(!rocketPoolInstalled)}</td>
