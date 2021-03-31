@@ -68,6 +68,7 @@ const LogsContainer = styled.div`
   border-radius: 5px;
   border-style: groove;
   color: black;
+  overflow-anchor: none;
 `;
 
 const LogsList = styled.ul`
@@ -79,6 +80,11 @@ const LogsListItem = styled.li`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+`;
+
+const LogsContainerAnchor = styled.div`
+  overflow-anchor: auto;
+  height: 1px;
 `;
 
 const Installing = ({ history }: {history: History}) => {
@@ -128,6 +134,7 @@ const Installing = ({ history }: {history: History}) => {
                 return (<LogsListItem key={i}>{line}</LogsListItem>)
               })}
             </LogsList>
+            <LogsContainerAnchor />
           </LogsContainer>
         </Content>
     </Container>
