@@ -64,6 +64,10 @@ const LogsContainer = styled.div`
   width: 100%;
   margin-top: 30px;
   overflow-y: auto;
+  background-color: white;
+  border-radius: 5px;
+  border-style: groove;
+  color: black;
 `;
 
 const LogsList = styled.ul`
@@ -116,6 +120,8 @@ const Installing = ({ history }: {history: History}) => {
           <SpinnerContainer>
             <LoadingSpinner />
           </SpinnerContainer>
+          <br/>
+          Install logs:
           <LogsContainer>
             <LogsList>
               {stdoutText.map((line, i) => {
