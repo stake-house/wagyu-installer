@@ -1,5 +1,5 @@
 import { doesFileExist, readlink } from "./BashUtils";
-import { executeCommandInNewTerminal, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
+import { executeCommandInNewTerminal, executeCommandStream, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
 
 import fs from "fs";
 import yaml from "js-yaml";
@@ -20,6 +20,7 @@ const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.pe
 
 type Callback = (success: boolean) => void;
 type NodeStatusCallback = (status: number) => void;
+type StdoutCallback = (text: string[]) => void;
 
 const wrapCommandInDockerGroup = (command: string) => {
   return "sg docker \"" + command + "\"";
@@ -39,23 +40,31 @@ const getEth2ClientName = (): string => {
   }
 }
 
-const installAndStartRocketPool = async (callback: Callback) => {
+const installAndStartRocketPool = async (callback: Callback, stdoutCallback: StdoutCallback) => {
+  // Used for reporting back log messages to caller
+  // TODO: there has to be a better way to do this...
+  const consoleMessages: string[] = [];
+  const internalStdoutCallback = (text: string) => {
+    consoleMessages.push(text);
+    stdoutCallback(consoleMessages);
+  }
+
   // cache sudo credentials to be used for install later
-  const passwordRc = executeCommandSync("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'Authentication successful.'");
+  const passwordRc = await executeCommandStream("export SUDO_ASKPASS='" + ASKPASS_PATH + "' && sudo -A echo 'Authentication successful.'", internalStdoutCallback);
   if (passwordRc != 0) {
     console.log("password failed");
     callback(false);
     return;
   }
 
-  const cliRc = executeCommandSync(ROCKET_POOL_INSTALL_COMMAND);
+  const cliRc = await executeCommandStream(ROCKET_POOL_INSTALL_COMMAND, internalStdoutCallback);
   if (cliRc != 0) {
     console.log("cli failed to install");
     callback(false);
     return;
   }
 
-  const serviceRc = executeCommandSync(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont")
+  const serviceRc = await executeCommandStream(ROCKET_POOL_EXECUTABLE + " service install --yes --network pyrmont", internalStdoutCallback);
   if (serviceRc != 0) {
     console.log("service install failed");
     callback(false);
@@ -75,7 +84,7 @@ const installAndStartRocketPool = async (callback: Callback) => {
     "\n"   // graffiti
   ]
 
-  const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath, ["service", "config"], promptResponses);
+  const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath + " service config", promptResponses, internalStdoutCallback);
   if (serviceConfigRc != 0) {
     console.log("service config failed");
     callback(false);
@@ -83,17 +92,19 @@ const installAndStartRocketPool = async (callback: Callback) => {
   }
 
   // Just in case nodes were running - pick up new config (might happen anyway on start, not sure)
-  const stopNodesRc = stopNodes();
+  const stopNodesRc = await executeCommandStream(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service stop -y"), internalStdoutCallback);
   if (stopNodesRc != 0) {
     console.log("stop nodes failed");
     callback(false);
   }
 
-  const startNodesRc = startNodes();
+  const startNodesRc = await executeCommandStream(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service start"), internalStdoutCallback);
   if (startNodesRc != 0) {
     console.log("start nodes failed");
     callback(false);
   }
+
+  await executeCommandStream("echo 'Install complete - redirecting...'", internalStdoutCallback);
 
   callback(true);
 }

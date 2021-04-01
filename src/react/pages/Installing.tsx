@@ -6,7 +6,7 @@ import {
   MainContent
 } from "../colors";
 import { Link, withRouter } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
 import { History } from "history";
@@ -59,13 +59,50 @@ const LoadingSpinner = styled.div`
   animation: ${rotate} 2s linear infinite;
 `;
 
+const LogsContainer = styled.div`
+  height: 250px;
+  width: 100%;
+  margin-top: 5px;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 5px;
+  border-style: groove;
+  color: black;
+`;
+
+const LogsList = styled.ul`
+  list-style: none;
+  padding-left: 0;
+`;
+
+const LogsListItem = styled.li`
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const LogsContainerAnchor = styled.div`
+`;
+
 const Installing = ({ history }: {history: History}) => {
+  const anchorRef = useRef(document.createElement("div"));
+
+  const [stdoutText, setStdoutText] = useState([""]);
 
   useEffect(() => {
     setTimeout(() => {
-      installAndStartRocketPool(installCallback);
+      installAndStartRocketPool(installCallback, stdoutCallback);
     }, 1000);
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    anchorRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [stdoutText]);
+
+  const stdoutCallback = (text: string[]) => {
+    console.log("installing cb with " + text.join());
+    setStdoutText(stdoutText.concat(text));
+  }
 
   const installCallback = (success: boolean) => {
     if (success) {
@@ -92,6 +129,23 @@ const Installing = ({ history }: {history: History}) => {
           <SpinnerContainer>
             <LoadingSpinner />
           </SpinnerContainer>
+          <br/>
+          { // Only show logs container if there are some
+            stdoutText.length > 1
+            &&
+            <div>
+              Install logs:
+              <LogsContainer>
+                <LogsList>
+                  {stdoutText.map((line, i) => {
+                    return (<LogsListItem key={i}>{line}</LogsListItem>)
+                  })}
+                </LogsList>
+                <LogsContainerAnchor ref={anchorRef}></LogsContainerAnchor>
+              </LogsContainer>
+            </div>
+          }
+
         </Content>
     </Container>
   )
