@@ -9,7 +9,8 @@ Dubbed a 'one-click installer', it provides a clean UI automating the setup and 
 ## Disclaimer
 Stakehouse:
  - only runs on Ubuntu (see below for more system requirements)
- - is currently experimental - use at your own risk
+ - is not audited - use at your own risk
+ - is currently experimental and still under development
  - only runs on pyrmont (right now)
  - does not currently do anything with real ETH or mainnet (__DO NOT USE REAL ETH__)
 
@@ -18,6 +19,12 @@ StakeHouse did a demo at the EthStaker Validator Workshop - take a look [here](h
 
 ## Usage
 There are no releases yet.  Please see Development section.
+
+## Getting Involved
+Theres plenty left to do with StakeHouse.  If you'd like to help out come join us on the [EthStaker](http://invite.gg/ethstaker) discord, channel #stakehouse or reach out to Colfax (discord username: colfax#1983) directly.
+
+
+Also feel free to watch our demo above and/or browse our open [issues](https://github.com/ethstaker-core/stakehouse/issues).
 
 ## Development
 ### Requirements
@@ -45,12 +52,6 @@ Run the following commands:
 Reach out to the EthStaker community:
  - on [discord](https://invite.gg/ethstaker)
  - on [reddit](https://www.reddit.com/r/ethstaker/)
-
-## Getting Involved
-Theres plenty left to do with StakeHouse.  If you'd like to help out come join us on the (EthStaker)[http://invite.gg/ethstaker] discord, channel #stakehouse or reach out to Colfax (discord username: colfax#1983) directly.
-
-
-Also feel free to watch our demo above and/or browse our open (issues)[https://github.com/ethstaker-core/stakehouse/issues].
 
 ## License
 [GPL](LICENSE)
