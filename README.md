@@ -24,7 +24,7 @@ There are no releases yet.  Please see Development section.
 Theres plenty left to do with StakeHouse.  If you'd like to help out come join us on the [EthStaker](http://invite.gg/ethstaker) discord, channel #stakehouse, or reach out to Colfax (discord username: colfax#1983) directly.
 
 
-Also try it out (feedback welcome!), take a look our demo above, and/or browse our open [issues](https://github.com/ethstaker-core/stakehouse/issues).
+Also try it out (feedback welcome!), take a look our demo above, and/or browse our open [issues](https://github.com/ethstaker-core/stakehouse/issues) (start by filtering by the label 'small').
 
 ## Development
 ### Requirements
