@@ -13,6 +13,9 @@ Stakehouse:
  - only runs on pyrmont (right now)
  - does not currently do anything with real ETH or mainnet (__DO NOT USE REAL ETH__)
 
+## Demo
+StakeHouse did a demo at the EthStaker Validator Workshop - take a look [here](https://youtu.be/cxP9gwapXJ0).
+
 ## Usage
 There are no releases yet.  Please see Development section.
 
@@ -44,49 +47,10 @@ Reach out to the EthStaker community:
  - on [reddit](https://www.reddit.com/r/ethstaker/)
 
 ## Getting Involved
-Theres plenty left to do with Stakehouse.  If you'd like to help out, please give the app a try, take a look at the TODOs below, and reach out to Colfax on the EthStaker discord (username: colfax#1983).  The below secionts will soon be migrated to github issues.
-
-### Product
-| Description | Priority | Size | Asignee |
-| ----------- | -------- | ---- | ------- |
-| Migrate these TODOs to Github Issues | High | Medium | GreyWizard |
-
-### Engineering
-__New Features__
-| Description | Priority | Size | Asignee |
-| ----------- | -------- | ---- | ------- |
-| Deposit screen - key generation, import validator keys, and set up validator properly | High | Large | colfax |
-| Creating an executable for the application that users to download and click to open | High | Small |  |
-| Ability to update client version through a button on the status page. | High | Medium |  |
-| Eth2 Beacon Node status granualrity - stopped, syncing, online (currently only looks at docker status) | Low | Medium |  |
-| Support picking Eth2 client, not just random selection | Low | Large |  |
-| "Dry run" mode for testing/demos not on Ubuntu (does not run any actual commands) | Medium | Medium |  |
-| Display relevant info from Beaconcha.in on Status screen | Medium | Medium |  |
-| OS check to make sure it doesnt run if not on Ubuntu | Low | Small |  |
-| More system check tests to see if the machine is powerful enough to run the nodes | Medium | Medium |  |
-| Add port checking test hitting the port checker tool | Low | Small |  |
-| Support running application on one host and setting up nodes on remote host | Low | Large |  |
-| Support additional operating systems (depends on Rocket Pool support as well) | Low | Large |  |
-| TODOs in code | Various | Various | n/a |
+Theres plenty left to do with StakeHouse.  If you'd like to help out come join us on the (EthStaker)[http://invite.gg/ethstaker] discord, channel #stakehouse or reach out to Colfax (discord username: colfax#1983) directly.
 
 
-__Cosmetic__
-| Description | Priority | Size | Asignee |
-| ----------- | -------- | ---- | ------- |
-| If install fails, give a descriptive error message and troubleshooting steps. | Medium | Medium |  |
-| Make status indicators flash/dynamic in some way | Medium | Small |  |
-
-
-__Engineering__
-| Description | Priority | Size | Asignee |
-| ----------- | -------- | ---- | ------- |
-| General React audit by someone who is a more experienced React developer, including usage of child_process, error handling, etc | Medium | Medium |  |
-| Installer "interface" implementation so it is extendable to handle multiple different installers | Medium | Large |  |
-| Alphabetize/clean up CSS | Medium | Small |  |
-| Fix DeprecationWarning on startup | Low | ? |  |
-| Create a proper loading state for each page which only renders once all data is loaded | Medium | Small |  |
-| Clean up logging/set up proper logging | Medium | Small |  |
-| General audit of error handling, edge cases | Medium | Medium |  |
+Also feel free to watch our demo above and/or browse our open (issues)[https://github.com/ethstaker-core/stakehouse/issues].
 
 ## License
 [GPL](LICENSE)
