@@ -1,14 +1,18 @@
 import {
+  Black,
+  Button,
+  ButtonHover,
   Heading,
   MainContent
 } from "../colors";
+import { Link, withRouter } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import styled, { keyframes } from "styled-components";
 
 import { History } from "history";
-import ScrollToBottom from 'react-scroll-to-bottom';
 import { installAndStartRocketPool } from "../commands/RocketPool";
-import { withRouter } from "react-router-dom";
+
+const ENTER_KEYCODE = 13;
 
 const Container = styled.div`
   display: flex;
@@ -55,21 +59,30 @@ const LoadingSpinner = styled.div`
   animation: ${rotate} 2s linear infinite;
 `;
 
+const LogsContainer = styled.div`
+  height: 250px;
+  width: 100%;
+  margin-top: 5px;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 5px;
+  border-style: groove;
+  color: black;
+`;
+
 const LogsList = styled.ul`
   list-style: none;
   padding-left: 0;
 `;
 
-const ScrollToBottomContainerCss = {
-  height: "250px",
-  width: "100%",
-  marginTop: "5px",
-  overflowY: "auto",
-  backgroundColor: "white",
-  borderRadius: "5px",
-  borderStyle: "groove",
-  color: "black"
-}
+const LogsListItem = styled.li`
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+`;
+
+const LogsContainerAnchor = styled.div`
+`;
 
 const Installing = ({ history }: {history: History}) => {
   const anchorRef = useRef(document.createElement("div"));
@@ -118,13 +131,14 @@ const Installing = ({ history }: {history: History}) => {
           </SpinnerContainer>
           <br/>
           Install logs:
-          <ScrollToBottom style={ScrollToBottomContainerCss}>
+          <LogsContainer>
             <LogsList>
               {stdoutText.map((line, i) => {
-                return (<div key={i}>{line}</div>)
+                return (<LogsListItem key={i}>{line}</LogsListItem>)
               })}
             </LogsList>
-          </ScrollToBottom>
+            <LogsContainerAnchor ref={anchorRef}></LogsContainerAnchor>
+          </LogsContainer>
         </Content>
     </Container>
   )
