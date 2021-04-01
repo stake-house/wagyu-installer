@@ -130,15 +130,22 @@ const Installing = ({ history }: {history: History}) => {
             <LoadingSpinner />
           </SpinnerContainer>
           <br/>
-          Install logs:
-          <LogsContainer>
-            <LogsList>
-              {stdoutText.map((line, i) => {
-                return (<LogsListItem key={i}>{line}</LogsListItem>)
-              })}
-            </LogsList>
-            <LogsContainerAnchor ref={anchorRef}></LogsContainerAnchor>
-          </LogsContainer>
+          { // Only show logs container if there are some
+            stdoutText.length > 1
+            &&
+            <div>
+              Install logs:
+              <LogsContainer>
+                <LogsList>
+                  {stdoutText.map((line, i) => {
+                    return (<LogsListItem key={i}>{line}</LogsListItem>)
+                  })}
+                </LogsList>
+                <LogsContainerAnchor ref={anchorRef}></LogsContainerAnchor>
+              </LogsContainer>
+            </div>
+          }
+
         </Content>
     </Container>
   )
