@@ -9,6 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   // development mode will set some useful defaults in webpack
   mode: 'development',
+  devtool: 'source-map',
   // the entry point is the top of the tree of modules.
   // webpack will bundle this file and everything it references.
   entry: './src/react/index.tsx',
