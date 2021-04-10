@@ -8,11 +8,24 @@ import {
   MainContent
 } from "../colors";
 import React, { useEffect, useState } from "react";
-import { getEth2ClientName, openEth1Logs, openEth2BeaconLogs, openEth2ValidatorLogs, queryEth1PeerCount, queryEth1Status, queryEth1Syncing, queryEth2BeaconStatus, queryEth2ValidatorStatus } from "../commands/RocketPool";
+import {
+  getEth2ClientName,
+  openEth1Logs,
+  openEth2BeaconLogs,
+  openEth2ValidatorLogs,
+  queryEth1PeerCount,
+  queryEth1Status,
+  queryEth1Syncing,
+  queryEth2BeaconStatus,
+  queryEth2ValidatorStatus,
+  startRocketPool,
+  stopRocketPool
+} from '../commands/RocketPool'
 
 import Footer from "../components/Footer";
 import { shell } from "electron";
 import styled from "styled-components";
+import { Link } from 'react-router-dom'
 
 const Container = styled.div`
   display: flex;
@@ -75,6 +88,29 @@ const LogsButton = styled.button`
     background-color: ${Gray4};
   }
 `;
+
+const StartButton = styled.button`
+  color: ${Black};
+  display: inline-block;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 24;
+  background-color: ${Button};
+  padding: 16 24;
+  border-radius: 10%;
+  text-decoration: none;
+
+  transition: 250ms background-color ease;
+  cursor: pointer;
+  //margin-top: 60;
+
+  &:hover {
+    background-color: ${ButtonHover};
+  }
+`;
+
+
 
 // TODO: turn this into an enum?
 const NodeStatus: [string, string, string][] = [
@@ -145,6 +181,11 @@ const Status = () => {
     return (
       <ResultsTable>
         <thead>
+          <tr>
+            <th colSpan='2'/>
+            <th><StartButton onClick={startRocketPool}>Start All</StartButton></th>
+            <th><StartButton onClick={stopRocketPool}>Stop All</StartButton></th>
+          </tr>
           <tr>
             <th>Application</th>
             <th>Status*</th>
