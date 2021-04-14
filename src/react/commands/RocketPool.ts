@@ -80,8 +80,13 @@ const installAndStartRocketPool = async (callback: Callback, stdoutCallback: Std
     "1\n", // which eth1 client? 1 geth, 2 infura, 3 custom
     "\n",  // ethstats label
     "\n",  // ethstats login
+    "\n",  // Cache size
+    "\n",  // Max peers
+    "\n",  // P2P port
     "y\n", // random eth2 client? y/n
-    "\n"   // graffiti
+    "\n",  // graffiti
+    "\n",  // Max peers
+    "\n",  // P2P port
   ]
 
   const serviceConfigRc = await executeCommandWithPromptsAsync(rocketPoolExecutableFullPath + " service config", promptResponses, internalStdoutCallback);
