@@ -1,13 +1,13 @@
-# Stakehouse
-Stakehouse is an application aimed at lowering the technical bar to staking on Ethereum 2.0.
+# Wagyu
+Wagyu (formerly known as StakeHouse) is an application aimed at lowering the technical bar to staking on Ethereum 2.0.
 
 
 Dubbed a 'one-click installer', it provides a clean UI automating the setup and management of all the infrastructure necessary to stake without the user needing to have any technical knowledge.
 
-[![stakehouse preview](https://img.youtube.com/vi/-KKeZwI8EII/0.jpg)](https://www.youtube.com/watch?v=-KKeZwI8EII&ab_channel=ColfaxSelby)
+[![wagyu preview](https://img.youtube.com/vi/-KKeZwI8EII/0.jpg)](https://www.youtube.com/watch?v=-KKeZwI8EII&ab_channel=ColfaxSelby)
 
 ## Disclaimer
-Stakehouse:
+Wagyu:
  - only runs on Ubuntu (see below for more system requirements)
  - is not audited - use at your own risk
  - is currently experimental and still under development
@@ -15,16 +15,16 @@ Stakehouse:
  - does not currently do anything with real ETH or mainnet (__DO NOT USE REAL ETH__)
 
 ## Demo
-StakeHouse did a demo at the EthStaker Validator Workshop - take a look [here](https://youtu.be/cxP9gwapXJ0).
+Wagyu (while it was known as StakeHouse) did a demo at the EthStaker Validator Workshop - take a look [here](https://youtu.be/cxP9gwapXJ0).
 
 ## Usage
 There are no releases yet.  Please see Development section.
 
 ## Getting Involved
-Theres plenty left to do with StakeHouse.  If you'd like to help out come join us on the [EthStaker](http://invite.gg/ethstaker) discord, channel #stakehouse, or reach out to Colfax (discord username: colfax#1983) directly.
+Theres plenty left to do with Wagyu.  If you'd like to help out come join us on the [EthStaker](http://invite.gg/ethstaker) discord, channel #stakehouse, or reach out to Colfax (discord username: colfax#1983) directly.
 
 
-Also try it out (feedback welcome!), take a look our demo above, and/or browse our open [issues](https://github.com/ethstaker-core/stakehouse/issues) (start by filtering by the label 'small').
+Also try it out (feedback welcome!), take a look our demo above, and/or browse our open [issues](https://github.com/stake-house/wagyu/issues) (start by filtering by the label 'small').
 
 ## Development
 ### Requirements
@@ -34,7 +34,7 @@ Also try it out (feedback welcome!), take a look our demo above, and/or browse o
  - root access
 
 ### Setup
-Stakehouse is a React app running in Electron and currently *only runs on Ubuntu* (tested on version 20.04).  See `src/electron/` for the simple electron app and `src/react/` for where the magic happens.  Feedback and help is much encouraged so please reach out!
+Wagyu is a React app running in Electron and currently *only runs on Ubuntu* (tested on version 20.04).  See `src/electron/` for the simple electron app and `src/react/` for where the magic happens.  Feedback and help is much encouraged so please reach out!
 
  - `yarn install`
  - `yarn run build:watch` in one terminal - this continually watches and builds your ts code and puts it in `./dist`
