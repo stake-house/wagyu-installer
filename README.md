@@ -18,7 +18,7 @@ Wagyu:
 Wagyu (while it was known as StakeHouse) did a demo at the EthStaker Validator Workshop - take a look [here](https://youtu.be/cxP9gwapXJ0).
 
 ## Usage
-There are no releases yet.  Please see Development section.
+There are no releases yet, please see [Development section](https://github.com/stake-house/wagyu#setup) to run the latest version.
 
 ## Getting Involved
 Theres plenty left to do with Wagyu.  If you'd like to help out come join us on the [EthStaker](http://invite.gg/ethstaker) discord, channel #stakehouse, or reach out to Colfax (discord username: colfax#1983) directly.
