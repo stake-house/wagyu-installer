@@ -36,6 +36,7 @@ Also try it out (feedback welcome!), take a look our demo above, and/or browse o
 ### Setup
 Wagyu is a React app running in Electron and currently *only runs on Ubuntu* (tested on version 20.04).  See `src/electron/` for the simple electron app and `src/react/` for where the magic happens.  Feedback and help is much encouraged so please reach out!
 
+Start by cloning this repo and enter the directory by running `git clone https://github.com/stake-house/wagyu.git` and `cd wagyu`.  Then run the following:
  - `yarn install`
  - `yarn build` (or run `yarn run build:watch` in a separate terminal to hot reload your changes)
    - _If you are running with `build:watch` after saving your changes will automatically build.  In order to get them to show in the app press `ctrl+r` or `cmd+r`._
