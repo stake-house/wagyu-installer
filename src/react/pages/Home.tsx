@@ -6,15 +6,13 @@ import {
   MainContent,
   Red
 } from "../colors";
-
 import { Link, withRouter } from "react-router-dom";
-import React from "react";
-import { shell } from "electron";
-import styled from "styled-components";
 
 import { History } from "history";
-
+import React from "react";
 import { isRocketPoolInstalled } from "../commands/RocketPool";
+import { shell } from "electron";
+import styled from "styled-components";
 
 const Container = styled.div`
   display: flex;
@@ -79,7 +77,7 @@ const Home = ({ history }: {history: History}) => {
 
   return (
     <Container>
-      <LandingHeader>Welcome to Stakehouse</LandingHeader>
+      <LandingHeader>Welcome to Wagyu</LandingHeader>
       <Content>
         This is your portal into the Eth2 world - welcome.
         <br />

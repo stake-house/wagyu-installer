@@ -1,7 +1,7 @@
 {
-  "name": "stakehouse",
+  "name": "wagyu",
   "version": "1.0.0",
-  "description": "Stakehouse: a portal into the eth2 staking world.",
+  "description": "Wagyu: a portal into the eth2 staking world.",
   "main": "./dist/electron/index.js",
   "author": "Colfax Selby <colfax.selby@gmail.com>",
   "license": "MIT",

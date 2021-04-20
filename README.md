@@ -57,6 +57,6 @@ Reach out to the EthStaker community:
 [GPL](LICENSE)
 
 ## Credits
- - Stakehouse uses the [Rocket Pool](https://www.rocketpool.net/) installer to manage eth1/eth2 clients.
+ - Wagyu uses the [Rocket Pool](https://www.rocketpool.net/) installer to manage eth1/eth2 clients.
  - [EthStaker](https://www.reddit.com/r/ethstaker/) for the incredible guidance and support.
  - [Somer Esat](https://someresat.medium.com/)'s guides for the introductory knowledge.
