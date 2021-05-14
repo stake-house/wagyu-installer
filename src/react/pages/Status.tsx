@@ -8,7 +8,7 @@ import {
   MainContent
 } from "../colors";
 import React, { useEffect, useState } from "react";
-import { getEth2ClientName, openEth1Logs, openEth2BeaconLogs, openEth2ValidatorLogs, queryEth1PeerCount, queryEth1Status, queryEth1Syncing, queryEth2BeaconStatus, queryEth2ValidatorStatus } from "../commands/RocketPool";
+import { getEth2ClientName, openEth1Logs, openEth2BeaconLogs, openEth2ValidatorLogs, queryEth1PeerCount, queryEth1Status, queryEth1Syncing, queryEth2BeaconStatus, queryEth2ValidatorStatus, startNodes, stopNodes } from "../commands/RocketPool";
 
 import Footer from "../components/Footer";
 import { shell } from "electron";
@@ -94,11 +94,13 @@ const Status = () => {
   const [eth2ClientName, setEth2ClientName] = useState("");
   const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] = useState(3);
   const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(3);
+  const eth2WagyuStatus = useState(3);
 
   useEffect(() => {
     setTimeout(() => {
       queryStatuses();
       setEth2ClientName(getEth2ClientName());
+      computeEth2WagyuStatus();
       setInterval(queryStatuses, 5000);
     }, 500)
   }, []);
@@ -136,9 +138,30 @@ const Status = () => {
   const computeEth2BeaconStatus = () => {
     return eth2BeaconContainerStatus;
   }
-  
+
   const computeEth2ValidatorStatus = () => {
     return eth2ValidatorContainerStatus;
+  }
+
+  const computeEth2WagyuStatus = (): number => {
+    if (eth1ContainerStatus != 2) {
+      return 1;
+    } else if (eth2BeaconContainerStatus != 2) {
+      return 1;
+    } else if (eth2ValidatorContainerStatus != 2) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+  const computeWagyuStartStop = () => {
+    if (computeEth2WagyuStatus() == 2) {
+      return 'start';
+    } else if (computeEth2WagyuStatus() == 1) {
+      return 'stop';
+    } else if (computeEth2WagyuStatus() == 3) {
+      return 'stand by';
+    }
   }
 
   const renderNodeStatusTable = () => {
@@ -172,6 +195,16 @@ const Status = () => {
             <td><LogsButton onClick={openEth2ValidatorLogs} disabled={eth2ValidatorContainerStatus == 2}>View Logs</LogsButton></td>
           </tr>
         </tbody>
+        <thead>
+          <tr>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+          <td><LogsButton onClick={stopNodes} disabled={computeWagyuStartStop() == 'start'}>{computeWagyuStartStop()}</LogsButton></td>
+          <td><LogsButton onClick={startNodes} disabled={computeWagyuStartStop() == 'stop'}>{computeWagyuStartStop()}</LogsButton></td>
+          </tr>
+        </tbody>
       </ResultsTable>
     )
   }
@@ -183,15 +216,15 @@ const Status = () => {
   const sendToEthStakerSubreddit = () => {
     shell.openExternal("https://www.reddit.com/r/ethstaker/");
   }
-  
+
   const sendToGoerliEtherscan = () => {
     shell.openExternal("http://goerli.etherscan.io/");
   }
-  
+
   const sendToPyrmontBeaconchain = () => {
     shell.openExternal("https://pyrmont.beaconcha.in/");
-  }  
-  
+  }
+
   const sendToGetGoerliEth = () => {
     shell.openExternal("https://www.reddit.com/r/ethstaker/comments/ij56ox/best_way_to_get_goerli_ether/");
   }
