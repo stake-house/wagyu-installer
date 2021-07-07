@@ -44,10 +44,11 @@ Start by cloning this repo and enter the directory by running `git clone https:/
 
 ### Installing Yarn on Ubuntu
 Run the following commands:
-0) `sudo apt update`
-1) `sudo apt remove cmdtest yarn`
-2) `sudo apt install npm`
-3) `sudo npm install -g yarn`  
+
+1) `sudo apt update`
+2) `sudo apt remove cmdtest yarn`
+3) `sudo apt install npm`
+4) `sudo npm install -g yarn`  
 
 ## Support
 Reach out to the EthStaker community:
