@@ -1,5 +1,12 @@
 import { doesFileExist, readlink } from "./BashUtils";
-import { executeCommandInNewTerminal, executeCommandStream, executeCommandSync, executeCommandSyncReturnStdout, executeCommandWithPromptsAsync } from "./ExecuteCommand";
+import {
+  executeCommandAsync,
+  executeCommandInNewTerminal,
+  executeCommandStream,
+  executeCommandSync,
+  executeCommandSyncReturnStdout,
+  executeCommandWithPromptsAsync,
+} from './ExecuteCommand'
 
 import fs from "fs";
 import yaml from "js-yaml";
@@ -162,12 +169,12 @@ const openEth2ValidatorLogs = () => {
   }
 }
 
-const startNodes = (): number => {
-  return executeCommandSync(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service start"));
+const startNodes = (): Promise<any> => {
+  return executeCommandAsync(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service start"));
 }
 
-const stopNodes = (): number => {
-  return executeCommandSync(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service stop -y"));
+const stopNodes = (): Promise<any> => {
+  return executeCommandAsync(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service stop -y"));
 }
 
 const queryEth1PeerCount = (): number => {
