@@ -107,6 +107,7 @@ const Status = () => {
   const [eth2ClientName, setEth2ClientName] = useState("");
   const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] = useState(3);
   const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(3);
+  const [ProcessingTotalStatus, setProcessingTotalStatus] = useState(0);
 
   useEffect(() => {
     setTimeout(() => {
@@ -130,30 +131,27 @@ const Status = () => {
     )
   }
 
-  const formatTotalStatusButton = (status: number) => {
+  const formatTotalStatusButton = (running: boolean) => {
     const toggleTotalStatus = async () => {
-      console.log("start");
-      if (status == 2)
-        startNodes() // TODO error handling
-      else if (status == 1)
+      if (!running)
+      {
+        startNodes()
+        setProcessingTotalStatus(1);
+      }
+      else {
         stopNodes()
-      console.log("stop");
+        setProcessingTotalStatus(2);
+      }
     }
-    let text;
-    switch (status)
-    {
-      case 1:
-        text = "Stop All";
-        break;
-      case 2:
-        text = "Start All";
-        break;
-      case 3:
-        text = "Processing...";
-        break;
-    }
+    let text = running ? "Stop All" : "Start All";
+    if (ProcessingTotalStatus)
+      text = "Processing...";
+    let totalStatusChanged = ProcessingTotalStatus == 1 && running ||
+                             ProcessingTotalStatus == 2 && !running;
+    if (totalStatusChanged)
+      setProcessingTotalStatus(0);
     return (
-        <LogsButton onClick={toggleTotalStatus} disabled={status == 3}>{text}</LogsButton>
+        <LogsButton onClick={toggleTotalStatus} disabled={ProcessingTotalStatus != 0}>{text}</LogsButton>
     )
   }
 
@@ -182,16 +180,7 @@ const Status = () => {
   }
 
   const computeTotalStatus = () => {
-    if (computeEth1Status() != 2 && eth2BeaconContainerStatus != 2 && eth2ValidatorContainerStatus != 2) {
-      // all running
-      return 1
-    }
-    if (computeEth1Status() == 2 && eth2BeaconContainerStatus == 2 && eth2ValidatorContainerStatus == 2) {
-      // all stopped
-      return 2
-    }
-    // some running, some stopped
-    return 3
+    return !(computeEth1Status() == 2 && eth2BeaconContainerStatus == 2 && eth2ValidatorContainerStatus == 2);
   }
 
   const renderNodeStatusTable = () => {
