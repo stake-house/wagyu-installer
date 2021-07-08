@@ -66,7 +66,7 @@ const StyledLink = styled.span`
 
 const LogsButton = styled.button`
   color: ${Black};
-  display: flex;
+  width: 100%;
   flex-direction: row;
   justify-content: center;
   align-items: center;
@@ -88,32 +88,6 @@ const LogsButton = styled.button`
   }
 `;
 
-
-const StartButton = styled.button`
-  color: ${Black};
-  display: inline-block;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 24;
-  background-color: ${Button};
-  padding: 16 24;
-  border-radius: 10%;
-  cursor: pointer;
-  text-decoration: none;
-
-  transition: 250ms background-color ease;
-  //margin-top: 60;
-
-  &:hover {
-    background-color: ${ButtonHover};
-  }
-  &:disabled {
-     color: ${DarkGray};
-     background-color: ${Gray4};
-     cursor: default;
-   }
-`;
 
 // TODO: turn this into an enum?
 const NodeStatus: [string, string, string][] = [
@@ -165,24 +139,21 @@ const Status = () => {
         stopNodes()
       console.log("stop");
     }
-    let text, col;
+    let text;
     switch (status)
     {
       case 1:
         text = "Stop All";
-        col = "red";
         break;
       case 2:
         text = "Start All";
-        col = "green";
         break;
       case 3:
         text = "Processing...";
-        col = "gray";
         break;
     }
     return (
-        <StartButton onClick={toggleTotalStatus} style={{background: col}} disabled={status == 3}>{text}</StartButton>
+        <LogsButton onClick={toggleTotalStatus} disabled={status == 3}>{text}</LogsButton>
     )
   }
 
@@ -211,12 +182,14 @@ const Status = () => {
   }
 
   const computeTotalStatus = () => {
-    if (computeEth1Status() != 2 && eth2BeaconContainerStatus != 2 && eth2ValidatorContainerStatus != 2)
+    if (computeEth1Status() != 2 && eth2BeaconContainerStatus != 2 && eth2ValidatorContainerStatus != 2) {
       // all running
       return 1
-    if (computeEth1Status() == 2 && eth2BeaconContainerStatus == 2 && eth2ValidatorContainerStatus == 2)
+    }
+    if (computeEth1Status() == 2 && eth2BeaconContainerStatus == 2 && eth2ValidatorContainerStatus == 2) {
       // all stopped
       return 2
+    }
     // some running, some stopped
     return 3
   }
@@ -226,8 +199,8 @@ const Status = () => {
       <ResultsTable>
         <thead>
           <tr>
-            <th colSpan='3'/>
-            <th>{formatTotalStatusButton(computeTotalStatus())}</th>
+            <th colSpan={3}/>
+            <th style={{width: "100px"}}>{formatTotalStatusButton(computeTotalStatus())}</th>
           </tr>
           <tr>
             <th>Application</th>

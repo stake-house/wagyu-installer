@@ -47,32 +47,6 @@ const getEth2ClientName = (): string => {
   }
 }
 
-const stopRocketPool = async() => {
-  //const consoleMessages: string[] = [];
-  const internalStdoutCallback = (text: string) => {
-    //consoleMessages.push(text);
-    //stdoutCallback(consoleMessages);
-  }
-  const stopNodesRc = await executeCommandStream(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service stop -y"), internalStdoutCallback);
-  if (stopNodesRc != 0) {
-    console.log("stop nodes failed");
-    //callback(false);
-  }
-}
-
-const startRocketPool = async() => {
-  //const consoleMessages: string[] = [];
-  const internalStdoutCallback = (text: string) => {
-    //consoleMessages.push(text);
-    //stdoutCallback(consoleMessages);
-  }
-  const startNodesRc = await executeCommandStream(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service start"), internalStdoutCallback);
-  if (startNodesRc != 0) {
-    console.log("start nodes failed");
-    //callback(false);
-  }
-}
-
 const installAndStartRocketPool = async (callback: Callback, stdoutCallback: StdoutCallback) => {
   // Used for reporting back log messages to caller
   // TODO: there has to be a better way to do this...
@@ -130,11 +104,17 @@ const installAndStartRocketPool = async (callback: Callback, stdoutCallback: Std
   }
 
   // Just in case nodes were running - pick up new config (might happen anyway on start, not sure)
-  // await stopRocketPool(callback, stdoutCallback);
-  await stopRocketPool();
+  const stopNodesRc = await executeCommandStream(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service stop -y"), internalStdoutCallback);
+  if (stopNodesRc != 0) {
+    console.log("stop nodes failed");
+    callback(false);
+  }
 
-  // await startRocketPool(callback, stdoutCallback);
-  await startRocketPool();
+  const startNodesRc = await executeCommandStream(wrapCommandInDockerGroup(ROCKET_POOL_EXECUTABLE + " service start"), internalStdoutCallback);
+  if (startNodesRc != 0) {
+    console.log("start nodes failed");
+    callback(false);
+  }
 
   await executeCommandStream("echo 'Install complete - redirecting...'", internalStdoutCallback);
 
@@ -212,8 +192,6 @@ const dockerContainerStatus = async (containerName: string, nodeStatusCallback: 
 
 export {
   getEth2ClientName,
-  startRocketPool,
-  stopRocketPool,
   installAndStartRocketPool,
   isRocketPoolInstalled,
   openEth1Logs,
