@@ -8,7 +8,19 @@ import {
   MainContent
 } from "../colors";
 import React, { useEffect, useState } from "react";
-import { getEth2ClientName, openEth1Logs, openEth2BeaconLogs, openEth2ValidatorLogs, queryEth1PeerCount, queryEth1Status, queryEth1Syncing, queryEth2BeaconStatus, queryEth2ValidatorStatus } from "../commands/RocketPool";
+import {
+  getEth2ClientName,
+  openEth1Logs,
+  openEth2BeaconLogs,
+  openEth2ValidatorLogs,
+  queryEth1PeerCount,
+  queryEth1Status,
+  queryEth1Syncing,
+  queryEth2BeaconStatus,
+  queryEth2ValidatorStatus,
+  startNodes,
+  stopNodes,
+} from '../commands/RocketPool'
 
 import Footer from "../components/Footer";
 import { shell } from "electron";
@@ -54,7 +66,7 @@ const StyledLink = styled.span`
 
 const LogsButton = styled.button`
   color: ${Black};
-  display: flex;
+  width: 100%;
   flex-direction: row;
   justify-content: center;
   align-items: center;
@@ -76,6 +88,7 @@ const LogsButton = styled.button`
   }
 `;
 
+
 // TODO: turn this into an enum?
 const NodeStatus: [string, string, string][] = [
   ["Online", "\u2B24", "green"],     // 0
@@ -94,6 +107,7 @@ const Status = () => {
   const [eth2ClientName, setEth2ClientName] = useState("");
   const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] = useState(3);
   const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(3);
+  const [ProcessingTotalStatus, setProcessingTotalStatus] = useState(0);
 
   useEffect(() => {
     setTimeout(() => {
@@ -114,6 +128,30 @@ const Status = () => {
   const formatStatusIcon = (status: number) => {
     return (
       <span style={{ color: NodeStatus[status][2]}}>{NodeStatus[status][1]}</span>
+    )
+  }
+
+  const formatTotalStatusButton = (running: boolean) => {
+    const toggleTotalStatus = async () => {
+      if (!running)
+      {
+        startNodes()
+        setProcessingTotalStatus(1);
+      }
+      else {
+        stopNodes()
+        setProcessingTotalStatus(2);
+      }
+    }
+    let text = running ? "Stop All" : "Start All";
+    if (ProcessingTotalStatus)
+      text = "Processing...";
+    let totalStatusChanged = ProcessingTotalStatus == 1 && running ||
+                             ProcessingTotalStatus == 2 && !running;
+    if (totalStatusChanged)
+      setProcessingTotalStatus(0);
+    return (
+        <LogsButton onClick={toggleTotalStatus} disabled={ProcessingTotalStatus != 0}>{text}</LogsButton>
     )
   }
 
@@ -141,10 +179,18 @@ const Status = () => {
     return eth2ValidatorContainerStatus;
   }
 
+  const computeTotalStatus = () => {
+    return !(computeEth1Status() == 2 && eth2BeaconContainerStatus == 2 && eth2ValidatorContainerStatus == 2);
+  }
+
   const renderNodeStatusTable = () => {
     return (
       <ResultsTable>
         <thead>
+          <tr>
+            <th colSpan={3}/>
+            <th style={{width: "100px"}}>{formatTotalStatusButton(computeTotalStatus())}</th>
+          </tr>
           <tr>
             <th>Application</th>
             <th>Status*</th>
