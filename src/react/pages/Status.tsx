@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import {
   Black,
   Button,
@@ -5,9 +7,17 @@ import {
   DarkGray,
   Gray4,
   Heading,
-  MainContent
-} from "../colors";
-import React, { useEffect, useState } from "react";
+  MainContent,
+} from '../colors';
+import { Status, AllStatuses, NodeStatuses } from '../types';
+import {
+  sendToEthStakerDiscord,
+  sendToEthStakerSubreddit,
+  sendToGoerliEtherscan,
+  sendToPyrmontBeaconchain,
+  sendToGetGoerliEth,
+  sendToEthereumStudymaster,
+} from '../utils';
 import {
   getEth2ClientName,
   openEth1Logs,
@@ -20,7 +30,8 @@ import {
   queryEth2ValidatorStatus,
   startNodes,
   stopNodes,
-} from '../commands/RocketPool'
+} from '../commands/RocketPool';
+import Footer from '../components/Footer';
 
 import Footer from "../components/Footer";
 import { shell } from "electron";
