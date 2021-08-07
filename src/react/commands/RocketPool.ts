@@ -3,7 +3,6 @@ import {
   executeCommandAsync,
   executeCommandInNewTerminal,
   executeCommandStream,
-  executeCommandSync,
   executeCommandSyncReturnStdout,
   executeCommandWithPromptsAsync,
 } from './ExecuteCommand'
