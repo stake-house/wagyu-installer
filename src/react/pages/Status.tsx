@@ -33,9 +33,12 @@ import {
 } from '../commands/RocketPool';
 import Footer from '../components/Footer';
 
-import Footer from "../components/Footer";
-import { shell } from "electron";
-import styled from "styled-components";
+const NodeStatus: NodeStatuses = {
+  Online: { code: 0, text: 'Online', character: '\u2B24', color: 'green' },
+  Syncing: { code: 1, text: 'Syncing', character: '\u2B24', color: 'yellow' },
+  Offline: { code: 2, text: 'Offline', character: '\u2B24', color: 'red' },
+  Loading: { code: 3, text: 'Loading...', character: '', color: '' },
+};
 
 const Container = styled.div`
   display: flex;
@@ -98,15 +101,6 @@ const LogsButton = styled.button`
     background-color: ${Gray4};
   }
 `;
-
-
-// TODO: turn this into an enum?
-const NodeStatus: [string, string, string][] = [
-  ["Online", "\u2B24", "green"],     // 0
-  ["Syncing", "\u2B24", "yellow"],   // 1
-  ["Offline", "\u2B24", "red"],      // 2
-  ["Loading...", "", ""]             // 3
-]
 
 // TODO: right after install, while nodes are starting up, this page says everything is "online"
 // while things are looking for peers.  Need to improve that logic.
