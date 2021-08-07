@@ -105,12 +105,19 @@ const LogsButton = styled.button`
 // while things are looking for peers.  Need to improve that logic.
 
 const StatusPage = () => {
+  const [eth1ContainerStatus, setEth1ContainerStatus] = useState<Status>(
+    Status.Loading,
+  );
   const [eth1PeerCount, setEth1PeerCount] = useState(0);
   const [eth1Syncing, setEth1Syncing] = useState(false);
-  const [eth2ClientName, setEth2ClientName] = useState("");
-  const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] = useState(3);
-  const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] = useState(3);
-  const [ProcessingTotalStatus, setProcessingTotalStatus] = useState(0);
+  const [eth2ClientName, setEth2ClientName] = useState('');
+  const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] =
+    useState<Status>(Status.Loading);
+  const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] =
+    useState<Status>(Status.Loading);
+  const [ProcessingTotalStatus, setProcessingTotalStatus] = useState<Status>(
+    Status.Online,
+  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -126,10 +133,13 @@ const StatusPage = () => {
     setEth1PeerCount(queryEth1PeerCount());
     queryEth2BeaconStatus(setEth2BeaconContainerStatus);
     queryEth2ValidatorStatus(setEth2ValidatorContainerStatus);
-  }
+  };
 
-  const formatStatusIcon = (status: number) => {
+  const formatStatusIcon = (status: Status) => {
     return (
+      <span style={{ color: NodeStatus[status].color }}>
+        {NodeStatus[status].character}
+      </span>
     );
   };
 
@@ -137,35 +147,54 @@ const StatusPage = () => {
     const toggleTotalStatus = async () => {
       if (!running) {
         startNodes();
+        setProcessingTotalStatus(Status.Syncing);
       } else {
         stopNodes();
+        setProcessingTotalStatus(Status.Offline);
       }
+    };
     let text = running ? 'Stop All' : 'Start All';
     if (ProcessingTotalStatus) text = 'Processing...';
+    let totalStatusChanged =
+      (ProcessingTotalStatus === Status.Syncing && running) ||
+      (ProcessingTotalStatus === Status.Offline && !running);
+    if (totalStatusChanged) setProcessingTotalStatus(Status.Online);
     return (
-        <LogsButton onClick={toggleTotalStatus} disabled={ProcessingTotalStatus != 0}>{text}</LogsButton>
-    )
-  }
-
-  const eth1eth2synced = () => {
+      <LogsButton
+        onClick={toggleTotalStatus}
+        disabled={ProcessingTotalStatus !== Status.Online}
+      >
+        {text}
+      </LogsButton>
     );
   };
 
-  const computeEth1Status = (): number => {
-    if (eth1ContainerStatus == 3) {
-      return 3;
-    } else if (eth1ContainerStatus == 2) {
-      return 2;
+  const eth1eth2synced = () => {
+    return (
+      computeEth1Status() === Status.Loading &&
+      eth2BeaconContainerStatus === Status.Online
+    );
+  };
+
+  const computeEth1Status = (): AllStatuses => {
+    if (eth1ContainerStatus === Status.Loading) {
+      return Status.Loading;
+    } else if (eth1ContainerStatus === Status.Offline) {
+      return Status.Offline;
     } else if (eth1Syncing) {
-      return 1;
+      return Status.Syncing;
     } else {
-      return 0;
+      return Status.Online;
     }
   };
 
   const computeTotalStatus = () => {
-    return !(computeEth1Status() == 2 && eth2BeaconContainerStatus == 2 && eth2ValidatorContainerStatus == 2);
-  }
+    return !(
+      computeEth1Status() === Status.Offline &&
+      eth2BeaconContainerStatus === Status.Offline &&
+      eth2ValidatorContainerStatus === Status.Offline
+    );
+  };
 
   const renderNodeStatusTable = () => {
     return (
@@ -187,21 +216,51 @@ const StatusPage = () => {
         <tbody>
           <tr>
             <td>Eth1 Node - geth</td>
-            <td>{formatStatusIcon(computeEth1Status())} {NodeStatus[computeEth1Status()][0]}</td>
+            <td>
+              {formatStatusIcon(computeEth1Status())}
+              {NodeStatus[computeEth1Status()].text}
+            </td>
             <td>{eth1PeerCount}</td>
-            <td><LogsButton onClick={openEth1Logs} disabled={eth1ContainerStatus == 2}>View Logs</LogsButton></td>
+            <td>
+              <LogsButton
+                onClick={openEth1Logs}
+                disabled={eth1ContainerStatus === Status.Offline}
+              >
+                View Logs
+              </LogsButton>
+            </td>
           </tr>
           <tr>
             <td>Eth2 Beacon Node - {eth2ClientName}</td>
-            <td>{formatStatusIcon(computeEth2BeaconStatus())} {NodeStatus[computeEth2BeaconStatus()][0]}</td>
+            <td>
+              {formatStatusIcon(eth2BeaconContainerStatus)}
+              {NodeStatus[eth2BeaconContainerStatus].text}
+            </td>
             <td>-</td>
-            <td><LogsButton onClick={openEth2BeaconLogs} disabled={eth2BeaconContainerStatus == 2}>View Logs</LogsButton></td>
+            <td>
+              <LogsButton
+                onClick={openEth2BeaconLogs}
+                disabled={eth2BeaconContainerStatus === Status.Offline}
+              >
+                View Logs
+              </LogsButton>
+            </td>
           </tr>
           <tr>
             <td>Eth2 Validator - {eth2ClientName}</td>
-            <td>{formatStatusIcon(computeEth2ValidatorStatus())} {NodeStatus[computeEth2ValidatorStatus()][0]}</td>
+            <td>
+              {formatStatusIcon(eth2ValidatorContainerStatus)}
+              {NodeStatus[eth2ValidatorContainerStatus].text}
+            </td>
             <td>-</td>
-            <td><LogsButton onClick={openEth2ValidatorLogs} disabled={eth2ValidatorContainerStatus == 2}>View Logs</LogsButton></td>
+            <td>
+              <LogsButton
+                onClick={openEth2ValidatorLogs}
+                disabled={eth2ValidatorContainerStatus === Status.Offline}
+              >
+                View Logs
+              </LogsButton>
+            </td>
           </tr>
         </tbody>
       </ResultsTable>
