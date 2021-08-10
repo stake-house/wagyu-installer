@@ -1,21 +1,15 @@
-import {
-  Black,
-  DisabledButton,
-  Heading,
-  MainContent
-} from "../colors";
-
-import Footer from "../components/Footer";
-import React from "react";
-import { shell } from "electron";
-import styled from "styled-components";
+import React from 'react';
+import { shell } from 'electron';
+import styled from 'styled-components';
+import { Black, DisabledButton, Heading, MainContent } from '../colors';
+import Footer from './Footer';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height:100vh;
+  min-height: 100vh;
 `;
 
 const LandingHeader = styled.div`
@@ -24,7 +18,7 @@ const LandingHeader = styled.div`
   margin-top: 50;
   color: ${Heading};
   max-width: 550;
-  flex-grow:1;
+  flex-grow: 1;
 `;
 
 const Content = styled.div`
@@ -62,17 +56,19 @@ const ImportKeysButton = styled.div`
 `;
 
 const sendToLaunchpad = () => {
-  shell.openExternal("https://pyrmont.launchpad.ethereum.org/");
-}  
+  shell.openExternal('https://pyrmont.launchpad.ethereum.org/');
+};
 
-const Deposit = () => {
-  // TODO: add browse 
+export const Deposit = () => {
+  // TODO: add browse
   // TODO: run validator then go to status page on Run click
   return (
     <Container>
       <LandingHeader>Deposit</LandingHeader>
       <Content>
-        1) Head to the <StyledLink onClick={sendToLaunchpad}>launchpad</StyledLink> to deposit 32 Goerli ETH.
+        1) Head to the
+        <StyledLink onClick={sendToLaunchpad}>launchpad</StyledLink> to deposit
+        32 Goerli ETH.
         <br />
         <br />
         <em>Note: Your nodes are set up already, so ignore those steps.</em>
@@ -86,9 +82,9 @@ const Deposit = () => {
         <br />
         <ButtonContainer>
           <ImportKeysButton>
-              Import Validator Keys `keystore-*.json` file
-              <br />
-              (still in development)
+            Import Validator Keys `keystore-*.json` file
+            <br />
+            (still in development)
           </ImportKeysButton>
         </ButtonContainer>
         <br />
@@ -96,9 +92,12 @@ const Deposit = () => {
         <br />
         3) Click Run.
       </Content>
-      <Footer backLink={"/status"} backLabel={"Back"} nextLink={"/status"} nextLabel={"Run"} />
+      <Footer
+        backLink={'/status'}
+        backLabel={'Back'}
+        nextLink={'/status'}
+        nextLabel={'Run'}
+      />
     </Container>
-  )
-}
-
-export default Deposit;
+  );
+};

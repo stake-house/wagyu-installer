@@ -31,7 +31,7 @@ import {
   startNodes,
   stopNodes,
 } from '../commands/RocketPool';
-import Footer from '../components/Footer';
+import Footer from './Footer';
 
 const NodeStatus: NodeStatuses = {
   Online: { code: 0, text: 'Online', character: '\u2B24', color: 'green' },

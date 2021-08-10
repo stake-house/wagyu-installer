@@ -1,25 +1,16 @@
-import {
-  Black,
-  Button,
-  ButtonHover,
-  Heading,
-  MainContent
-} from "../colors";
-import { Link, withRouter } from "react-router-dom";
-import React, { useEffect, useRef, useState } from "react";
-import styled, { keyframes } from "styled-components";
-
-import { History } from "history";
-import { installAndStartRocketPool } from "../commands/RocketPool";
-
-const ENTER_KEYCODE = 13;
+import React, { useEffect, useRef, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { withRouter } from 'react-router-dom';
+import { History } from 'history';
+import { Heading, MainContent } from '../colors';
+import { installAndStartRocketPool } from '../commands/RocketPool';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height:100vh;
+  min-height: 100vh;
 `;
 
 const LandingHeader = styled.div`
@@ -28,7 +19,7 @@ const LandingHeader = styled.div`
   margin-top: 50;
   color: ${Heading};
   max-width: 550;
-  flex-grow:1;
+  flex-grow: 1;
 `;
 
 const Content = styled.div`
@@ -81,13 +72,12 @@ const LogsListItem = styled.li`
   text-overflow: ellipsis;
 `;
 
-const LogsContainerAnchor = styled.div`
-`;
+const LogsContainerAnchor = styled.div``;
 
-const Installing = ({ history }: {history: History}) => {
-  const anchorRef = useRef(document.createElement("div"));
+const Installing = ({ history }: { history: History }) => {
+  const anchorRef = useRef(document.createElement('div'));
 
-  const [stdoutText, setStdoutText] = useState([""]);
+  const [stdoutText, setStdoutText] = useState(['']);
 
   useEffect(() => {
     setTimeout(() => {
@@ -100,55 +90,55 @@ const Installing = ({ history }: {history: History}) => {
   }, [stdoutText]);
 
   const stdoutCallback = (text: string[]) => {
-    console.log("installing cb with " + text.join());
+    console.log('installing cb with ' + text.join());
     setStdoutText(stdoutText.concat(text));
-  }
+  };
 
   const installCallback = (success: boolean) => {
     if (success) {
-      console.log("install succeeded")
-      
+      console.log('install succeeded');
+
       // wait 5 seconds before redirecting to make sure everythings up
       setTimeout(() => {
         history.push('/status');
       }, 5000);
     } else {
-      console.log("install failed");
-      history.push("/installfailed");
+      console.log('install failed');
+      history.push('/installfailed');
     }
-  }
+  };
 
   return (
     <Container>
       <LandingHeader>Install</LandingHeader>
-        <Content>
-          Installing...
-          <br />
-          <br />
-          May take 2-4 minutes depending on internet speed.
-          <SpinnerContainer>
-            <LoadingSpinner />
-          </SpinnerContainer>
-          <br/>
-          { // Only show logs container if there are some
-            stdoutText.length > 1
-            &&
+      <Content>
+        Installing...
+        <br />
+        <br />
+        May take 2-4 minutes depending on internet speed.
+        <SpinnerContainer>
+          <LoadingSpinner />
+        </SpinnerContainer>
+        <br />
+        {
+          // Only show logs container if there are some
+          stdoutText.length > 1 && (
             <div>
               Install logs:
               <LogsContainer>
                 <LogsList>
                   {stdoutText.map((line, i) => {
-                    return (<LogsListItem key={i}>{line}</LogsListItem>)
+                    return <LogsListItem key={i}>{line}</LogsListItem>;
                   })}
                 </LogsList>
                 <LogsContainerAnchor ref={anchorRef}></LogsContainerAnchor>
               </LogsContainer>
             </div>
-          }
-
-        </Content>
+          )
+        }
+      </Content>
     </Container>
-  )
-}
+  );
+};
 
 export default withRouter(Installing);

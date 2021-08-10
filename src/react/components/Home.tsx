@@ -1,18 +1,17 @@
+import React from 'react';
+import styled from 'styled-components';
+import { shell } from 'electron';
+import { Link, withRouter } from 'react-router-dom';
+import { History } from 'history';
+import { isRocketPoolInstalled } from '../commands/RocketPool';
 import {
   Black,
   Button,
   ButtonHover,
   Heading,
   MainContent,
-  Red
-} from "../colors";
-import { Link, withRouter } from "react-router-dom";
-
-import { History } from "history";
-import React from "react";
-import { isRocketPoolInstalled } from "../commands/RocketPool";
-import { shell } from "electron";
-import styled from "styled-components";
+  Red,
+} from '../colors';
 
 const Container = styled.div`
   display: flex;
@@ -63,17 +62,17 @@ const StyledLink = styled.em`
 `;
 
 const Testnet = styled.b`
-  color: ${Red}
+  color: ${Red};
 `;
 
-const Home = ({ history }: {history: History}) => {
+export const Home = withRouter(({ history }: { history: History }) => {
   if (isRocketPoolInstalled()) {
     history.push('/status');
   }
 
   const sendToRocketpool = () => {
-    shell.openExternal("https://www.rocketpool.net/");
-  }
+    shell.openExternal('https://www.rocketpool.net/');
+  };
 
   return (
     <Container>
@@ -81,24 +80,25 @@ const Home = ({ history }: {history: History}) => {
       <Content>
         This is your portal into the Eth2 world - welcome.
         <br />
-        <br/>
         <br />
-        A one-click staking installer for the <Testnet>pyrmont testnet</Testnet>.
-        <br/>
-        <br/>
-        <br/>
+        <br />A one-click staking installer for the
+        <Testnet>pyrmont testnet</Testnet>.
+        <br />
+        <br />
+        <br />
         It will configure the following for you*:
         <ul>
           <li>Eth 1 Node</li>
           <li>Eth 2 Beacon Node</li>
           <li>Eth 2 Validator</li>
         </ul>
-        <br/>
-        <br/>
-        *Note: we use the Rocket Pool install infrastructure which runs everything in docker, more info <StyledLink onClick={sendToRocketpool}>here</StyledLink>
+        <br />
+        <br />
+        *Note: we use the Rocket Pool install infrastructure which runs
+        everything in docker, more info
+        <StyledLink onClick={sendToRocketpool}>here</StyledLink>
       </Content>
       <StartButton to="/systemcheck">Enter</StartButton>
     </Container>
   );
-};
-export default withRouter(Home);
+});
