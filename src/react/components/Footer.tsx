@@ -1,15 +1,14 @@
-import { Black, Button, ButtonHover } from "../colors";
-
-import { Link } from "react-router-dom";
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import { Black, Button, ButtonHover } from '../colors';
 
 type FooterProps = {
   backLink: string;
   backLabel: string;
   nextLink: string;
   nextLabel: string;
-}
+};
 
 const FooterContainer = styled.div`
   display: flex;
@@ -18,8 +17,8 @@ const FooterContainer = styled.div`
   align-items: center;
   align-self: flex-end;
   height: 70;
-  flex-grow:1;
-  min-width:100vw;
+  flex-grow: 1;
+  min-width: 100vw;
 `;
 
 const StyledButton = styled(Link)`
@@ -28,7 +27,7 @@ const StyledButton = styled(Link)`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  align-self:flex-end;
+  align-self: flex-end;
   height: 24;
   background-color: ${Button};
   padding: 16 24;
@@ -44,15 +43,21 @@ const StyledButton = styled(Link)`
   }
 `;
 
-
 const Footer = (props: FooterProps) => {
-  return(
+  return (
     <FooterContainer>
-      { props.backLink ? <StyledButton to={props.backLink}>{props.backLabel}</StyledButton> : <div></div> }
-      { props.nextLink ? <StyledButton to={props.nextLink}>{props.nextLabel}</StyledButton> : <div></div> }
+      {props.backLink ? (
+        <StyledButton to={props.backLink}>{props.backLabel}</StyledButton>
+      ) : (
+        <div />
+      )}
+      {props.nextLink ? (
+        <StyledButton to={props.nextLink}>{props.nextLabel}</StyledButton>
+      ) : (
+        <div />
+      )}
     </FooterContainer>
-  )
-
-}
+  );
+};
 
 export default Footer;
