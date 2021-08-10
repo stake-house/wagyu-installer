@@ -1,15 +1,14 @@
-import { Heading, MainContent } from '../colors';
-
-import Footer from '../components/Footer';
 import React from 'react';
 import styled from 'styled-components';
+import { Heading, MainContent } from '../colors';
+import Footer from './Footer';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height:100vh;
+  min-height: 100vh;
 `;
 
 const LandingHeader = styled.div`
@@ -18,9 +17,8 @@ const LandingHeader = styled.div`
   margin-top: 50;
   color: ${Heading};
   max-width: 550;
-  flex-grow:1;
+  flex-grow: 1;
 `;
-
 
 const Content = styled.div`
   color: ${MainContent};
@@ -29,19 +27,19 @@ const Content = styled.div`
   flex-grow: 6;
 `;
 
-const InstallFailed = () => {
+export const InstallFailed = () => {
   return (
     <Container>
       <LandingHeader>Install Failed</LandingHeader>
       <Content>
-        Unfortunately your install failed.  At this time we cannot provide any additonal info.
+        Unfortunately your install failed. At this time we cannot provide any
+        additonal info.
         <br />
         <br />
         <br />
         Please reach out to the ethstaker community for help.
       </Content>
-      <Footer backLink={"/"} backLabel={"Home"} nextLink={""} nextLabel={""} />
+      <Footer backLink={'/'} backLabel={'Home'} nextLink={''} nextLabel={''} />
     </Container>
   );
-}
-export default InstallFailed;
+};

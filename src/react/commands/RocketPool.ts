@@ -3,13 +3,13 @@ import {
   executeCommandAsync,
   executeCommandInNewTerminal,
   executeCommandStream,
-  executeCommandSync,
   executeCommandSyncReturnStdout,
   executeCommandWithPromptsAsync,
 } from './ExecuteCommand'
 
 import fs from "fs";
 import yaml from "js-yaml";
+import { Status } from "../types";
 
 const ASKPASS_PATH = "src/scripts/askpass.sh";
 
@@ -26,7 +26,7 @@ const GETH_PEERS_DOCKER_CMD = "docker exec rocketpool_eth1 geth --exec 'admin.pe
 // TODO: better error handling/logging
 
 type Callback = (success: boolean) => void;
-type NodeStatusCallback = (status: number) => void;
+type NodeStatusCallback = (status: Status) => void;
 type StdoutCallback = (text: string[]) => void;
 
 const wrapCommandInDockerGroup = (command: string) => {
@@ -184,9 +184,9 @@ const dockerContainerStatus = async (containerName: string, nodeStatusCallback: 
   const containerId = executeCommandSyncReturnStdout(wrapCommandInDockerGroup("docker ps -q -f name=" + containerName));
 
   if (containerId.trim()) {
-    nodeStatusCallback(0); // online
+    nodeStatusCallback(Status.Online);
   } else {
-    nodeStatusCallback(2); // offline
+    nodeStatusCallback(Status.Offline);
   }
 }
 

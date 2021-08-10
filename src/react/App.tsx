@@ -1,14 +1,13 @@
-import { HashRouter, Route, Switch } from "react-router-dom";
-
-import { Background } from "./colors";
-import Deposit from "./pages/Deposit";
-import Home from "./pages/Home";
-import InstallFailed from "./pages/InstallFailed";
-import Installing from "./pages/Installing";
-import React from "react";
-import Status from "./pages/Status";
-import SystemCheck from "./pages/SystemCheck";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
+import { HashRouter, Route, Switch } from 'react-router-dom';
+import { Background } from './colors';
+import { Deposit } from './components/Deposit';
+import { Home } from './components/Home';
+import { InstallFailed } from './components/InstallFailed';
+import Installing from './components/Installing';
+import Status from './components/Status';
+import { SystemCheck } from './components/SystemCheck';
 
 const Container = styled.main`
   font-family: 'PT Mono', monospace;
