@@ -5,8 +5,8 @@ import { Background } from './colors';
 import { Deposit } from './components/Deposit';
 import { Home } from './components/Home';
 import { InstallFailed } from './components/InstallFailed';
-import Installing from './components/Installing';
-import Status from './components/Status';
+import { Installing } from './components/Installing';
+import { StatusPage as Status } from './components/Status';
 import { SystemCheck } from './components/SystemCheck';
 
 const Container = styled.main`

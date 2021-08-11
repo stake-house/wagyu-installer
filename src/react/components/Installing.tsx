@@ -74,7 +74,7 @@ const LogsListItem = styled.li`
 
 const LogsContainerAnchor = styled.div``;
 
-const Installing = ({ history }: { history: History }) => {
+export const Installing = withRouter(({ history }: { history: History }) => {
   const anchorRef = useRef(document.createElement('div'));
 
   const [stdoutText, setStdoutText] = useState(['']);
@@ -139,6 +139,4 @@ const Installing = ({ history }: { history: History }) => {
       </Content>
     </Container>
   );
-};
-
-export default withRouter(Installing);
+});

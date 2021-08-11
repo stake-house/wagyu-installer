@@ -104,7 +104,7 @@ const LogsButton = styled.button`
 // TODO: right after install, while nodes are starting up, this page says everything is "online"
 // while things are looking for peers.  Need to improve that logic.
 
-const StatusPage = () => {
+export const StatusPage = () => {
   const [eth1ContainerStatus, setEth1ContainerStatus] = useState<Status>(
     Status.Loading,
   );
@@ -378,5 +378,3 @@ const StatusPage = () => {
     </Container>
   );
 };
-
-export default StatusPage;
