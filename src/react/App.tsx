@@ -17,7 +17,7 @@ const Container = styled.main`
   background-color: ${Slate1};
 `;
 
-const App = () => {
+export const App = () => {
   return (
     <HashRouter>
       <Container>
@@ -33,5 +33,3 @@ const App = () => {
     </HashRouter>
   );
 };
-
-export default App;
