@@ -12,6 +12,7 @@ import {
   Gray3,
   Red,
 } from '../colors';
+import { Header } from './typography/Header';
 
 const Container = styled.div`
   display: flex;
@@ -20,12 +21,8 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const LandingHeader = styled.div`
-  font-weight: 700;
-  font-size: 35;
+const LandingHeader = styled(Header)`
   margin-top: 120;
-  color: ${Heading};
-  max-width: 550;
   text-align: center;
 `;
 

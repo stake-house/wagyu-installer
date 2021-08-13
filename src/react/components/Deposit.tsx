@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { rem } from 'polished';
 import { Black, DarkGray, MediumBlue, Gray3 } from '../colors';
 import { Footer } from './Footer';
+import { Header } from './typography/Header';
 
 const Container = styled.div`
   display: flex;
@@ -13,12 +14,7 @@ const Container = styled.div`
   min-height: 100vh;
 `;
 
-const LandingHeader = styled.div`
-  font-weight: 700;
-  font-size: 35;
-  margin-top: 50;
-  color: ${Heading};
-  max-width: 550;
+const LandingHeader = styled(Header)`
   flex-grow: 1;
 `;
 

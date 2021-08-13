@@ -33,6 +33,7 @@ import {
   stopNodes,
 } from '../commands/RocketPool';
 import { Footer } from './Footer';
+import { Header } from './typography/Header';
 
 const NodeStatus: NodeStatuses = {
   Online: { code: 0, text: 'Online', character: '\u2B24', color: 'green' },
@@ -49,12 +50,7 @@ const Container = styled.div`
   min-height: 100vh;
 `;
 
-const LandingHeader = styled.div`
-  font-weight: 700;
-  font-size: 35;
-  margin-top: 50;
-  color: ${Heading};
-  max-width: 550;
+const LandingHeader = styled(Header)`
   flex-grow: 1;
 `;
 
@@ -112,10 +108,14 @@ export const StatusPage = () => {
   const [eth1PeerCount, setEth1PeerCount] = useState(0);
   const [eth1Syncing, setEth1Syncing] = useState(false);
   const [eth2ClientName, setEth2ClientName] = useState('');
-  const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] =
-    useState<Status>(Status.Loading);
-  const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] =
-    useState<Status>(Status.Loading);
+  const [
+    eth2BeaconContainerStatus,
+    setEth2BeaconContainerStatus,
+  ] = useState<Status>(Status.Loading);
+  const [
+    eth2ValidatorContainerStatus,
+    setEth2ValidatorContainerStatus,
+  ] = useState<Status>(Status.Loading);
   const [ProcessingTotalStatus, setProcessingTotalStatus] = useState<Status>(
     Status.Online,
   );
