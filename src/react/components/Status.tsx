@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { rem } from 'polished';
 import {
   Black,
-  Button,
-  ButtonHover,
+  LightBlue,
+  LightGreen,
   DarkGray,
   Gray4,
-  Heading,
-  MainContent,
+  MediumBlue,
+  Gray3,
 } from '../colors';
 import { Status, AllStatuses, NodeStatuses } from '../types';
 import {
@@ -58,7 +59,7 @@ const LandingHeader = styled.div`
 `;
 
 const Content = styled.div`
-  color: ${MainContent};
+  color: ${Gray3};
   margin-top: 20;
   width: 650;
   flex-grow: 6;
@@ -67,13 +68,13 @@ const Content = styled.div`
 const ResultsTable = styled.table`
   border: 2px solid gray;
   width: 100%;
-  padding: 15px;
+  padding: ${rem(15)};
   text-align: left;
   color: white;
 `;
 
 const StyledLink = styled.span`
-  color: ${Heading};
+  color: ${MediumBlue};
   cursor: pointer;
 `;
 
@@ -83,15 +84,15 @@ const LogsButton = styled.button`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-color: ${Button};
-  border-radius: 10px;
+  background-color: ${LightBlue};
+  border-radius: ${rem(10)};
   text-decoration: none;
 
   transition: 250ms background-color ease;
   cursor: pointer;
 
   &:hover {
-    background-color: ${ButtonHover};
+    background-color: ${LightGreen};
   }
 
   &:disabled {

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { HashRouter, Route, Switch } from 'react-router-dom';
-import { Background } from './colors';
+import { Slate1 } from './colors';
 import { Deposit } from './components/Deposit';
 import { Home } from './components/Home';
 import { InstallFailed } from './components/InstallFailed';
@@ -14,7 +14,7 @@ const Container = styled.main`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: ${Background};
+  background-color: ${Slate1};
 `;
 
 const App = () => {

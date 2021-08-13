@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Heading, MainContent } from '../colors';
-import Footer from './Footer';
+import { Gray3 } from '../colors';
 
 const Container = styled.div`
   display: flex;
@@ -21,7 +20,7 @@ const LandingHeader = styled.div`
 `;
 
 const Content = styled.div`
-  color: ${MainContent};
+  color: ${Gray3};
   margin-top: 20;
   width: 650;
   flex-grow: 6;

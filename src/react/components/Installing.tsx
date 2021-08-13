@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { rem } from 'polished';
 import { withRouter } from 'react-router-dom';
 import { History } from 'history';
-import { Heading, MainContent } from '../colors';
+import { Gray3 } from '../colors';
 import { installAndStartRocketPool } from '../commands/RocketPool';
 
 const Container = styled.div`
@@ -23,7 +24,7 @@ const LandingHeader = styled.div`
 `;
 
 const Content = styled.div`
-  color: ${MainContent};
+  color: ${Gray3};
   margin-top: 20;
   width: 650;
   flex-grow: 6;
@@ -41,22 +42,22 @@ const SpinnerContainer = styled.div`
 `;
 
 const LoadingSpinner = styled.div`
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
+  border: ${rem(16)} solid #f3f3f3; /* Light grey */
+  border-top: ${rem(16)} solid #3498db; /* Blue */
   border-radius: 50%;
-  margin-top: 30px;
-  width: 120px;
-  height: 120px;
+  margin-top: ${rem(30)};
+  width: ${rem(120)};
+  height: ${rem(120)};
   animation: ${rotate} 2s linear infinite;
 `;
 
 const LogsContainer = styled.div`
-  height: 250px;
+  height: ${rem(250)};
   width: 100%;
-  margin-top: 5px;
+  margin-top: ${rem(5)};
   overflow-y: auto;
   background-color: white;
-  border-radius: 5px;
+  border-radius: ${rem(5)};
   border-style: groove;
   color: black;
 `;

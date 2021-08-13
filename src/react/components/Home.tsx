@@ -6,10 +6,10 @@ import { History } from 'history';
 import { isRocketPoolInstalled } from '../commands/RocketPool';
 import {
   Black,
-  Button,
-  ButtonHover,
-  Heading,
-  MainContent,
+  LightBlue,
+  LightGreen,
+  MediumBlue,
+  Gray3,
   Red,
 } from '../colors';
 
@@ -30,7 +30,7 @@ const LandingHeader = styled.div`
 `;
 
 const Content = styled.div`
-  color: ${MainContent};
+  color: ${Gray3};
   margin-top: 40;
   max-width: 650;
 `;
@@ -42,7 +42,7 @@ const StartButton = styled(Link)`
   justify-content: center;
   align-items: center;
   height: 24;
-  background-color: ${Button};
+  background-color: ${LightBlue};
   padding: 16 24;
   border-radius: 10%;
   text-decoration: none;
@@ -52,12 +52,12 @@ const StartButton = styled(Link)`
   margin-top: 60;
 
   &:hover {
-    background-color: ${ButtonHover};
+    background-color: ${LightGreen};
   }
 `;
 
 const StyledLink = styled.em`
-  color: ${Heading};
+  color: ${MediumBlue};
   cursor: pointer;
 `;
 
