@@ -3,6 +3,7 @@ import { shell } from 'electron';
 import styled from 'styled-components';
 import { rem } from 'polished';
 import { Black, DarkGray, MediumBlue, Gray3 } from '../colors';
+import { Footer } from './Footer';
 
 const Container = styled.div`
   display: flex;

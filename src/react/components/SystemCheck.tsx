@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { rem } from 'polished';
 import { DarkBlue, Gray3 } from '../colors';
+import { Footer } from './Footer';
 import { isRocketPoolInstalled } from '../commands/RocketPool';
 
 const Container = styled.div`

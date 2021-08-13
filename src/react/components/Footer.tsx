@@ -43,7 +43,7 @@ const StyledButton = styled(Link)`
   }
 `;
 
-const Footer = (props: FooterProps) => {
+export const Footer = (props: FooterProps) => {
   return (
     <FooterContainer>
       {props.backLink ? (
@@ -59,5 +59,3 @@ const Footer = (props: FooterProps) => {
     </FooterContainer>
   );
 };
-
-export default Footer;

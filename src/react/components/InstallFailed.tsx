@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Gray3 } from '../colors';
+import { Footer } from './Footer';
 
 const Container = styled.div`
   display: flex;
