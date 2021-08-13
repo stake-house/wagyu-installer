@@ -1,0 +1,11 @@
+{
+  "editor.formatOnSave": true,
+  "workbench.tree.renderIndentGuides": "always",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.options": {
+    "rules": {
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "prefer-const": "off"
+    }
+  }
+}

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { DarkBlue, Heading, MainContent } from '../colors';
-import Footer from './Footer';
+import { rem } from 'polished';
+import { DarkBlue, Gray3 } from '../colors';
+import { Footer } from './Footer';
 import { isRocketPoolInstalled } from '../commands/RocketPool';
+import { Header } from './typography/Header';
 
 const Container = styled.div`
   display: flex;
@@ -12,17 +14,12 @@ const Container = styled.div`
   min-height: 100vh;
 `;
 
-const LandingHeader = styled.div`
-  font-weight: 700;
-  font-size: 35;
-  margin-top: 50;
-  color: ${Heading};
-  max-width: 550;
+const LandingHeader = styled(Header)`
   flex-grow: 1;
 `;
 
 const Content = styled.div`
-  color: ${MainContent};
+  color: ${Gray3};
   margin-top: 20;
   width: 650;
   flex-grow: 6;
@@ -38,7 +35,7 @@ const Advanced = styled.div`
 const ResultsTable = styled.table`
   border: 2px solid gray;
   width: 75%;
-  padding: 15px;
+  padding: ${rem(15)};
   text-align: left;
   color: white;
 `;

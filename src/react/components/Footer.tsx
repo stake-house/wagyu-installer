@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { Black, Button, ButtonHover } from '../colors';
+import { Black, LightBlue, LightGreen } from '../colors';
 
 type FooterProps = {
   backLink: string;
@@ -29,7 +29,7 @@ const StyledButton = styled(Link)`
   align-items: center;
   align-self: flex-end;
   height: 24;
-  background-color: ${Button};
+  background-color: ${LightBlue};
   padding: 16 24;
   border-radius: 10%;
   text-decoration: none;
@@ -39,11 +39,11 @@ const StyledButton = styled(Link)`
   margin: 60;
 
   &:hover {
-    background-color: ${ButtonHover};
+    background-color: ${LightGreen};
   }
 `;
 
-const Footer = (props: FooterProps) => {
+export const Footer = (props: FooterProps) => {
   return (
     <FooterContainer>
       {props.backLink ? (
@@ -59,5 +59,3 @@ const Footer = (props: FooterProps) => {
     </FooterContainer>
   );
 };
-
-export default Footer;

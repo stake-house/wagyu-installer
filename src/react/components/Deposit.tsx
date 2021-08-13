@@ -1,8 +1,10 @@
 import React from 'react';
 import { shell } from 'electron';
 import styled from 'styled-components';
-import { Black, DisabledButton, Heading, MainContent } from '../colors';
-import Footer from './Footer';
+import { rem } from 'polished';
+import { Black, DarkGray, MediumBlue, Gray3 } from '../colors';
+import { Footer } from './Footer';
+import { Header } from './typography/Header';
 
 const Container = styled.div`
   display: flex;
@@ -12,24 +14,19 @@ const Container = styled.div`
   min-height: 100vh;
 `;
 
-const LandingHeader = styled.div`
-  font-weight: 700;
-  font-size: 35;
-  margin-top: 50;
-  color: ${Heading};
-  max-width: 550;
+const LandingHeader = styled(Header)`
   flex-grow: 1;
 `;
 
 const Content = styled.div`
-  color: ${MainContent};
+  color: ${Gray3};
   margin-top: 20;
   width: 650;
   flex-grow: 6;
 `;
 
 const StyledLink = styled.span`
-  color: ${Heading};
+  color: ${MediumBlue};
   cursor: pointer;
 `;
 
@@ -46,9 +43,9 @@ const ImportKeysButton = styled.div`
   justify-content: center;
   align-items: center;
   width: fit-content;
-  background-color: ${DisabledButton};
+  background-color: ${DarkGray};
   padding: 16 24;
-  border-radius: 20px;
+  border-radius: ${rem(20)};
   text-decoration: none;
 
   transition: 250ms background-color ease;

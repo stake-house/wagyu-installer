@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { HashRouter, Route, Switch } from 'react-router-dom';
-import { Background } from './colors';
+import { Slate1 } from './colors';
 import { Deposit } from './components/Deposit';
 import { Home } from './components/Home';
 import { InstallFailed } from './components/InstallFailed';
-import Installing from './components/Installing';
-import Status from './components/Status';
+import { Installing } from './components/Installing';
+import { StatusPage as Status } from './components/Status';
 import { SystemCheck } from './components/SystemCheck';
 
 const Container = styled.main`
@@ -14,10 +14,10 @@ const Container = styled.main`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: ${Background};
+  background-color: ${Slate1};
 `;
 
-const App = () => {
+export const App = () => {
   return (
     <HashRouter>
       <Container>
@@ -33,5 +33,3 @@ const App = () => {
     </HashRouter>
   );
 };
-
-export default App;

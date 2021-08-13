@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { rem } from 'polished';
 import {
   Black,
-  Button,
-  ButtonHover,
+  LightBlue,
+  LightGreen,
   DarkGray,
   Gray4,
-  Heading,
-  MainContent,
+  MediumBlue,
+  Gray3,
 } from '../colors';
 import { Status, AllStatuses, NodeStatuses } from '../types';
 import {
@@ -31,7 +32,8 @@ import {
   startNodes,
   stopNodes,
 } from '../commands/RocketPool';
-import Footer from './Footer';
+import { Footer } from './Footer';
+import { Header } from './typography/Header';
 
 const NodeStatus: NodeStatuses = {
   Online: { code: 0, text: 'Online', character: '\u2B24', color: 'green' },
@@ -48,17 +50,12 @@ const Container = styled.div`
   min-height: 100vh;
 `;
 
-const LandingHeader = styled.div`
-  font-weight: 700;
-  font-size: 35;
-  margin-top: 50;
-  color: ${Heading};
-  max-width: 550;
+const LandingHeader = styled(Header)`
   flex-grow: 1;
 `;
 
 const Content = styled.div`
-  color: ${MainContent};
+  color: ${Gray3};
   margin-top: 20;
   width: 650;
   flex-grow: 6;
@@ -67,13 +64,13 @@ const Content = styled.div`
 const ResultsTable = styled.table`
   border: 2px solid gray;
   width: 100%;
-  padding: 15px;
+  padding: ${rem(15)};
   text-align: left;
   color: white;
 `;
 
 const StyledLink = styled.span`
-  color: ${Heading};
+  color: ${MediumBlue};
   cursor: pointer;
 `;
 
@@ -83,15 +80,15 @@ const LogsButton = styled.button`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  background-color: ${Button};
-  border-radius: 10px;
+  background-color: ${LightBlue};
+  border-radius: ${rem(10)};
   text-decoration: none;
 
   transition: 250ms background-color ease;
   cursor: pointer;
 
   &:hover {
-    background-color: ${ButtonHover};
+    background-color: ${LightGreen};
   }
 
   &:disabled {
@@ -104,17 +101,21 @@ const LogsButton = styled.button`
 // TODO: right after install, while nodes are starting up, this page says everything is "online"
 // while things are looking for peers.  Need to improve that logic.
 
-const StatusPage = () => {
+export const StatusPage = () => {
   const [eth1ContainerStatus, setEth1ContainerStatus] = useState<Status>(
     Status.Loading,
   );
   const [eth1PeerCount, setEth1PeerCount] = useState(0);
   const [eth1Syncing, setEth1Syncing] = useState(false);
   const [eth2ClientName, setEth2ClientName] = useState('');
-  const [eth2BeaconContainerStatus, setEth2BeaconContainerStatus] =
-    useState<Status>(Status.Loading);
-  const [eth2ValidatorContainerStatus, setEth2ValidatorContainerStatus] =
-    useState<Status>(Status.Loading);
+  const [
+    eth2BeaconContainerStatus,
+    setEth2BeaconContainerStatus,
+  ] = useState<Status>(Status.Loading);
+  const [
+    eth2ValidatorContainerStatus,
+    setEth2ValidatorContainerStatus,
+  ] = useState<Status>(Status.Loading);
   const [ProcessingTotalStatus, setProcessingTotalStatus] = useState<Status>(
     Status.Online,
   );
@@ -378,5 +379,3 @@ const StatusPage = () => {
     </Container>
   );
 };
-
-export default StatusPage;
