@@ -1,6 +1,3 @@
 node_modules/
 dist/
 .idea
-
-# Ignore Visual Studio Code IDE workspace settings
-.vscode/
