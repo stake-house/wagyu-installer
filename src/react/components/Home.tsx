@@ -79,7 +79,7 @@ export const Home = withRouter(({ history }: { history: History }) => {
         <br />
         <br />
         <br />A one-click staking installer for the
-        <Testnet>pyrmont testnet</Testnet>.
+        <Testnet>{' pyrmont testnet'}</Testnet>.
         <br />
         <br />
         <br />
@@ -93,7 +93,7 @@ export const Home = withRouter(({ history }: { history: History }) => {
         <br />
         *Note: we use the Rocket Pool install infrastructure which runs
         everything in docker, more info
-        <StyledLink onClick={sendToRocketpool}>here</StyledLink>
+        <StyledLink onClick={sendToRocketpool}>{' here'}</StyledLink>
       </Content>
       <StartButton to="/systemcheck">Enter</StartButton>
     </Container>
