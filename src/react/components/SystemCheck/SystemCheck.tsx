@@ -32,9 +32,18 @@ const Advanced = styled.div`
   cursor: pointer;
 `;
 
+enum InstallationStatus {
+  Unknown = 'Unknown',
+  NotInstalled = 'Not Installed',
+  Installed = 'Installed',
+}
+
 export const SystemCheck = () => {
   const [shouldShowAdvanced, setShouldShowAdvanced] = useState(false);
-  const [isRocketPoolInstalled, setIsRocketPoolInstalled] = useState(false);
+  const [
+    isRocketPoolInstalled,
+    setIsRocketPoolInstalled,
+  ] = useState<InstallationStatus>(InstallationStatus.Unknown);
   const [isSystemReady, setIsSystemReady] = useState(false);
 
   /**
@@ -48,14 +57,19 @@ export const SystemCheck = () => {
      * - Check for anything that looks like an already running eth1/2 node
      * - Check ports
      */
-    setIsRocketPoolInstalled(isRocketPoolInstalledCmd());
+
+    setIsRocketPoolInstalled(
+      isRocketPoolInstalledCmd()
+        ? InstallationStatus.Installed
+        : InstallationStatus.NotInstalled,
+    );
 
     // TODO: add instructions/links for install/fix if a test fails
     // TODO: create a loading state and only render once the test is finished
   }, []);
 
   useEffect(() => {
-    setIsSystemReady(!isRocketPoolInstalled);
+    setIsSystemReady(isRocketPoolInstalled === InstallationStatus.Installed);
   }, [isRocketPoolInstalled]);
 
   const renderSystemCheckContent = () => {
@@ -67,7 +81,7 @@ export const SystemCheck = () => {
         <ResultsTable isRocketPoolInstalled />
         <br />
         <br />
-        {isSystemReady ? (
+        {isSystemReady && (
           <div>
             We are good to go. We will pick a random eth1 and eth2 client to
             install in order to promote client diversity.
@@ -98,12 +112,14 @@ export const SystemCheck = () => {
               )
             }
           </div>
-        ) : (
-          <div>
-            Unfortunately your system does not meet the requirements so we
-            cannot proceed :(
-          </div>
         )}
+        {!isSystemReady &&
+          isRocketPoolInstalled === InstallationStatus.NotInstalled && (
+            <div>
+              Unfortunately your system does not meet the requirements so we
+              cannot proceed :(
+            </div>
+          )}
       </Content>
     );
   };
@@ -111,7 +127,7 @@ export const SystemCheck = () => {
   return (
     <Container>
       <LandingHeader>System Check</LandingHeader>
-      {isRocketPoolInstalled ? (
+      {isRocketPoolInstalled === InstallationStatus.Installed ? (
         <Content>
           It looks like you already have Rocket Pool installed. Let's hop over
           to check the status of your node.
@@ -121,7 +137,9 @@ export const SystemCheck = () => {
       )}
       <SystemCheckFooter
         isSystemReady={isSystemReady}
-        isRocketPoolInstalled={isRocketPoolInstalled}
+        isRocketPoolInstalled={
+          isRocketPoolInstalled === InstallationStatus.Installed
+        }
       />
     </Container>
   );
