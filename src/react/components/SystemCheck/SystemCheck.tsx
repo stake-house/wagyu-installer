@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { DarkBlue, Gray3 } from '../../colors';
-import { isRocketPoolInstalled as isRocketPoolInstalledCmd } from '../../commands/RocketPool';
+import { isRocketPoolInstalled } from '../../commands/RocketPool';
 import { Header } from '../typography/Header';
 import { SystemCheckFooter } from './SystemCheckFooter';
 import { ResultsTable } from './ResultsTable';
@@ -41,8 +41,8 @@ enum InstallationStatus {
 export const SystemCheck = () => {
   const [shouldShowAdvanced, setShouldShowAdvanced] = useState(false);
   const [
-    isRocketPoolInstalled,
-    setIsRocketPoolInstalled,
+    rocketPoolInstallationStatus,
+    setRocketPoolInstallationStatus,
   ] = useState<InstallationStatus>(InstallationStatus.Unknown);
   const [isSystemReady, setIsSystemReady] = useState(false);
 
@@ -58,8 +58,8 @@ export const SystemCheck = () => {
      * - Check ports
      */
 
-    setIsRocketPoolInstalled(
-      isRocketPoolInstalledCmd()
+    setRocketPoolInstallationStatus(
+      isRocketPoolInstalled()
         ? InstallationStatus.Installed
         : InstallationStatus.NotInstalled,
     );
@@ -69,76 +69,73 @@ export const SystemCheck = () => {
   }, []);
 
   useEffect(() => {
-    setIsSystemReady(isRocketPoolInstalled === InstallationStatus.Installed);
-  }, [isRocketPoolInstalled]);
-
-  const renderSystemCheckContent = () => {
-    return (
-      <Content>
-        We did some system checks, here are the results:
-        <br />
-        <br />
-        <ResultsTable isRocketPoolInstalled />
-        <br />
-        <br />
-        {isSystemReady && (
-          <div>
-            We are good to go. We will pick a random eth1 and eth2 client to
-            install in order to promote client diversity.
-            <br />
-            <br />
-            <Advanced
-              onClick={() => setShouldShowAdvanced(!shouldShowAdvanced)}
-            >
-              Advanced
-            </Advanced>
-            {
-              // TODO: fix jump when this is clicked, or redesign this altogether
-              // TODO: add pivoting dropdown arrow to signify menu opening and closing?
-
-              shouldShowAdvanced ? (
-                <div>
-                  <br />
-                  <em>
-                    This is where we will allow users to pick their client,
-                    customize params, etc, however it is not yet implemented.
-                  </em>
-                  <br />
-                  <br />
-                  Come join the team and help out :)
-                </div>
-              ) : (
-                <div />
-              )
-            }
-          </div>
-        )}
-        {!isSystemReady &&
-          isRocketPoolInstalled === InstallationStatus.NotInstalled && (
-            <div>
-              Unfortunately your system does not meet the requirements so we
-              cannot proceed :(
-            </div>
-          )}
-      </Content>
+    setIsSystemReady(
+      rocketPoolInstallationStatus === InstallationStatus.Installed,
     );
-  };
+  }, [rocketPoolInstallationStatus]);
 
   return (
     <Container>
       <LandingHeader>System Check</LandingHeader>
-      {isRocketPoolInstalled === InstallationStatus.Installed ? (
+      {rocketPoolInstallationStatus === InstallationStatus.Installed ? (
         <Content>
           It looks like you already have Rocket Pool installed. Let's hop over
           to check the status of your node.
         </Content>
       ) : (
-        renderSystemCheckContent()
+        <Content>
+          We did some system checks, here are the results:
+          <br />
+          <br />
+          <ResultsTable isRocketPoolInstalled={false} />
+          <br />
+          <br />
+          {isSystemReady && (
+            <div>
+              We are good to go. We will pick a random eth1 and eth2 client to
+              install in order to promote client diversity.
+              <br />
+              <br />
+              <Advanced
+                onClick={() => setShouldShowAdvanced(!shouldShowAdvanced)}
+              >
+                Advanced
+              </Advanced>
+              {
+                // TODO: fix jump when this is clicked, or redesign this altogether
+                // TODO: add pivoting dropdown arrow to signify menu opening and closing?
+
+                shouldShowAdvanced ? (
+                  <div>
+                    <br />
+                    <em>
+                      This is where we will allow users to pick their client,
+                      customize params, etc, however it is not yet implemented.
+                    </em>
+                    <br />
+                    <br />
+                    Come join the team and help out :)
+                  </div>
+                ) : (
+                  <div />
+                )
+              }
+            </div>
+          )}
+          {!isSystemReady &&
+            rocketPoolInstallationStatus ===
+              InstallationStatus.NotInstalled && (
+              <div>
+                Unfortunately your system does not meet the requirements so we
+                cannot proceed :(
+              </div>
+            )}
+        </Content>
       )}
       <SystemCheckFooter
         isSystemReady={isSystemReady}
         isRocketPoolInstalled={
-          isRocketPoolInstalled === InstallationStatus.Installed
+          rocketPoolInstallationStatus === InstallationStatus.Installed
         }
       />
     </Container>
