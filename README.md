@@ -50,6 +50,16 @@ Run the following commands:
 3) `sudo apt install npm`
 4) `sudo npm install -g yarn`  
 
+### Contribution Guidelines
+To streamline contributions to React code within the Wagyu codebase, a small set of guidelines encapsulating our opinions is included here: 
+1) Libraries - Use `styled-components` for css encapsulation, `rem` units for any pixel sizes (potentially via the utility library `polished`).
+2) Typescript - Make generous use of everything typescript has to offer (don't use `any`... ever).
+3) Formatting - This codebase uses `prettier` (rules defined in `.prettierrc`) for standardized code formatting. If using vscode, the formatter will run on save, if not, be sure to run `npx prettier --write "**/*.ts*"` to format the code.
+4) Common components - Extract commonly used typography or UI elements into the `typography` directory.
+5) Utility Functions - Keep utility functions that don't deal with rendering outside of components.
+6) Other Opinions - Refrain from using 'render' functions within functional components. Extract this logic out into a separate component instead. Refrain from using `<br />` and use padding and/or margin instead.
+
+
 ## Support
 Reach out to the EthStaker community:
  - on [discord](https://invite.gg/ethstaker)
