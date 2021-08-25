@@ -7,7 +7,7 @@ import { Home } from './components/Home';
 import { InstallFailed } from './components/InstallFailed';
 import { Installing } from './components/Installing';
 import { StatusPage as Status } from './components/Status';
-import { SystemCheck } from './components/SystemCheck';
+import { SystemCheck } from './components/SystemCheck/SystemCheck';
 
 const Container = styled.main`
   font-family: 'PT Mono', monospace;
