@@ -59,6 +59,8 @@ To streamline contributions to React code within the Wagyu codebase, a small set
 5) Utility Functions - Keep utility functions that don't deal with rendering outside of components.
 6) Other Opinions - Refrain from using 'render' functions within functional components. Extract this logic out into a separate component instead. Refrain from using `<br />` and use padding and/or margin instead.
 
+Refer to this [React style guide](https://alexkondov.com/tao-of-react/) for more information.
+
 
 ## Support
 Reach out to the EthStaker community:
