@@ -17,6 +17,19 @@ Wagyu:
 ## Demo
 Wagyu (while it was known as StakeHouse) did a demo at the EthStaker Validator Workshop - take a look [here](https://youtu.be/cxP9gwapXJ0).
 
+## Staking Resources
+We are going to assume if you've gotten this far you already know about Ethereum and Ethereum 2.0, if not we suggest starting with [Superphiz's overview](https://www.youtube.com/watch?v=tpkpW031RCI) then heading over to [the EthStaker reddit](https://www.reddit.com/r/ethstaker/comments/jjdxvw/welcome_to_rethstaker_the_home_for_ethereum/) and [checking out our Studymaster program](https://www.reddit.com/r/ethstaker/wiki/studymaster). 
+
+The key to the Eth2 upgrades is the introduction of staking and the transition from Proof-of-Work to Proof-of-Stake. This transition, referred to as "The Merge", will make Ethereum more secure and sustainable while unlocking what is needed to achieve scalability through sharding. By becoming an Ethereum validator and staking your Ethereum you can do a public good, securing the network, while earning rewards. 
+
+Learn More: 
+
+- [A Comprehensive overview of Eth 2.0 and Staking for beginners](https://www.youtube.com/watch?v=tpkpW031RCI)  by Superphiz
+- [Proof-of-Stake FAQs](https://eth.wiki/en/concepts/proof-of-stake-faqs) Ethereum Wiki by the Ethereum Foundation
+- [Staking FAQs](https://www.reddit.com/r/ethstaker/comments/ju61pf/ethstaker_faq/) by Lamboshi
+- [Staking hardware guide](https://ethstaker.cc/a-comprehensive-look-at-hardware-for-staking-by-u-lamboshinakaghini/) by Lamboshi
+- [A country's worth of power, no more!](https://blog.ethereum.org/2021/05/18/country-power-no-more/) by Carl Beekhuizen of the Ethereum Foundation
+
 ## Usage
 There are no releases yet, please see the [setup](#setup) section under development to run the latest version.
 
