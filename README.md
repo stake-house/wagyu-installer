@@ -1,6 +1,6 @@
 # Wagyu
 
-## Download at https://wagyu.gg
+## Download at [https://wagyu.gg](https://wagyu.gg)
 
 Wagyu (formerly known as StakeHouse) is an application aimed at lowering the technical bar to staking on Ethereum 2.0.
 
