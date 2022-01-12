@@ -8,4 +8,4 @@ dist/
 !.yarn/sdks
 !.yarn/versions
 
-build/*
+build/
