@@ -1,36 +1,101 @@
-import { BrowserWindow, app, globalShortcut } from 'electron';
-import installExtension, {
-  REACT_DEVELOPER_TOOLS,
-} from 'electron-devtools-installer';
+// index.ts
+/**
+ * This typescript file contains the Electron app which renders the React app.
+ */
 
-app.on('ready', () => {
-  installExtension(REACT_DEVELOPER_TOOLS)
-    .then((name) => console.log(`Added Extension:  ${name}`))
-    .catch((err) => console.log('An error occurred: ', err));
+import { BrowserWindow, app, globalShortcut, ipcMain, dialog, clipboard } from "electron";
+import path from "path";
 
-  // once electron has started up, create a window.
+import { accessSync, constants } from "fs";
+import { OpenDialogOptions } from "electron/common";
+
+/**
+ * VERSION and COMMITHASH are set by the git-revision-webpack-plugin module.
+ */
+declare var VERSION: string;
+declare var COMMITHASH: string;
+
+const doesFileExist = (filename: string): boolean => {
+  try {
+    accessSync(filename, constants.F_OK);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
+app.on("ready", () => {
+  var iconPath = path.join("static", "icon.png");
+  const bundledIconPath = path.join(process.resourcesPath, "..", "static", "icon.png");
+  
+  if (doesFileExist(bundledIconPath)) {
+    iconPath = bundledIconPath;
+  }
+
+  const title = `${app.getName()} ${VERSION}-${COMMITHASH}`;
+
+  /**
+   * Create the window in which to render the React app
+   */
   const window = new BrowserWindow({
-    width: 900,
-    height: 720,
-    icon: 'src/images/ethstaker_icon_1.png',
+    width: 950,
+    height: 750,
+    icon: iconPath,
+    title: title,
 
     webPreferences: {
-      nodeIntegration: true,
-
-      // TODO: is it a problem to disable this?
-      // https://www.electronjs.org/docs/tutorial/context-isolation#security-considerations
-      contextIsolation: false,
-    },
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
+    }
   });
 
-  // hide the default menu bar that comes with the browser window
+  /**
+   * Hide the default menu bar that comes with the browser window
+   */
   window.setMenuBarVisibility(false);
 
-  globalShortcut.register('CommandOrControl+R', function () {
-    console.log('CommandOrControl+R is pressed');
-    window.reload();
+  /**
+   * Set the Permission Request Handler to deny all permissions requests
+   */
+  window.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+    return callback(false);
   });
 
-  // load a website to display
+  /**
+   * Allow for refreshing of the React app within Electron without reopening.
+   * This feature is used for development and will be disabled before production deployment.
+   */
+	globalShortcut.register('CommandOrControl+R', function() {
+		console.log('CommandOrControl+R was pressed, refreshing the React app within Electron.')
+		window.reload()
+	})
+
+  /**
+   * This logic closes the application when the window is closed, explicitly.
+   * On MacOS this is not a default feature.
+   */
+  ipcMain.on('close', (evt, arg) => {
+    app.quit();
+  })
+
+  /**
+   * Provides the renderer a way to call the dialog.showOpenDialog function using IPC.
+   */
+  ipcMain.handle('showOpenDialog', async (event, options) => {
+    return await dialog.showOpenDialog(<OpenDialogOptions> options);
+  });
+
+  /**
+   * Load the react app
+   */
   window.loadURL(`file://${__dirname}/../react/index.html`);
 });
+
+app.on('will-quit', () => {
+  /**
+   * Clear clipboard on quit to avoid access to any mnemonic or password that was copied during
+   * application use.
+   */
+  clipboard.clear();
+})
