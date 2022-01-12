@@ -3,9 +3,7 @@ import React, { FC, ReactElement, useState, Dispatch, SetStateAction } from "rea
 import styled from "styled-components";
 import { Container, Divider, Grid, Modal, Tooltip, Typography } from "@material-ui/core";
 import { Button } from '@material-ui/core';
-import { KeyIcon } from "../components/icons/KeyIcon";
 import { NetworkPicker } from "../components/NetworkPicker";
-import { tooltips } from "../constants";
 import { Network, StepSequenceKey } from '../types'
 import VersionFooter from "../components/VersionFooter";
 
@@ -62,8 +60,6 @@ type HomeProps = {
 const Home: FC<HomeProps> = (props): ReactElement => {
   const [showNetworkModal, setShowNetworkModal] = useState(false);
   const [networkModalWasOpened, setNetworkModalWasOpened] = useState(false);
-  const [createMnemonicSelected, setCreateMnemonicSelected] = useState(false);
-  const [useExistingMnemonicSelected, setUseExistingMnemonicSelected] = useState(false);
 
   let history = useHistory();
 
@@ -76,39 +72,6 @@ const Home: FC<HomeProps> = (props): ReactElement => {
     if (reason !== 'backdropClick') {
       setShowNetworkModal(false);
 
-      if (createMnemonicSelected) {
-        handleCreateNewMnemonic();
-      } else if (useExistingMnemonicSelected) {
-        handleUseExistingMnemonic();
-      }
-    }
-  }
-
-  const handleCreateNewMnemonic = () => {
-    setCreateMnemonicSelected(true);
-
-    if (!networkModalWasOpened) {
-      handleOpenNetworkModal();
-    } else {
-      const location = {
-        pathname: `/wizard/${StepSequenceKey.MnemonicGeneration}`
-      }
-
-      history.push(location);
-    }
-  }
-
-  const handleUseExistingMnemonic = () => {
-    setUseExistingMnemonicSelected(true);
-
-    if (!networkModalWasOpened) {
-      handleOpenNetworkModal();
-    } else {
-      const location = {
-        pathname: `/wizard/${StepSequenceKey.MnemonicImport}`
-      }
-
-      history.push(location);
     }
   }
 
@@ -130,29 +93,14 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       </Modal>
 
       <LandingHeader variant="h1">Welcome!</LandingHeader>
-      <KeyIcon />
-      <SubHeader>Your key generator for Ethereum 2.0</SubHeader>
+      <SubHeader>Your installer for staking on Ethereum</SubHeader>
 
       <Links>
-        <InfoLabel>Github:</InfoLabel> https://github.com/stake-house/wagyu-key-gen
+        <InfoLabel>Github:</InfoLabel> https://github.com/stake-house/wagyu-installer
         <br />
         <InfoLabel>Support:</InfoLabel> https://discord.io/ethstaker
       </Links>
 
-      <OptionsGrid container spacing={2} direction="column">
-        <Grid item>
-          <Button variant="contained" color="primary" onClick={handleCreateNewMnemonic} tabIndex={tabIndex(1)}>
-            Create New Secret Recovery Phrase
-          </Button>
-        </Grid>
-        <Grid item>
-          <Tooltip title={tooltips.IMPORT_MNEMONIC}>
-            <Button style={{color: "gray"}} size="small" onClick={handleUseExistingMnemonic} tabIndex={tabIndex(1)}>
-              Use Existing Secret Recovery Phrase
-            </Button>
-          </Tooltip>
-        </Grid>
-      </OptionsGrid>
       <VersionFooter />
     </StyledMuiContainer>
   );

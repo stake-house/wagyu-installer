@@ -1,18 +1,12 @@
 export enum StepKey {
-  MnemonicImport,
-  MnemonicGeneration,
-  KeyConfiguration,
-  KeyGeneration,
   Finish
 }
 
 export enum StepSequenceKey {
-  MnemonicGeneration = "mnemonicgeneration",
-  MnemonicImport = "mnemonicimport"
+  Installing = "installing"
 }
 
 export enum Network {
-	PYRMONT = "Pyrmont",
-	PRATER = "Prater",
-	MAINNET = "Mainnet"
+  PRATER = "Prater",
+  MAINNET = "Mainnet"
 }

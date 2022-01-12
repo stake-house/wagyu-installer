@@ -12,8 +12,6 @@ import {
   OpenDialogReturnValue
 } from "electron";
 
-import { createMnemonic, generateKeys, validateMnemonic } from './Eth2Deposit';
-
 import { doesDirectoryExist, isDirectoryWritable, findFirstFile } from './BashUtils';
 
 const ipcRendererSendClose = () => {
@@ -30,12 +28,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   'clipboardWriteText': clipboard.writeText,
   'ipcRendererSendClose': ipcRendererSendClose,
   'invokeShowOpenDialog': invokeShowOpenDialog
-});
-
-contextBridge.exposeInMainWorld('eth2Deposit', {
-  'createMnemonic': createMnemonic,
-  'generateKeys': generateKeys,
-  'validateMnemonic': validateMnemonic
 });
 
 contextBridge.exposeInMainWorld('bashUtils', {

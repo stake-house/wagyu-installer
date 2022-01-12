@@ -31,13 +31,6 @@ export interface IElectronAPI {
   invokeShowOpenDialog: (options: OpenDialogOptions) => Promise<OpenDialogReturnValue>
 }
 
-export interface IEth2DepositAPI {
-  createMnemonic: (language: string) => Promise<string>,
-  generateKeys: (mnemonic: string, index: number, count: number, network: string,
-    password: string, eth1_withdrawal_address: string, folder: string) => Promise<void>,
-  validateMnemonic: (mnemonic: string) => Promise<void>
-}
-
 export interface IBashUtilsAPI {
   doesDirectoryExist: (directory: string) => Promise<boolean>,
   isDirectoryWritable: (directory: string) => Promise<boolean>,
@@ -47,7 +40,6 @@ export interface IBashUtilsAPI {
 declare global {
   interface Window {
     electronAPI: IElectronAPI,
-    eth2Deposit: IEth2DepositAPI,
     bashUtils: IBashUtilsAPI
   }
 }
