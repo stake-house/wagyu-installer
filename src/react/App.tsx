@@ -1,35 +1,40 @@
-import React from 'react';
-import styled from 'styled-components';
-import { HashRouter, Route, Switch } from 'react-router-dom';
-import { Slate1 } from './colors';
-import { Deposit } from './components/Deposit';
-import { Home } from './components/Home';
-import { InstallFailed } from './components/InstallFailed';
-import { Installing } from './components/Installing';
-import { StatusPage as Status } from './components/Status';
-import { SystemCheck } from './components/SystemCheck/SystemCheck';
+import { HashRouter, Route, Switch } from "react-router-dom";
+import React, { FC, ReactElement, useState } from "react";
+import styled from "styled-components";
+import Home from "./pages/Home";
+import { CssBaseline, ThemeProvider } from "@material-ui/core";
+import 'typeface-roboto';
+import MainWizard from "./pages/MainWizard";
+import theme from "./theme";
+import { Network } from './types';
 
 const Container = styled.main`
-  font-family: 'PT Mono', monospace;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: ${Slate1};
 `;
 
-export const App = () => {
+/**
+ * The React app top level including theme and routing.
+ * 
+ * @returns the react element containing the app
+ */
+const App: FC = (): ReactElement => {
+  const [network, setNetwork] = useState<Network>(Network.PRATER);
+
   return (
-    <HashRouter>
-      <Container>
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route exact path="/systemcheck" component={SystemCheck} />
-          <Route exact path="/installing" component={Installing} />
-          <Route exact path="/installfailed" component={InstallFailed} />
-          <Route exact path="/status" component={Status} />
-          <Route exact path="/deposit" component={Deposit} />
-        </Switch>
-      </Container>
-    </HashRouter>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <HashRouter>
+        <Container>
+          <Switch>
+            <Route exact path="/" render={() => <Home network={network} setNetwork={setNetwork} />} />
+            <Route exact path="/wizard/:stepSequenceKey" render={() => <MainWizard network={network} />} />
+          </Switch>
+        </Container>
+      </HashRouter>
+    </ThemeProvider>
   );
 };
+
+export default App;

@@ -1,3 +1,11 @@
 node_modules/
 dist/
-.idea
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+build/
