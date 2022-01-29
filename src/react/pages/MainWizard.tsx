@@ -6,8 +6,16 @@ import { StepKey } from '../types';
 import { stepLabels } from '../constants';
 import { Network, StepSequenceKey } from '../types';
 import VersionFooter from '../components/VersionFooter';
+import Install from '../components/InstallFlow/2-Install';
+import Configuration from '../components/InstallFlow/1-Configuration';
+import SystemCheck from '../components/InstallFlow/0-SystemCheck';
 
 const stepSequenceMap: Record<string, StepKey[]> = {
+  install: [
+    StepKey.SystemCheck,
+    StepKey.Configuration,
+    StepKey.Installing,
+  ]
 }
 
 const MainGrid = styled(Grid)`
@@ -43,11 +51,16 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
   const [activeStepIndex, setActiveStepIndex] = useState(0);
 
   const stepSequence = stepSequenceMap[stepSequenceKey];
+  const activeStepKey = stepSequence[activeStepIndex];
+
 
   const onStepForward = () => {
     if (activeStepIndex === stepSequence.length - 1) {
-      window.electronAPI.ipcRendererSendClose();
-      return;
+      const location = {
+        pathname: `/systemOverview`
+      }
+
+      history.push(location);
     }
     setActiveStepIndex(activeStepIndex + 1);
   }
@@ -85,8 +98,23 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
    * This switch returns the correct react components based on the active step.
    * @returns the component to render
    */
-  const stepComponentSwitch = (): ReactElement => {
-    return <div>No component for this step</div>
+   const stepComponentSwitch = (): ReactElement => {
+    switch(activeStepKey) {
+      case StepKey.SystemCheck:
+        return (
+          <SystemCheck {...{ ...commonProps }} />
+        );
+      case StepKey.Configuration:
+        return (
+          <Configuration {...{ ...commonProps }} />
+        );
+      case StepKey.Installing:
+        return (
+          <Install {...{ ...commonProps }} />
+        );
+      default:
+        return <div>No component for this step</div>
+    }
   }
 
   return (

@@ -7,5 +7,7 @@ export const errors = {
 };
 
 export const stepLabels = {
-	[StepKey.Finish]: 'Finish'
+	[StepKey.SystemCheck]: 'System Check',
+	[StepKey.Configuration]: 'Configuration',
+	[StepKey.Installing]: 'Install',
 };

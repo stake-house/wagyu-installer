@@ -1,9 +1,11 @@
 export enum StepKey {
-  Finish
+  SystemCheck,
+  Configuration,
+  Installing
 }
 
 export enum StepSequenceKey {
-  Installing = "installing"
+  Install = "install"
 }
 
 export enum Network {

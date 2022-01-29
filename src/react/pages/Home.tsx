@@ -32,16 +32,26 @@ const SubHeader = styled(Typography)`
 `;
 
 const Links = styled.div`
-  margin-top: 35px;
+  margin-top: 20px;
+`;
+
+const StyledLink = styled(Typography)`
+  cursor: pointer;
+  display: inline;
 `;
 
 const InfoLabel = styled.span`
   color: gray;
 `;
 
-const OptionsGrid = styled(Grid)`
+const EnterGrid = styled(Grid)`
   margin-top: 35px;
   align-items: center;
+`;
+
+const ContentGrid = styled(Grid)`
+  height: 320px;
+  margin-top: 16px;
 `;
 
 type HomeProps = {
@@ -60,6 +70,7 @@ type HomeProps = {
 const Home: FC<HomeProps> = (props): ReactElement => {
   const [showNetworkModal, setShowNetworkModal] = useState(false);
   const [networkModalWasOpened, setNetworkModalWasOpened] = useState(false);
+  const [enterSelected, setEnterSelected] = useState(false);
 
   let history = useHistory();
 
@@ -72,6 +83,31 @@ const Home: FC<HomeProps> = (props): ReactElement => {
     if (reason !== 'backdropClick') {
       setShowNetworkModal(false);
 
+      if (enterSelected) {
+        handleEnter();
+      }
+    }
+  }
+
+  const sendToGithub = () => {
+    window.electronAPI.shellOpenExternal("https://github.com/stake-house/wagyu-installer");
+  }
+
+  const sendToDiscord = () => {
+    window.electronAPI.shellOpenExternal("https://discord.io/ethstaker");
+  }
+
+  const handleEnter = () => {
+    setEnterSelected(true);
+
+    if (!networkModalWasOpened) {
+      handleOpenNetworkModal();
+    } else {
+      const location = {
+        pathname: `/wizard/${StepSequenceKey.Install}`
+      }
+
+      history.push(location);
     }
   }
 
@@ -93,14 +129,20 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       </Modal>
 
       <LandingHeader variant="h1">Welcome!</LandingHeader>
+      <ContentGrid />
       <SubHeader>Your installer for staking on Ethereum</SubHeader>
 
       <Links>
-        <InfoLabel>Github:</InfoLabel> https://github.com/stake-house/wagyu-installer
-        <br />
-        <InfoLabel>Support:</InfoLabel> https://discord.io/ethstaker
+        <StyledLink display="inline" color="primary" onClick={sendToGithub} tabIndex={tabIndex(0)}>Github</StyledLink>
+        &nbsp;|&nbsp;
+        <StyledLink display="inline" color="primary" onClick={sendToDiscord} tabIndex={tabIndex(0)}>Discord</StyledLink>
       </Links>
 
+      <EnterGrid>
+        <Button variant="contained" color="primary" onClick={handleEnter} tabIndex={tabIndex(1)}>
+          Enter
+        </Button>
+      </EnterGrid>
       <VersionFooter />
     </StyledMuiContainer>
   );
