@@ -7,6 +7,7 @@ import 'typeface-roboto';
 import MainWizard from "./pages/MainWizard";
 import theme from "./theme";
 import { Network } from './types';
+import SystemOverview from "./pages/SystemOverview";
 
 const Container = styled.main`
   display: flex;
@@ -30,6 +31,7 @@ const App: FC = (): ReactElement => {
           <Switch>
             <Route exact path="/" render={() => <Home network={network} setNetwork={setNetwork} />} />
             <Route exact path="/wizard/:stepSequenceKey" render={() => <MainWizard network={network} />} />
+            <Route exact path="/systemOverview" render={() => <SystemOverview network={network} />} />
           </Switch>
         </Container>
       </HashRouter>
