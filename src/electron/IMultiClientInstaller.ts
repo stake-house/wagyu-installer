@@ -1,8 +1,6 @@
 export interface IMultiClientInstaller {
 
   // Functionality
-  runComputerSystemChecks: () => Promise<SystemTestResult[]>,
-  
   preInstall: () => Promise<void>,
   install: () => Promise<void>,
   postInstall: () => Promise<void>,
@@ -45,13 +43,6 @@ export interface IMultiClientInstaller {
   consensusClientLatestBlock: () => Promise<number>,
 
   // TODO: logs stream
-}
-
-
-export type SystemTestResult = {
-  name: string;
-  result: boolean;
-  remediation: string;
 }
 
 export type KeyImportResult = {

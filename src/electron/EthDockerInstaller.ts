@@ -1,23 +1,6 @@
-import { ExecutionClient, ConsensusClient, IMultiClientInstaller, KeyImportResult, NodeStatus, SystemTestResult, ValidatorStatus } from "./IMultiClientInstaller";
+import { ExecutionClient, ConsensusClient, IMultiClientInstaller, KeyImportResult, NodeStatus, ValidatorStatus } from "./IMultiClientInstaller";
 
 export class EthDockerInstaller implements IMultiClientInstaller {
-
-  // Functionality
-  async runComputerSystemChecks(): Promise<SystemTestResult[]> {
-    const results: SystemTestResult[] = [
-      {
-        name: "test1",
-        result: true,
-        remediation: "reboot"
-      }, {
-        name: "test2",
-        result: true,
-        remediation: "throw your computer"
-      }
-    ]
-
-    return results;
-  }
 
   async preInstall(): Promise<void> {
     // TODO: implement
@@ -76,7 +59,7 @@ export class EthDockerInstaller implements IMultiClientInstaller {
 
     return results;
   }
-  
+
   async exportKeys(keyStorePaths: string[]): Promise<KeyImportResult[]> {
     // TODO: implement
     console.log("Executing exportKeys");
@@ -92,13 +75,13 @@ export class EthDockerInstaller implements IMultiClientInstaller {
 
     return results;
   }
-  
+
   async switchExecutionClient(targetClient: ExecutionClient): Promise<void> {
     // TODO: implement
     console.log("Executing switchExecutionClient");
     return;
   }
-  
+
   async switchConsensusClient(targetClient: ConsensusClient): Promise<void> {
     // TODO: implement
     console.log("Executing switchConsensusClient");
@@ -142,7 +125,7 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     console.log("Executing getLatestExecutionClientVersion");
     return "0.1";
   }
-  
+
   async getLatestConsensusClientVersion(client: ConsensusClient): Promise<string> {
     // TODO: implement
     console.log("Executing getLatestConsensusClientVersion");
