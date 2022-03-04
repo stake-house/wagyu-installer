@@ -1,6 +1,6 @@
-import { Grid, Typography } from "@material-ui/core";
+import { Grid, Typography } from '@mui/material';
 import React from "react";
-import styled from "styled-components";
+import styled from '@emotion/styled';
 
 declare var VERSION: string;
 declare var COMMITHASH: string;
@@ -23,7 +23,7 @@ const Container = styled.div`
  * @returns the footer component containing the version and commit hash
  */
 const VersionFooter = () => {
-  return(
+  return (
     <Container>
       <Grid container direction="column">
         <Grid item xs={12}>

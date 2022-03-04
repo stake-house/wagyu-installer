@@ -1,7 +1,7 @@
 import React, { FC, ReactElement } from 'react';
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, Typography } from '@mui/material';
 import StepNavigation from '../StepNavigation';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 type InstallProps = {
   onStepBack: () => void,

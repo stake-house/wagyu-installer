@@ -1,5 +1,5 @@
 import React, { FC, ReactElement } from "react";
-import { Grid, Button } from "@material-ui/core";
+import { Grid, Button } from '@mui/material';
 
 type Props = {
   onPrev: () => void,
@@ -36,7 +36,7 @@ const StepNavigation: FC<Props> = (props): ReactElement => {
       </Grid>
       <Grid item xs={4} />
       <Grid item xs={2}>
-        {!props.hideNext  && (
+        {!props.hideNext && (
           <Button variant="contained" color="primary" disabled={props.disableNext} onClick={props.onNext} tabIndex={2}>{props.nextLabel}</Button>
         )}
       </Grid>

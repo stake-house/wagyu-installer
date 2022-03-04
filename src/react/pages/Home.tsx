@@ -1,8 +1,8 @@
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import React, { FC, ReactElement, useState, Dispatch, SetStateAction } from "react";
-import styled from "styled-components";
-import { Container, Divider, Grid, Modal, Tooltip, Typography } from "@material-ui/core";
-import { Button } from '@material-ui/core';
+import styled from '@emotion/styled';
+import { Container, Divider, Grid, Modal, Tooltip, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 import { NetworkPicker } from "../components/NetworkPicker";
 import { Network, StepSequenceKey } from '../types'
 import VersionFooter from "../components/VersionFooter";
@@ -72,7 +72,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
   const [networkModalWasOpened, setNetworkModalWasOpened] = useState(false);
   const [enterSelected, setEnterSelected] = useState(false);
 
-  let history = useHistory();
+  const navigate = useNavigate();
 
   const handleOpenNetworkModal = () => {
     setShowNetworkModal(true);
@@ -107,7 +107,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
         pathname: `/wizard/${StepSequenceKey.Install}`
       }
 
-      history.push(location);
+      navigate(location);
     }
   }
 
