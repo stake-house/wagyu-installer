@@ -1,9 +1,10 @@
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import React, { FC, ReactElement, useState } from "react";
-import styled from "styled-components";
+import styled from '@emotion/styled';
 import Home from "./pages/Home";
-import { CssBaseline, ThemeProvider } from "@material-ui/core";
-import 'typeface-roboto';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from "@mui/material";
+import '@fontsource/roboto';
 import MainWizard from "./pages/MainWizard";
 import theme from "./theme";
 import { Network } from './types';
@@ -28,11 +29,11 @@ const App: FC = (): ReactElement => {
       <CssBaseline />
       <HashRouter>
         <Container>
-          <Switch>
-            <Route exact path="/" render={() => <Home network={network} setNetwork={setNetwork} />} />
-            <Route exact path="/wizard/:stepSequenceKey" render={() => <MainWizard network={network} />} />
-            <Route exact path="/systemOverview" render={() => <SystemOverview network={network} />} />
-          </Switch>
+          <Routes>
+            <Route path="/" element={<Home network={network} setNetwork={setNetwork} />} />
+            <Route path="/wizard/:stepSequenceKey" element={<MainWizard network={network} />} />
+            <Route path="/systemOverview" element={<SystemOverview network={network} />} />
+          </Routes>
         </Container>
       </HashRouter>
     </ThemeProvider>

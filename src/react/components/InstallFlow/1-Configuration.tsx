@@ -1,7 +1,7 @@
 import React, { FC, ReactElement } from 'react';
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, Typography } from '@mui/material';
 import StepNavigation from '../StepNavigation';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 type ConfigurationProps = {
   onStepBack: () => void,
@@ -29,7 +29,7 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
         </Typography>
       </Grid>
       <ContentGrid>
-        
+
       </ContentGrid>
       {/* props.children is the stepper */}
       {props.children}

@@ -1,9 +1,9 @@
 import { BackgroundLight, } from '../colors';
-import { FormControl, FormControlLabel, Radio, RadioGroup, Button } from '@material-ui/core';
+import { FormControl, FormControlLabel, Radio, RadioGroup, Button } from '@mui/material';
 import React, { Dispatch, SetStateAction } from 'react';
 
 import { Network } from '../types';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const Container = styled.div`
   display: flex;
@@ -57,7 +57,7 @@ export const NetworkPicker = (props: NetworkPickerProps) => {
   return (
     <Container>
       <Header>Network</Header>
-      <form onSubmit={closePicker} style={{textAlign: 'center'}}>
+      <form onSubmit={closePicker} style={{ textAlign: 'center' }}>
         <div>
           <FormControl focused>
             <RadioGroup aria-label="gender" name="gender1" value={props.network} onChange={networkChanged}>

@@ -1,7 +1,7 @@
 import React, { FC, ReactElement, useState } from 'react';
-import { useParams, useHistory } from "react-router-dom";
-import { Stepper, Step, StepLabel, Grid, Typography } from '@material-ui/core';
-import styled from 'styled-components';
+import { useParams, useNavigate } from "react-router-dom";
+import { Stepper, Step, StepLabel, Grid, Typography } from '@mui/material';
+import styled from '@emotion/styled';
 import { StepKey } from '../types';
 import { stepLabels } from '../constants';
 import { Network, StepSequenceKey } from '../types';
@@ -45,12 +45,12 @@ type WizardProps = {
  * @returns the react element to render
  */
 const Wizard: FC<WizardProps> = (props): ReactElement => {
-  const { stepSequenceKey } = useParams<RouteParams>();
-  const history = useHistory();
+  const { stepSequenceKey } = useParams();
+  const navigate = useNavigate();
 
   const [activeStepIndex, setActiveStepIndex] = useState(0);
 
-  const stepSequence = stepSequenceMap[stepSequenceKey];
+  const stepSequence = stepSequenceMap[stepSequenceKey as string];
   const activeStepKey = stepSequence[activeStepIndex];
 
 
@@ -60,14 +60,14 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
         pathname: `/systemOverview`
       }
 
-      history.push(location);
+      navigate(location);
     }
     setActiveStepIndex(activeStepIndex + 1);
   }
 
   const onStepBack = () => {
     if (activeStepIndex === 0) {
-      history.push("/");
+      navigate("/");
     } else {
       setActiveStepIndex(activeStepIndex - 1);
     }
@@ -98,8 +98,8 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
    * This switch returns the correct react components based on the active step.
    * @returns the component to render
    */
-   const stepComponentSwitch = (): ReactElement => {
-    switch(activeStepKey) {
+  const stepComponentSwitch = (): ReactElement => {
+    switch (activeStepKey) {
       case StepKey.SystemCheck:
         return (
           <SystemCheck {...{ ...commonProps }} />
