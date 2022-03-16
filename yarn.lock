@@ -4714,6 +4714,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sudo-prompt@npm:^9.2.1":
+  version: 9.2.1
+  resolution: "sudo-prompt@npm:9.2.1"
+  checksum: 50a29eec2f264f2b78d891452a64112d839a30bffbff4ec065dba4af691a35b23cdb8f9107d413e25c1a9f1925644a19994c00602495cab033d53f585fdfd665
+  languageName: node
+  linkType: hard
+
 "sumchecker@npm:^3.0.1":
   version: 3.0.1
   resolution: "sumchecker@npm:3.0.1"
@@ -5093,6 +5100,7 @@ __metadata:
     react-router-dom: ^6.2.2
     shebang-loader: ^0.0.1
     style-loader: ^3.3.1
+    sudo-prompt: ^9.2.1
     ts-loader: ^9.2.3
     typescript: ^4.3.5
     webpack: ^5.64.3

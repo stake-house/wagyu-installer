@@ -98,6 +98,10 @@ const Home: FC<HomeProps> = (props): ReactElement => {
   }
 
   const handleEnter = () => {
+
+    window.ethDocker.preInstall().then(result => console.log(result));
+
+    /*
     setEnterSelected(true);
 
     if (!networkModalWasOpened) {
@@ -108,7 +112,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       }
 
       navigate(location);
-    }
+    }*/
   }
 
   const tabIndex = (priority: number) => showNetworkModal ? -1 : priority;

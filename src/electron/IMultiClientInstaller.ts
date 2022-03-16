@@ -1,7 +1,7 @@
 export interface IMultiClientInstaller {
 
   // Functionality
-  preInstall: () => Promise<void>,
+  preInstall: () => Promise<boolean>,
   install: () => Promise<void>,
   postInstall: () => Promise<void>,
 

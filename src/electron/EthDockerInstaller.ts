@@ -1,11 +1,84 @@
-import { ExecutionClient, ConsensusClient, IMultiClientInstaller, KeyImportResult, NodeStatus, ValidatorStatus } from "./IMultiClientInstaller";
+import sudo from 'sudo-prompt';
+
+import {
+  ExecutionClient,
+  ConsensusClient,
+  IMultiClientInstaller,
+  KeyImportResult,
+  NodeStatus,
+  ValidatorStatus
+} from "./IMultiClientInstaller";
 
 export class EthDockerInstaller implements IMultiClientInstaller {
 
-  async preInstall(): Promise<void> {
+  title = 'Electron';
+
+  async preInstall(): Promise<boolean> {
+    console.log('preInstall called');
+    // We need updated packages
+
+    if (!await this.ubuntuAptUpdate()) {
+      return false;
+    };
+
+    // We need git installed
+
+    const gitPackageName = 'git';
+
+    const gitInstalled = await this.checkForInstalledUbuntuPackage(gitPackageName);
+    if (!gitInstalled) {
+      if (!await this.installUbuntuPackage(gitPackageName)) {
+        return false;
+      }
+    }
+
+    // We need docker installed
+
+    const dockerPackageName = 'docker-compose';
+
+    const dockerInstalled = await this.checkForInstalledUbuntuPackage(dockerPackageName);
+    if (!dockerInstalled) {
+      if (!await this.installUbuntuPackage(dockerPackageName)) {
+        return false;
+      }
+    }
+
+    // TODO: We need docker service enabled
+    // TODO: We need our user to be in docker group
+    return false;
+  }
+
+  async ubuntuAptUpdate(): Promise<boolean> {
+    console.log('ubuntuAptUpdate called')
+    const promise = new Promise<boolean>((resolve, reject) => {
+      const options = {
+        name: this.title
+      };
+      try {
+        sudo.exec('apt -y update', options,
+          function (error, stdout, stderr) {
+            if (error) throw error;
+            console.log(stdout);
+            resolve(true);
+          }
+        );
+      } catch (error) {
+        resolve(false);
+      }
+    });
+    return promise;
+  }
+
+  async checkForInstalledUbuntuPackage(packageName: string): Promise<boolean> {
+    console.log('checkForInstalledUbuntuPackage called')
     // TODO: implement
-    console.log("Executing preInstall");
-    return;
+    return false;
+  }
+
+  async installUbuntuPackage(packageName: string): Promise<boolean> {
+    console.log('installUbuntuPackage called')
+    // TODO: implement
+    return false;
   }
 
   async install(): Promise<void> {

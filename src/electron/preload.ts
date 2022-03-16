@@ -14,6 +14,14 @@ import {
 
 import { doesDirectoryExist, isDirectoryWritable, findFirstFile } from './BashUtils';
 
+import { EthDockerInstaller } from './EthDockerInstaller';
+
+const ethDockerInstaller = new EthDockerInstaller();
+const preInstall = async (): Promise<boolean> => {
+  console.log('IPC preInstall called');
+  return ethDockerInstaller.preInstall();
+}
+
 const ipcRendererSendClose = () => {
   ipcRenderer.send('close');
 };
@@ -34,4 +42,9 @@ contextBridge.exposeInMainWorld('bashUtils', {
   'doesDirectoryExist': doesDirectoryExist,
   'isDirectoryWritable': isDirectoryWritable,
   'findFirstFile': findFirstFile
+});
+
+console.log('exposeInMainWorld');
+contextBridge.exposeInMainWorld('ethDocker', {
+  'preInstall': preInstall
 });
