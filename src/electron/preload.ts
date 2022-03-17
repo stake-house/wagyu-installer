@@ -12,13 +12,12 @@ import {
   OpenDialogReturnValue
 } from "electron";
 
-import { doesDirectoryExist, isDirectoryWritable, findFirstFile } from './BashUtils';
+import { doesDirectoryExist, findFirstFile } from './BashUtils';
 
 import { EthDockerInstaller } from './EthDockerInstaller';
 
 const ethDockerInstaller = new EthDockerInstaller();
-const preInstall = async (): Promise<boolean> => {
-  console.log('IPC preInstall called');
+const ethDockerPreInstall = async (): Promise<boolean> => {
   return ethDockerInstaller.preInstall();
 }
 
@@ -40,11 +39,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 contextBridge.exposeInMainWorld('bashUtils', {
   'doesDirectoryExist': doesDirectoryExist,
-  'isDirectoryWritable': isDirectoryWritable,
   'findFirstFile': findFirstFile
 });
 
 console.log('exposeInMainWorld');
 contextBridge.exposeInMainWorld('ethDocker', {
-  'preInstall': preInstall
+  'preInstall': ethDockerPreInstall
 });

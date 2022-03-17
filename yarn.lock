@@ -296,6 +296,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@improved/node@npm:^1.0.0":
+  version: 1.1.1
+  resolution: "@improved/node@npm:1.1.1"
+  checksum: 39dca64da0e948c3595dd1966428948abb091e5ebc28ad0829b914afa026a0ede5b43ba1f3e5b32d576ab0346695b0f582652d686aed2fdd063a59178713820c
+  languageName: node
+  linkType: hard
+
 "@malept/cross-spawn-promise@npm:^1.1.0":
   version: 1.1.1
   resolution: "@malept/cross-spawn-promise@npm:1.1.1"
@@ -739,13 +746,6 @@ __metadata:
   version: 0.16.2
   resolution: "@types/scheduler@npm:0.16.2"
   checksum: b6b4dcfeae6deba2e06a70941860fb1435730576d3689225a421280b7742318d1548b3d22c1f66ab68e414f346a9542f29240bc955b6332c5b11e561077583bc
-  languageName: node
-  linkType: hard
-
-"@types/tmp@npm:^0.2.2":
-  version: 0.2.3
-  resolution: "@types/tmp@npm:0.2.3"
-  checksum: 0ca45e99b3b3c6959d5c4f4555f73c8007db540cfb0fbbb9373217f9ab85e67eef75193f51a1d6564b0ee6c6f5ffa259d1034d7f7530a5b7ce80acb94cfc4daa
   languageName: node
   linkType: hard
 
@@ -1657,6 +1657,15 @@ __metadata:
   dependencies:
     delayed-stream: ~1.0.0
   checksum: 49fa4aeb4916567e33ea81d088f6584749fc90c7abec76fd516bf1c5aa5c79f3584b5ba3de6b86d26ddd64bae5329c4c7479343250cfe71c75bb366eae53bb7c
+  languageName: node
+  linkType: hard
+
+"command-join@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "command-join@npm:3.0.0"
+  dependencies:
+    "@improved/node": ^1.0.0
+  checksum: afdfe94848dc3a78d98e0cf22e685c6456ab835c8fcf6ac00f5862a3f186cb722ae975c1826d6ce2183edefaf0a0a7b84f5402657b2b1ac380e61f7be09cdebd
   languageName: node
   linkType: hard
 
@@ -4835,7 +4844,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tmp-promise@npm:^3.0.2":
+"tmp-promise@npm:^3.0.2, tmp-promise@npm:^3.0.3":
   version: 3.0.3
   resolution: "tmp-promise@npm:3.0.3"
   dependencies:
@@ -5089,7 +5098,7 @@ __metadata:
     "@types/react": ^17.0.14
     "@types/react-dom": ^17.0.9
     "@types/react-router-dom": ^5.1.8
-    "@types/tmp": ^0.2.2
+    command-join: ^3.0.0
     css-loader: ^6.7.0
     electron: ^17.1.0
     electron-builder: ^22.14.5
@@ -5101,6 +5110,7 @@ __metadata:
     shebang-loader: ^0.0.1
     style-loader: ^3.3.1
     sudo-prompt: ^9.2.1
+    tmp-promise: ^3.0.3
     ts-loader: ^9.2.3
     typescript: ^4.3.5
     webpack: ^5.64.3
