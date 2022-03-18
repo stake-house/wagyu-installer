@@ -3,6 +3,7 @@ import React, { FC, ReactElement, useState, Dispatch, SetStateAction } from "rea
 import styled from '@emotion/styled';
 import { Container, Divider, Grid, Modal, Tooltip, Typography } from '@mui/material';
 import { Button } from '@mui/material';
+import { HomeIcon } from "../components/icons/HomeIcon";
 import { NetworkPicker } from "../components/NetworkPicker";
 import { Network, StepSequenceKey } from '../types'
 import VersionFooter from "../components/VersionFooter";
@@ -16,8 +17,8 @@ const StyledMuiContainer = styled(Container)`
 
 const NetworkDiv = styled.div`
   margin-top: 35px;
-  margin-right: 35px;
-  align-self: flex-end;
+  margin-left: 35px;
+  align-self: flex-start;
   color: gray;
 `;
 
@@ -129,7 +130,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       </Modal>
 
       <LandingHeader variant="h1">Welcome!</LandingHeader>
-      <ContentGrid />
+      <HomeIcon />
       <SubHeader>Your installer for staking on Ethereum</SubHeader>
 
       <Links>

@@ -8,6 +8,9 @@ const theme = createTheme({
     mode: "dark",
     primary: amber,
     secondary: blue,
+    background: {
+      default: '#1b262c',
+    },
   },
   typography: {
     fontFamily: [
