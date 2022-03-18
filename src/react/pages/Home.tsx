@@ -106,7 +106,8 @@ const Home: FC<HomeProps> = (props): ReactElement => {
         const installationDetails: InstallDetails = {
           network: props.network,
           executionClient: ExecutionClient.GETH,
-          consensusClient: ConsensusClient.LIGHTHOUSE
+          consensusClient: ConsensusClient.LIGHTHOUSE,
+          keysDirectory: ''
         };
 
         window.ethDocker.install(installationDetails).then(installResult => {

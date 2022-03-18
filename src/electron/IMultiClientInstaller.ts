@@ -51,7 +51,7 @@ export type InstallDetails = {
   network: Network,
   executionClient: ExecutionClient,
   consensusClient: ConsensusClient,
-  keyDirectory: string
+  keysDirectory: string
 }
 
 export type KeyImportResult = {
