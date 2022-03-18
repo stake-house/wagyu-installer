@@ -20,7 +20,7 @@ import {
   ValidatorStatus,
   InstallDetails
 } from "./IMultiClientInstaller";
-import { Network } from '../react/types';
+import { Network, networkToExecution } from '../react/types';
 import { doesFileExist, doesDirectoryExist } from './BashUtils';
 
 const execFileProm = promisify(execFile);
@@ -226,7 +226,11 @@ export class EthDockerInstaller implements IMultiClientInstaller {
       return false;
     }
 
-    // TODO: Create .env file with all the configuration details
+    // Create .env file with all the configuration details
+    if (!await this.createEthDockerEnvFile(details)) {
+      return false;
+    }
+
     // TODO: Build the client
     // TODO: Import the keys
     // TODO: Start the clients
@@ -234,8 +238,77 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     return true;
   }
 
+  async createEthDockerEnvFile(details: InstallDetails): Promise<boolean> {
+    const networkPath = path.join(installPath, details.network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    // Start with the default env file.
+    const defaultEnvPath = path.join(ethDockerPath, 'default.env');
+    const envPath = path.join(ethDockerPath, '.env');
+
+    // Open default env file and update the configs.
+    const defaultEnvFile = await open(defaultEnvPath, 'r');
+    const defaultEnvConfigs = await defaultEnvFile.readFile({ encoding: 'utf8' });
+    await defaultEnvFile.close();
+
+    let envConfigs = defaultEnvConfigs;
+
+    // Writing consensus network
+    const networkValue = details.network.toLowerCase();
+    envConfigs = envConfigs.replace(/NETWORK=(.*)/, `NETWORK=${networkValue}`);
+
+    // Writing execution network
+    const ecNetworkValue = networkToExecution.get(details.network)?.toLowerCase() as string;
+    envConfigs = envConfigs.replace(/EC_NETWORK=(.*)/, `EC_NETWORK=${ecNetworkValue}`);
+
+    let composeFileValues = new Array<string>();
+
+    switch (details.consensusClient) {
+      case ConsensusClient.LIGHTHOUSE:
+        composeFileValues.push('lh-base.yml');
+        break;
+      case ConsensusClient.NIMBUS:
+        composeFileValues.push('nimbus-base.yml');
+        break;
+      case ConsensusClient.PRYSM:
+        composeFileValues.push('prysm-base.yml');
+        break;
+      case ConsensusClient.TEKU:
+        composeFileValues.push('teku-base.yml');
+        break;
+      case ConsensusClient.LODESTAR:
+        composeFileValues.push('lodestar-base.yml');
+        break;
+    }
+
+    switch (details.executionClient) {
+      case ExecutionClient.GETH:
+        composeFileValues.push('geth.yml');
+        break;
+      case ExecutionClient.NETHERMIND:
+        composeFileValues.push('nm.yml');
+        break;
+      case ExecutionClient.BESU:
+        composeFileValues.push('besu.yml');
+        break;
+      case ExecutionClient.ERIGON:
+        composeFileValues.push('erigon.yml');
+        break;
+    }
+
+    const composeFileValue = composeFileValues.join(':');
+    envConfigs = envConfigs.replace(/COMPOSE_FILE=(.*)/, `COMPOSE_FILE=${composeFileValue}`);
+
+    // Write our new env file
+    const envFile = await open(envPath, 'w');
+    envFile.writeFile(envConfigs, { encoding: 'utf8' });
+    await envFile.close();
+
+    return true;
+  }
+
   async installUpdateEthDockerCode(network: Network): Promise<boolean> {
-    const networkPath = path.join(installPath, network.toLocaleLowerCase());
+    const networkPath = path.join(installPath, network.toLowerCase());
 
     // Make sure the networkPath is a directory
     const networkPathExists = await doesFileExist(networkPath);

@@ -50,7 +50,8 @@ export interface IMultiClientInstaller {
 export type InstallDetails = {
   network: Network,
   executionClient: ExecutionClient,
-  consensusClient: ConsensusClient
+  consensusClient: ConsensusClient,
+  keyDirectory: string
 }
 
 export type KeyImportResult = {
@@ -76,6 +77,8 @@ export enum ValidatorStatus {
 export enum ExecutionClient {
   GETH = "geth",
   NETHERMIND = "nethermind",
+  BESU = "besu",
+  ERIGON = "erigon"
 }
 
 export enum ConsensusClient {
@@ -83,4 +86,5 @@ export enum ConsensusClient {
   NIMBUS = "nimbus",
   LIGHTHOUSE = "lighthouse",
   PRYSM = "prysm",
+  LODESTAR = "lodestar"
 }
