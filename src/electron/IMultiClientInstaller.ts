@@ -1,8 +1,10 @@
+import { Network } from "../react/types"
+
 export interface IMultiClientInstaller {
 
   // Functionality
   preInstall: () => Promise<boolean>,
-  install: () => Promise<void>,
+  install: (details: InstallDetails) => Promise<boolean>,
   postInstall: () => Promise<void>,
 
   stopNodes: () => Promise<void>,
@@ -43,6 +45,12 @@ export interface IMultiClientInstaller {
   consensusClientLatestBlock: () => Promise<number>,
 
   // TODO: logs stream
+}
+
+export type InstallDetails = {
+  network: Network,
+  executionClient: ExecutionClient,
+  consensusClient: ConsensusClient
 }
 
 export type KeyImportResult = {

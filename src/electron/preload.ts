@@ -15,10 +15,14 @@ import {
 import { doesDirectoryExist, findFirstFile } from './BashUtils';
 
 import { EthDockerInstaller } from './EthDockerInstaller';
+import { InstallDetails } from "./IMultiClientInstaller";
 
 const ethDockerInstaller = new EthDockerInstaller();
 const ethDockerPreInstall = async (): Promise<boolean> => {
   return ethDockerInstaller.preInstall();
+}
+const ethDockerInstall = async (details: InstallDetails): Promise<boolean> => {
+  return ethDockerInstaller.install(details);
 }
 
 const ipcRendererSendClose = () => {
@@ -44,5 +48,6 @@ contextBridge.exposeInMainWorld('bashUtils', {
 
 console.log('exposeInMainWorld');
 contextBridge.exposeInMainWorld('ethDocker', {
-  'preInstall': ethDockerPreInstall
+  'preInstall': ethDockerPreInstall,
+  'install': ethDockerInstall
 });

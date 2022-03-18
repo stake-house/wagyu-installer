@@ -6,6 +6,7 @@ import { Button } from '@mui/material';
 import { NetworkPicker } from "../components/NetworkPicker";
 import { Network, StepSequenceKey } from '../types'
 import VersionFooter from "../components/VersionFooter";
+import { ConsensusClient, ExecutionClient, InstallDetails } from "../../electron/IMultiClientInstaller";
 
 const StyledMuiContainer = styled(Container)`
   display: flex;
@@ -99,7 +100,20 @@ const Home: FC<HomeProps> = (props): ReactElement => {
 
   const handleEnter = () => {
 
-    window.ethDocker.preInstall().then(result => console.log(result));
+    window.ethDocker.preInstall().then(preInstallResult => {
+      console.log(`preInstall ${preInstallResult}`);
+      if (preInstallResult) {
+        const installationDetails: InstallDetails = {
+          network: props.network,
+          executionClient: ExecutionClient.GETH,
+          consensusClient: ConsensusClient.LIGHTHOUSE
+        };
+
+        window.ethDocker.install(installationDetails).then(installResult => {
+          console.log(`install ${installResult}`);
+        });
+      }
+    });
 
     /*
     setEnterSelected(true);

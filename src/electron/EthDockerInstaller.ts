@@ -5,9 +5,11 @@ import { commandJoin } from "command-join"
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { withDir } from 'tmp-promise'
-import { open, rm } from 'fs/promises';
+
+import { open, rm, mkdir } from 'fs/promises';
 
 import path from 'path';
+import os from 'os';
 
 import {
   ExecutionClient,
@@ -15,11 +17,17 @@ import {
   IMultiClientInstaller,
   KeyImportResult,
   NodeStatus,
-  ValidatorStatus
+  ValidatorStatus,
+  InstallDetails
 } from "./IMultiClientInstaller";
+import { Network } from '../react/types';
+import { doesFileExist, doesDirectoryExist } from './BashUtils';
 
 const execFileProm = promisify(execFile);
+
 const dockerServiceName = 'docker.service';
+const installPath = path.join(os.homedir(), '.wagyu-installer');
+const ethDockerGitRepository = 'https://github.com/eth-educators/eth-docker.git';
 
 type SystemdServiceDetails = {
   description: string | undefined;
@@ -38,7 +46,6 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     let packagesToInstall = new Array<string>();
 
     // We need git installed
-
     const gitPackageName = 'git';
 
     const gitInstalled = await this.checkForInstalledUbuntuPackage(gitPackageName);
@@ -47,7 +54,6 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     }
 
     // We need docker installed, enabled and running
-
     const dockerPackageName = 'docker-compose';
     let needToEnableDockerService = true;
     let needToStartDockerService = false;
@@ -62,9 +68,11 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     }
 
     // We need our user to be in docker group
-
     const dockerGroupName = 'docker';
     const needUserInDockerGroup = !await this.isUserInGroup(dockerGroupName);
+
+    // We need our installPath directory
+    await mkdir(installPath, { recursive: true });
 
     return await this.preInstallAdminScript(
       packagesToInstall,
@@ -142,19 +150,23 @@ export class EthDockerInstaller implements IMultiClientInstaller {
         const scriptFile = await open(scriptPath, 'w');
         await scriptFile.write('#!/bin/bash\n');
 
+        // Install APT packages
         if (packagesToInstall.length > 0) {
           await scriptFile.write('apt -y update\n');
           await scriptFile.write('apt -y install ' + commandJoin(packagesToInstall) + '\n');
         }
 
+        // Enable docker service
         if (needToEnableDockerService) {
           await scriptFile.write('systemctl enable --now ' + commandJoin([dockerServiceName]) + '\n');
         }
 
+        // Start docker service
         if (needToStartDockerService) {
           await scriptFile.write('systemctl start ' + commandJoin([dockerServiceName]) + '\n');
         }
 
+        // Add user in docker group
         if (needUserInDockerGroup) {
           const { stdout, stderr } = await execFileProm('whoami');
           const userName = stdout.trim();
@@ -208,10 +220,90 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     return stdout.indexOf('[installed]') > 0
   }
 
-  async install(): Promise<void> {
-    // TODO: implement
-    console.log("Executing install");
-    return;
+  async install(details: InstallDetails): Promise<boolean> {
+    // Install and update eth-docker
+    if (!await this.installUpdateEthDockerCode(details.network)) {
+      return false;
+    }
+
+    // TODO: Create .env file with all the configuration details
+    // TODO: Build the client
+    // TODO: Import the keys
+    // TODO: Start the clients
+
+    return true;
+  }
+
+  async installUpdateEthDockerCode(network: Network): Promise<boolean> {
+    const networkPath = path.join(installPath, network.toLocaleLowerCase());
+
+    // Make sure the networkPath is a directory
+    const networkPathExists = await doesFileExist(networkPath);
+    const networkPathIsDir = networkPathExists && await doesDirectoryExist(networkPath);
+    if (!networkPathExists) {
+      await mkdir(networkPath, { recursive: true });
+    } else if (networkPathExists && !networkPathIsDir) {
+      await rm(networkPath);
+      await mkdir(networkPath, { recursive: true });
+    }
+
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethDockerPathExists = await doesFileExist(ethDockerPath);
+    const ethDockerPathIsDir = ethDockerPathExists && await doesDirectoryExist(ethDockerPath);
+    let needToClone = !ethDockerPathExists;
+
+    if (ethDockerPathExists && !ethDockerPathIsDir) {
+      await rm(ethDockerPath);
+      needToClone = true;
+    } else if (ethDockerPathIsDir) {
+      // Check if eth-docker was already cloned.
+      const execProm = execFileProm('git', ['remote', 'show', 'origin'], { cwd: ethDockerPath });
+      const { stdout, stderr } = await execProm;
+
+      if (execProm.child.exitCode === 0) {
+        // Check for origin being ethDockerGitRepository
+        const remoteMatch = stdout.match(/Fetch URL: (?<remote>.+)/);
+        if (remoteMatch) {
+          if (remoteMatch.groups?.remote.trim() === ethDockerGitRepository) {
+            needToClone = false;
+          } else {
+            // Git repository with the wrong remote.
+            await rm(ethDockerPath, { recursive: true, force: true });
+            needToClone = true;
+          }
+        } else {
+          console.log('Cannot parse `git remote show origin` output.');
+          return false;
+        }
+      } else {
+        // Not a git repository or does not have origin remote
+        await rm(ethDockerPath, { recursive: true, force: true });
+        needToClone = true;
+      }
+    }
+
+    // Clone repository if needed
+    if (needToClone) {
+      const execProm = execFileProm('git', ['clone', ethDockerGitRepository], { cwd: networkPath });
+      const { stdout, stderr } = await execProm;
+
+      if (execProm.child.exitCode !== 0) {
+        console.log('We failed to clone eth-docker repository.');
+        return false;
+      }
+    }
+
+    // Update repository
+    const execProm = execFileProm('git', ['pull'], { cwd: ethDockerPath });
+    const { stdout, stderr } = await execProm;
+
+    if (execProm.child.exitCode !== 0) {
+      console.log('We failed to update eth-docker repository.');
+      return false;
+    }
+
+    return true;
   }
 
   async postInstall(): Promise<void> {
