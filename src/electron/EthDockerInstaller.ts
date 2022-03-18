@@ -283,8 +283,8 @@ export class EthDockerInstaller implements IMultiClientInstaller {
       }
     }
 
-    // Clone repository if needed
     if (needToClone) {
+      // Clone repository if needed
       const execProm = execFileProm('git', ['clone', ethDockerGitRepository], { cwd: networkPath });
       const { stdout, stderr } = await execProm;
 
@@ -292,15 +292,15 @@ export class EthDockerInstaller implements IMultiClientInstaller {
         console.log('We failed to clone eth-docker repository.');
         return false;
       }
-    }
+    } else {
+      // Update repository
+      const execProm = execFileProm('git', ['pull'], { cwd: ethDockerPath });
+      const { stdout, stderr } = await execProm;
 
-    // Update repository
-    const execProm = execFileProm('git', ['pull'], { cwd: ethDockerPath });
-    const { stdout, stderr } = await execProm;
-
-    if (execProm.child.exitCode !== 0) {
-      console.log('We failed to update eth-docker repository.');
-      return false;
+      if (execProm.child.exitCode !== 0) {
+        console.log('We failed to update eth-docker repository.');
+        return false;
+      }
     }
 
     return true;
