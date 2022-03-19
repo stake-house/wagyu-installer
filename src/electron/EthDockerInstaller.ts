@@ -2,7 +2,7 @@ import sudo from 'sudo-prompt';
 
 import { commandJoin } from "command-join"
 
-import { execFile } from 'child_process';
+import { exec, execFile } from 'child_process';
 import { promisify } from 'util';
 import { withDir } from 'tmp-promise'
 
@@ -24,6 +24,7 @@ import { Network, networkToExecution } from '../react/types';
 import { doesFileExist, doesDirectoryExist } from './BashUtils';
 
 const execFileProm = promisify(execFile);
+const execProm = promisify(exec);
 
 const dockerServiceName = 'docker.service';
 const dockerGroupName = 'docker';
@@ -250,39 +251,23 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     const ethDockerPath = path.join(networkPath, 'eth-docker');
 
     const ethdCommand = path.join(ethDockerPath, 'ethd');
-    const dockerGroupId = await this.getGroupId(dockerGroupName);
-    console.log(`dockerGroupId: ${dockerGroupId}`);
+    const bashScript = `
+/usr/bin/newgrp ${dockerGroupName} <<EONG
+${ethdCommand} cmd build --pull
+EONG
+    `;
 
-    const execProm = execFileProm(ethdCommand, ['cmd', 'build', '--pull'],
-      { cwd: ethDockerPath, gid: dockerGroupId });
-    const { stdout, stderr } = await execProm;
+    const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
+    const { stdout, stderr } = await returnProm;
     console.log(stdout);
     console.log(stderr);
 
-    if (execProm.child.exitCode !== 0) {
+    if (returnProm.child.exitCode !== 0) {
       console.log('We failed to build eth-docker clients.');
       return false;
     }
 
     return true;
-  }
-
-  async getGroupId(groupName: string): Promise<number> {
-    const execProm = execFileProm('getent', ['group', groupName]);
-    const { stdout, stderr } = await execProm;
-
-    if (execProm.child.exitCode !== 0) {
-      console.log(`We failed to get gid for ${groupName}`);
-      return -1;
-    }
-
-    const parts = stdout.trim().split(':');
-    if (parts.length > 2) {
-      return parseInt(parts[2]);
-    } else {
-      console.log('We failed to parse the output of getent.');
-      return -1;
-    }
   }
 
   async createEthDockerEnvFile(details: InstallDetails): Promise<boolean> {
@@ -378,10 +363,10 @@ export class EthDockerInstaller implements IMultiClientInstaller {
       needToClone = true;
     } else if (ethDockerPathIsDir) {
       // Check if eth-docker was already cloned.
-      const execProm = execFileProm('git', ['remote', 'show', 'origin'], { cwd: ethDockerPath });
-      const { stdout, stderr } = await execProm;
+      const returnProm = execFileProm('git', ['remote', 'show', 'origin'], { cwd: ethDockerPath });
+      const { stdout, stderr } = await returnProm;
 
-      if (execProm.child.exitCode === 0) {
+      if (returnProm.child.exitCode === 0) {
         // Check for origin being ethDockerGitRepository
         const remoteMatch = stdout.match(/Fetch URL: (?<remote>.+)/);
         if (remoteMatch) {
@@ -405,19 +390,19 @@ export class EthDockerInstaller implements IMultiClientInstaller {
 
     if (needToClone) {
       // Clone repository if needed
-      const execProm = execFileProm('git', ['clone', ethDockerGitRepository], { cwd: networkPath });
-      const { stdout, stderr } = await execProm;
+      const returnProm = execFileProm('git', ['clone', ethDockerGitRepository], { cwd: networkPath });
+      const { stdout, stderr } = await returnProm;
 
-      if (execProm.child.exitCode !== 0) {
+      if (returnProm.child.exitCode !== 0) {
         console.log('We failed to clone eth-docker repository.');
         return false;
       }
     } else {
       // Update repository
-      const execProm = execFileProm('git', ['pull'], { cwd: ethDockerPath });
-      const { stdout, stderr } = await execProm;
+      const returnProm = execFileProm('git', ['pull'], { cwd: ethDockerPath });
+      const { stdout, stderr } = await returnProm;
 
-      if (execProm.child.exitCode !== 0) {
+      if (returnProm.child.exitCode !== 0) {
         console.log('We failed to update eth-docker repository.');
         return false;
       }
