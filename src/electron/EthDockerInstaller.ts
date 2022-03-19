@@ -26,6 +26,7 @@ import { doesFileExist, doesDirectoryExist } from './BashUtils';
 const execFileProm = promisify(execFile);
 
 const dockerServiceName = 'docker.service';
+const dockerGroupName = 'docker';
 const installPath = path.join(os.homedir(), '.wagyu-installer');
 const ethDockerGitRepository = 'https://github.com/eth-educators/eth-docker.git';
 
@@ -171,7 +172,7 @@ export class EthDockerInstaller implements IMultiClientInstaller {
           const { stdout, stderr } = await execFileProm('whoami');
           const userName = stdout.trim();
 
-          await scriptFile.write(`usermod -aG docker ${userName}\n`);
+          await scriptFile.write(`usermod -aG ${dockerGroupName} ${userName}\n`);
         }
 
         scriptFile.chmod(0o500);
@@ -231,11 +232,57 @@ export class EthDockerInstaller implements IMultiClientInstaller {
       return false;
     }
 
-    // TODO: Build the client
+    // Build the clients
+    if (!await this.buildClients(details.network)) {
+      return false;
+    }
+
     // TODO: Import the keys
     // TODO: Start the clients
 
     return true;
+  }
+
+  async buildClients(network: Network): Promise<boolean> {
+    console.log('buildClients called');
+    console.log(network);
+    const networkPath = path.join(installPath, network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethdCommand = path.join(ethDockerPath, 'ethd');
+    const dockerGroupId = await this.getGroupId(dockerGroupName);
+    console.log(`dockerGroupId: ${dockerGroupId}`);
+
+    const execProm = execFileProm(ethdCommand, ['cmd', 'build', '--pull'],
+      { cwd: ethDockerPath, gid: dockerGroupId });
+    const { stdout, stderr } = await execProm;
+    console.log(stdout);
+    console.log(stderr);
+
+    if (execProm.child.exitCode !== 0) {
+      console.log('We failed to build eth-docker clients.');
+      return false;
+    }
+
+    return true;
+  }
+
+  async getGroupId(groupName: string): Promise<number> {
+    const execProm = execFileProm('getent', ['group', groupName]);
+    const { stdout, stderr } = await execProm;
+
+    if (execProm.child.exitCode !== 0) {
+      console.log(`We failed to get gid for ${groupName}`);
+      return -1;
+    }
+
+    const parts = stdout.trim().split(':');
+    if (parts.length > 2) {
+      return parseInt(parts[2]);
+    } else {
+      console.log('We failed to parse the output of getent.');
+      return -1;
+    }
   }
 
   async createEthDockerEnvFile(details: InstallDetails): Promise<boolean> {
