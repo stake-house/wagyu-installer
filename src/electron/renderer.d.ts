@@ -42,9 +42,14 @@ export interface IBashUtilsAPI {
   findFirstFile: (directory: string, startsWith: string) => Promise<string>
 }
 
+
 export interface IEthDockerAPI {
   preInstall: () => Promise<boolean>,
-  install: (details: InstallDetails) => Promise<boolean>
+  install: (details: InstallDetails) => Promise<boolean>,
+  importKeys: (
+    network: Network,
+    keyStoreDirectoryPath: string,
+    keyStorePassword: string) => Promise<boolean>
 }
 
 declare global {

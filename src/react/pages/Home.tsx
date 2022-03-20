@@ -106,12 +106,20 @@ const Home: FC<HomeProps> = (props): ReactElement => {
         const installationDetails: InstallDetails = {
           network: props.network,
           executionClient: ExecutionClient.GETH,
-          consensusClient: ConsensusClient.LIGHTHOUSE,
-          keysDirectory: ''
+          consensusClient: ConsensusClient.LIGHTHOUSE
         };
 
         window.ethDocker.install(installationDetails).then(installResult => {
           console.log(`install ${installResult}`);
+          if (installResult) {
+            window.ethDocker.importKeys(
+              props.network,
+              '/home/remy/keys',
+              'password').then(importKeysResult => {
+                console.log(`importKeys ${importKeysResult}`);
+              });
+          }
+
         });
       }
     });

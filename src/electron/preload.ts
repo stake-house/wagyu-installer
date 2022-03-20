@@ -11,6 +11,7 @@ import {
   OpenDialogOptions,
   OpenDialogReturnValue
 } from "electron";
+import { Network } from "../react/types";
 
 import { doesDirectoryExist, findFirstFile } from './BashUtils';
 
@@ -20,10 +21,16 @@ import { InstallDetails } from "./IMultiClientInstaller";
 const ethDockerInstaller = new EthDockerInstaller();
 const ethDockerPreInstall = async (): Promise<boolean> => {
   return ethDockerInstaller.preInstall();
-}
+};
 const ethDockerInstall = async (details: InstallDetails): Promise<boolean> => {
   return ethDockerInstaller.install(details);
-}
+};
+const ethDockerImportKeys = async (
+  network: Network,
+  keyStoreDirectoryPath: string,
+  keyStorePassword: string): Promise<boolean> => {
+  return ethDockerInstaller.importKeys(network, keyStoreDirectoryPath, keyStorePassword);
+};
 
 const ipcRendererSendClose = () => {
   ipcRenderer.send('close');
@@ -46,8 +53,8 @@ contextBridge.exposeInMainWorld('bashUtils', {
   'findFirstFile': findFirstFile
 });
 
-console.log('exposeInMainWorld');
 contextBridge.exposeInMainWorld('ethDocker', {
   'preInstall': ethDockerPreInstall,
-  'install': ethDockerInstall
+  'install': ethDockerInstall,
+  'importKeys': ethDockerImportKeys
 });

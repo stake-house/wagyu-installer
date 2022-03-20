@@ -15,7 +15,6 @@ import {
   ExecutionClient,
   ConsensusClient,
   IMultiClientInstaller,
-  KeyImportResult,
   NodeStatus,
   ValidatorStatus,
   InstallDetails
@@ -70,7 +69,6 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     }
 
     // We need our user to be in docker group
-    const dockerGroupName = 'docker';
     const needUserInDockerGroup = !await this.isUserInGroup(dockerGroupName);
 
     // We need our installPath directory
@@ -170,8 +168,7 @@ export class EthDockerInstaller implements IMultiClientInstaller {
 
         // Add user in docker group
         if (needUserInDockerGroup) {
-          const { stdout, stderr } = await execFileProm('whoami');
-          const userName = stdout.trim();
+          const userName = await this.getUsername();
 
           await scriptFile.write(`usermod -aG ${dockerGroupName} ${userName}\n`);
         }
@@ -211,9 +208,18 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     }
   }
 
+  async getUsername(): Promise<string> {
+    const { stdout, stderr } = await execFileProm('whoami');
+    const userName = stdout.trim();
+
+    return userName;
+  }
+
   async isUserInGroup(groupName: string): Promise<boolean> {
-    const { stdout, stderr } = await execFileProm('groups');
-    const groups = stdout.split(' ');
+    const userName = await this.getUsername();
+
+    const { stdout, stderr } = await execFileProm('groups', [userName]);
+    const groups = stdout.trim().split(' ');
     return groups.findIndex(val => val === groupName) >= 0;
   }
 
@@ -238,15 +244,10 @@ export class EthDockerInstaller implements IMultiClientInstaller {
       return false;
     }
 
-    // TODO: Import the keys
-    // TODO: Start the clients
-
     return true;
   }
 
   async buildClients(network: Network): Promise<boolean> {
-    console.log('buildClients called');
-    console.log(network);
     const networkPath = path.join(installPath, network.toLowerCase());
     const ethDockerPath = path.join(networkPath, 'eth-docker');
 
@@ -259,8 +260,6 @@ EONG
 
     const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
     const { stdout, stderr } = await returnProm;
-    console.log(stdout);
-    console.log(stderr);
 
     if (returnProm.child.exitCode !== 0) {
       console.log('We failed to build eth-docker clients.');
@@ -411,22 +410,20 @@ EONG
     return true;
   }
 
-  async postInstall(): Promise<void> {
-    // TODO: implement
-    console.log("Executing postInstall");
-    return;
+  async postInstall(): Promise<boolean> {
+    return this.startNodes();
   }
 
-  async stopNodes(): Promise<void> {
+  async stopNodes(): Promise<boolean> {
     // TODO: implement
     console.log("Executing stopNodes");
-    return;
+    return false;
   }
 
-  async startNodes(): Promise<void> {
+  async startNodes(): Promise<boolean> {
     // TODO: implement
     console.log("Executing startNodes");
-    return;
+    return false;
   }
 
   async updateExecutionClient(): Promise<void> {
@@ -441,54 +438,55 @@ EONG
     return;
   }
 
-  async importKeys(keyStorePaths: string[]): Promise<KeyImportResult[]> {
-    // TODO: implement
-    console.log("Executing importKeys");
-    const results: KeyImportResult[] = [
-      {
-        path: "path1",
-        success: true,
-      }, {
-        path: "path2",
-        success: false,
-      }
-    ]
+  async importKeys(
+    network: Network,
+    keyStoreDirectoryPath: string,
+    keyStorePassword: string): Promise<boolean> {
 
-    return results;
+    const networkPath = path.join(installPath, network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethdCommand = path.join(ethDockerPath, 'ethd');
+    const argKeyStoreDirectoryPath = commandJoin([keyStoreDirectoryPath]);
+    const argKeyStorePassword = commandJoin([keyStorePassword]);
+    const bashScript = `
+/usr/bin/newgrp ${dockerGroupName} <<EONG
+KEYSTORE_PASSWORD=${argKeyStorePassword} ${ethdCommand} keyimport --non-interactive --path ${argKeyStoreDirectoryPath}
+EONG
+    `;
+
+    const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
+    const { stdout, stderr } = await returnProm;
+
+    if (returnProm.child.exitCode !== 0) {
+      console.log('We failed to import keys with eth-docker.');
+      return false;
+    }
+
+    return true;
   }
 
-  async exportKeys(keyStorePaths: string[]): Promise<KeyImportResult[]> {
+  async exportKeys(): Promise<void> {
     // TODO: implement
-    console.log("Executing exportKeys");
-    const results: KeyImportResult[] = [
-      {
-        path: "path1",
-        success: true,
-      }, {
-        path: "path2",
-        success: false,
-      }
-    ]
-
-    return results;
+    return;
   }
 
-  async switchExecutionClient(targetClient: ExecutionClient): Promise<void> {
+  async switchExecutionClient(targetClient: ExecutionClient): Promise<boolean> {
     // TODO: implement
     console.log("Executing switchExecutionClient");
-    return;
+    return false;
   }
 
-  async switchConsensusClient(targetClient: ConsensusClient): Promise<void> {
+  async switchConsensusClient(targetClient: ConsensusClient): Promise<boolean> {
     // TODO: implement
     console.log("Executing switchConsensusClient");
-    return;
+    return false;
   }
 
-  async uninstall(): Promise<void> {
+  async uninstall(): Promise<boolean> {
     // TODO: implement
     console.log("Executing uninstall");
-    return;
+    return false;
   }
 
 

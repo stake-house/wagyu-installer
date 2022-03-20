@@ -5,21 +5,24 @@ export interface IMultiClientInstaller {
   // Functionality
   preInstall: () => Promise<boolean>,
   install: (details: InstallDetails) => Promise<boolean>,
-  postInstall: () => Promise<void>,
+  postInstall: () => Promise<boolean>,
 
-  stopNodes: () => Promise<void>,
-  startNodes: () => Promise<void>,
+  stopNodes: () => Promise<boolean>,
+  startNodes: () => Promise<boolean>,
 
   updateExecutionClient: () => Promise<void>,
   updateConsensusClient: () => Promise<void>,
 
-  importKeys: (keyStorePaths: string[]) => Promise<KeyImportResult[]>,
-  exportKeys: (keyStorePaths: string[]) => Promise<KeyImportResult[]>,
+  importKeys: (
+    network: Network,
+    keyStoreDirectoryPath: string,
+    keyStorePassword: string) => Promise<boolean>,
+  exportKeys: () => Promise<void>,
 
-  switchExecutionClient: (targetClient: ExecutionClient) => Promise<void>,
-  switchConsensusClient: (targetClient: ConsensusClient) => Promise<void>,
+  switchExecutionClient: (targetClient: ExecutionClient) => Promise<boolean>,
+  switchConsensusClient: (targetClient: ConsensusClient) => Promise<boolean>,
 
-  uninstall: () => Promise<void>,
+  uninstall: () => Promise<boolean>,
 
 
   // Data
@@ -51,12 +54,6 @@ export type InstallDetails = {
   network: Network,
   executionClient: ExecutionClient,
   consensusClient: ConsensusClient,
-  keysDirectory: string
-}
-
-export type KeyImportResult = {
-  path: string,
-  success: boolean,
 }
 
 export enum NodeStatus {
