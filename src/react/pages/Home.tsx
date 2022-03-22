@@ -117,6 +117,13 @@ const Home: FC<HomeProps> = (props): ReactElement => {
               '/home/remy/keys',
               'password').then(importKeysResult => {
                 console.log(`importKeys ${importKeysResult}`);
+
+                if (importKeysResult) {
+                  window.ethDocker.postInstall(props.network).then(postInstallResult => {
+                    console.log(`postInstall ${postInstallResult}`);
+                  });
+                }
+
               });
           }
 

@@ -410,20 +410,52 @@ EONG
     return true;
   }
 
-  async postInstall(): Promise<boolean> {
-    return this.startNodes();
+  async postInstall(network: Network): Promise<boolean> {
+    return this.startNodes(network);
   }
 
-  async stopNodes(): Promise<boolean> {
-    // TODO: implement
-    console.log("Executing stopNodes");
-    return false;
+  async stopNodes(network: Network): Promise<boolean> {
+    const networkPath = path.join(installPath, network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethdCommand = path.join(ethDockerPath, 'ethd');
+    const bashScript = `
+/usr/bin/newgrp ${dockerGroupName} <<EONG
+${ethdCommand} stop
+EONG
+    `;
+
+    const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
+    const { stdout, stderr } = await returnProm;
+
+    if (returnProm.child.exitCode !== 0) {
+      console.log('We failed to stop eth-docker clients.');
+      return false;
+    }
+
+    return true;
   }
 
-  async startNodes(): Promise<boolean> {
-    // TODO: implement
-    console.log("Executing startNodes");
-    return false;
+  async startNodes(network: Network): Promise<boolean> {
+    const networkPath = path.join(installPath, network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethdCommand = path.join(ethDockerPath, 'ethd');
+    const bashScript = `
+/usr/bin/newgrp ${dockerGroupName} <<EONG
+${ethdCommand} start
+EONG
+    `;
+
+    const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
+    const { stdout, stderr } = await returnProm;
+
+    if (returnProm.child.exitCode !== 0) {
+      console.log('We failed to start eth-docker clients.');
+      return false;
+    }
+
+    return true;
   }
 
   async updateExecutionClient(): Promise<void> {

@@ -49,7 +49,10 @@ export interface IEthDockerAPI {
   importKeys: (
     network: Network,
     keyStoreDirectoryPath: string,
-    keyStorePassword: string) => Promise<boolean>
+    keyStorePassword: string) => Promise<boolean>,
+  postInstall: (network: Network) => Promise<boolean>,
+  startNodes: (network: Network) => Promise<boolean>,
+  stopNodes: (network: Network) => Promise<boolean>,
 }
 
 declare global {

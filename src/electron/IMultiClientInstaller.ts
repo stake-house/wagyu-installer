@@ -5,10 +5,10 @@ export interface IMultiClientInstaller {
   // Functionality
   preInstall: () => Promise<boolean>,
   install: (details: InstallDetails) => Promise<boolean>,
-  postInstall: () => Promise<boolean>,
+  postInstall: (network: Network) => Promise<boolean>,
 
-  stopNodes: () => Promise<boolean>,
-  startNodes: () => Promise<boolean>,
+  stopNodes: (network: Network) => Promise<boolean>,
+  startNodes: (network: Network) => Promise<boolean>,
 
   updateExecutionClient: () => Promise<void>,
   updateConsensusClient: () => Promise<void>,
