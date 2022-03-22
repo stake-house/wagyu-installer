@@ -100,7 +100,8 @@ const Home: FC<HomeProps> = (props): ReactElement => {
 
   const handleEnter = () => {
 
-    window.ethDocker.preInstall().then(preInstallResult => {
+    // Backend usage example
+    /*window.ethDocker.preInstall().then(preInstallResult => {
       console.log(`preInstall ${preInstallResult}`);
       if (preInstallResult) {
         const installationDetails: InstallDetails = {
@@ -129,9 +130,8 @@ const Home: FC<HomeProps> = (props): ReactElement => {
 
         });
       }
-    });
+    });*/
 
-    /*
     setEnterSelected(true);
 
     if (!networkModalWasOpened) {
@@ -142,7 +142,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       }
 
       navigate(location);
-    }*/
+    }
   }
 
   const tabIndex = (priority: number) => showNetworkModal ? -1 : priority;
