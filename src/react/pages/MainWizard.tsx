@@ -19,9 +19,6 @@ const stepSequenceMap: Record<string, StepKey[]> = {
 }
 
 const MainGrid = styled(Grid)`
-  width: 100%;
-  margin: 0px;
-  text-align: center;
 `;
 
 const StyledStepper = styled(Stepper)`
@@ -118,7 +115,7 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
   }
 
   return (
-    <MainGrid container spacing={5} direction="column">
+    <MainGrid container direction="column">
       <Grid item container>
         <Grid item xs={10} />
         <Grid item xs={2}>

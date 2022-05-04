@@ -11,6 +11,7 @@ type ConfigurationProps = {
 const ContentGrid = styled(Grid)`
   height: 320px;
   margin-top: 16px;
+  margin-bottom: 16px;
 `;
 
 /**
@@ -22,13 +23,13 @@ const ContentGrid = styled(Grid)`
 const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
 
   return (
-    <Grid container direction="column" spacing={2}>
+    <Grid item container direction="column" spacing={2}>
       <Grid item>
-        <Typography variant="h1">
+        <Typography variant="h1" align='center'>
           Configuration
         </Typography>
       </Grid>
-      <ContentGrid>
+      <ContentGrid item container>
 
       </ContentGrid>
       {/* props.children is the stepper */}

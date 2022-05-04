@@ -11,9 +11,8 @@ import { Network } from './types';
 import SystemOverview from "./pages/SystemOverview";
 
 const Container = styled.main`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  display: block;
+  padding: 20px;
 `;
 
 /**
