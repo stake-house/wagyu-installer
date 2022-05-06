@@ -29,13 +29,13 @@ const StepNavigation: FC<Props> = (props): ReactElement => {
   return (
     <Grid item container justifyContent="space-between">
       <Grid item xs={2} />
-      <Grid item xs={2}>
+      <Grid item xs={2} justifyContent={'flex-start'} display={'flex'}>
         {!props.hideBack && (
           <Button variant="contained" color="primary" disabled={props.disableBack} onClick={props.onPrev} tabIndex={3}>{props.backLabel}</Button>
         )}
       </Grid>
       <Grid item xs={4} />
-      <Grid item xs={2}>
+      <Grid item xs={2} justifyContent={'flex-end'} display={'flex'}>
         {!props.hideNext && (
           <Button variant="contained" color="primary" disabled={props.disableNext} onClick={props.onNext} tabIndex={2}>{props.nextLabel}</Button>
         )}

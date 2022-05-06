@@ -12,7 +12,7 @@ import SystemCheck from '../components/InstallFlow/0-SystemCheck';
 
 const stepSequenceMap: Record<string, StepKey[]> = {
   install: [
-    StepKey.SystemCheck,
+    // StepKey.SystemCheck,
     StepKey.Configuration,
     StepKey.Installing,
   ]
@@ -74,7 +74,7 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
    * This is the UI stepper component rendering where the user is in the process
    */
   const stepper = (
-    <Grid item>
+    <Grid item my={3}>
       <StyledStepper activeStep={activeStepIndex} alternativeLabel>
         {stepSequence.map((stepKey: StepKey) => (
           <Step key={stepKey}>
