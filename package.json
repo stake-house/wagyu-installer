@@ -33,6 +33,7 @@
     "@mui/icons-material": "^5.4.4",
     "@mui/material": "^5.4.4",
     "command-join": "^3.0.0",
+    "generate-password": "^1.7.0",
     "git-revision-webpack-plugin": "^5.0.0",
     "html-webpack-plugin": "^5.5.0",
     "react": "^17.0.2",

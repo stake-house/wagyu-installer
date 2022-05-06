@@ -2552,6 +2552,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"generate-password@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "generate-password@npm:1.7.0"
+  checksum: c0d13e9a9c72d84adc4365a0c0dbd28463f2da1975b4ec83f34a126b95122551274755db641418e5aa11c8d94c1d216c8da8314f38e56e05378e1a43792f4614
+  languageName: node
+  linkType: hard
+
 "get-caller-file@npm:^2.0.5":
   version: 2.0.5
   resolution: "get-caller-file@npm:2.0.5"
@@ -5102,6 +5109,7 @@ __metadata:
     css-loader: ^6.7.0
     electron: ^17.1.0
     electron-builder: ^22.14.5
+    generate-password: ^1.7.0
     git-revision-webpack-plugin: ^5.0.0
     html-webpack-plugin: ^5.5.0
     react: ^17.0.2

@@ -1,6 +1,7 @@
 import sudo from 'sudo-prompt';
 
-import { commandJoin } from "command-join"
+import { commandJoin } from "command-join";
+import { generate as generate_password } from "generate-password";
 
 import { exec, execFile } from 'child_process';
 import { promisify } from 'util';
@@ -29,6 +30,7 @@ const dockerServiceName = 'docker.service';
 const dockerGroupName = 'docker';
 const installPath = path.join(os.homedir(), '.wagyu-installer');
 const ethDockerGitRepository = 'https://github.com/eth-educators/eth-docker.git';
+const prysmWalletPasswordFileName = 'prysm-wallet-password';
 
 type SystemdServiceDetails = {
   description: string | undefined;
@@ -173,8 +175,8 @@ export class EthDockerInstaller implements IMultiClientInstaller {
           await scriptFile.write(`usermod -aG ${dockerGroupName} ${userName}\n`);
         }
 
-        scriptFile.chmod(0o500);
-        scriptFile.close();
+        await scriptFile.chmod(0o500);
+        await scriptFile.close();
 
         const promise = new Promise<boolean>(async (resolve, reject) => {
           const options = {
@@ -396,6 +398,16 @@ EONG
         console.log('We failed to clone eth-docker repository.');
         return false;
       }
+
+      // Generate Prysm wallet password and store it in plain text
+      const walletPassword = generate_password({
+        length: 32,
+        numbers: true
+      });
+      const walletPasswordPath = path.join(ethDockerPath, prysmWalletPasswordFileName);
+      const walletPasswordFile = await open(walletPasswordPath, 'w');
+      await walletPasswordFile.write(walletPassword);
+      await walletPasswordFile.close();
     } else {
       // Update repository
       const returnProm = execFileProm('git', ['pull'], { cwd: ethDockerPath });
@@ -481,9 +493,15 @@ EONG
     const ethdCommand = path.join(ethDockerPath, 'ethd');
     const argKeyStoreDirectoryPath = commandJoin([keyStoreDirectoryPath]);
     const argKeyStorePassword = commandJoin([keyStorePassword]);
+
+    const walletPasswordPath = path.join(ethDockerPath, prysmWalletPasswordFileName);
+    const walletPasswordFile = await open(walletPasswordPath, 'r');
+    const walletPassword = commandJoin([await walletPasswordFile.readFile({ encoding: 'utf8' })]);
+    await walletPasswordFile.close();
+
     const bashScript = `
 /usr/bin/newgrp ${dockerGroupName} <<EONG
-KEYSTORE_PASSWORD=${argKeyStorePassword} ${ethdCommand} keyimport --non-interactive --path ${argKeyStoreDirectoryPath}
+WALLET_PASSWORD=${walletPassword} KEYSTORE_PASSWORD=${argKeyStorePassword} ${ethdCommand} keyimport --non-interactive --path ${argKeyStoreDirectoryPath}
 EONG
     `;
 
