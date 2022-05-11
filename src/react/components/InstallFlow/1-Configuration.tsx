@@ -1,5 +1,6 @@
 import React, { FC, ReactElement, useState } from 'react';
-import { Grid, Typography, FormControl, Select, MenuItem, InputLabel, SelectChangeEvent, Modal, Box, Button } from '@mui/material';
+import { Grid, Typography, FormControl, Select, MenuItem, InputLabel, SelectChangeEvent, Modal, Box, Button, TextField, InputAdornment } from '@mui/material';
+import { Folder, Link } from '@mui/icons-material'
 import StepNavigation from '../StepNavigation';
 import styled from '@emotion/styled';
 import { ConsensusClients, ExecutionClients, IConsensusClient, IExecutionClient } from '../../constants'
@@ -23,7 +24,7 @@ const ModalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 600,
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -114,11 +115,63 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
         >
           <Box sx={ModalStyle}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              Text in a modal
+              Advanced options
             </Typography>
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography>
+            <hr style={{ borderColor: 'orange' }} />
+            <Grid container>
+              <Grid xs={12} item container justifyContent={'flex-start'} direction={'column'}>
+                <Grid item container alignItems={'center'} p={2} spacing={2}>
+                  <Grid item xs={6}>
+                    <span>Checkpoint Sync</span>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      type={'url'}
+                      sx={{ my: 2, minWidth: '215' }}
+                      // label="Checkpoint URL" 
+                      variant="outlined"
+                      disabled
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start"><Link /></InputAdornment>,
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid item container alignItems={'center'} p={2} spacing={2}>
+                  <Grid item xs={6}>
+                    <span>Execution Client Fallback</span>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      type={'url'}
+                      sx={{ my: 2, minWidth: '215' }}
+                      // label="Fallback URL" 
+                      variant="outlined"
+                      disabled
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start"><Link /></InputAdornment>,
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid item container alignItems={'center'} p={2} spacing={2}>
+                  <Grid item xs={6}>
+                    <span>Installation Path</span>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      onClick={(ev) => { ev.preventDefault(); console.log('lols') }}
+                      sx={{ my: 2, minWidth: '215' }}
+                      variant="outlined"
+                      disabled
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start"><Folder /></InputAdornment>,
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
           </Box>
         </Modal>
       </ContentGrid>
