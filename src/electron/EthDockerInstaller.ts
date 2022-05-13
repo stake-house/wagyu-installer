@@ -1,35 +1,473 @@
-import { ExecutionClient, ConsensusClient, IMultiClientInstaller, KeyImportResult, NodeStatus, ValidatorStatus } from "./IMultiClientInstaller";
+import sudo from 'sudo-prompt';
+
+import { commandJoin } from "command-join";
+import { generate as generate_password } from "generate-password";
+
+import { exec, execFile } from 'child_process';
+import { promisify } from 'util';
+import { withDir } from 'tmp-promise'
+
+import { open, rm, mkdir } from 'fs/promises';
+
+import path from 'path';
+import os from 'os';
+
+import {
+  ExecutionClient,
+  ConsensusClient,
+  IMultiClientInstaller,
+  NodeStatus,
+  ValidatorStatus,
+  InstallDetails
+} from "./IMultiClientInstaller";
+import { Network, networkToExecution } from '../react/types';
+import { doesFileExist, doesDirectoryExist } from './BashUtils';
+
+const execFileProm = promisify(execFile);
+const execProm = promisify(exec);
+
+const dockerServiceName = 'docker.service';
+const dockerGroupName = 'docker';
+const installPath = path.join(os.homedir(), '.wagyu-installer');
+const ethDockerGitRepository = 'https://github.com/eth-educators/eth-docker.git';
+const prysmWalletPasswordFileName = 'prysm-wallet-password';
+
+type SystemdServiceDetails = {
+  description: string | undefined;
+  loadState: string | undefined;
+  activeState: string | undefined;
+  subState: string | undefined;
+  unitFileState: string | undefined;
+}
 
 export class EthDockerInstaller implements IMultiClientInstaller {
 
-  async preInstall(): Promise<void> {
-    // TODO: implement
-    console.log("Executing preInstall");
-    return;
+  title = 'Electron';
+
+  async preInstall(): Promise<boolean> {
+
+    let packagesToInstall = new Array<string>();
+
+    // We need git installed
+    const gitPackageName = 'git';
+
+    const gitInstalled = await this.checkForInstalledUbuntuPackage(gitPackageName);
+    if (!gitInstalled) {
+      packagesToInstall.push(gitPackageName);
+    }
+
+    // We need docker installed, enabled and running
+    const dockerPackageName = 'docker-compose';
+    let needToEnableDockerService = true;
+    let needToStartDockerService = false;
+
+    const dockerInstalled = await this.checkForInstalledUbuntuPackage(dockerPackageName);
+    if (!dockerInstalled) {
+      packagesToInstall.push(dockerPackageName);
+    } else {
+      const dockerServiceDetails = await this.getSystemdServiceDetails(dockerServiceName);
+      needToEnableDockerService = dockerServiceDetails.unitFileState != 'enabled';
+      needToStartDockerService = dockerServiceDetails.subState != 'running';
+    }
+
+    // We need our user to be in docker group
+    const needUserInDockerGroup = !await this.isUserInGroup(dockerGroupName);
+
+    // We need our installPath directory
+    await mkdir(installPath, { recursive: true });
+
+    return await this.preInstallAdminScript(
+      packagesToInstall,
+      needUserInDockerGroup,
+      needToEnableDockerService,
+      needToStartDockerService);
   }
 
-  async install(): Promise<void> {
-    // TODO: implement
-    console.log("Executing install");
-    return;
+  async getSystemdServiceDetails(serviceName: string): Promise<SystemdServiceDetails> {
+    let resultValue: SystemdServiceDetails = {
+      description: undefined,
+      loadState: undefined,
+      activeState: undefined,
+      subState: undefined,
+      unitFileState: undefined
+    };
+
+    const properties = ['Description', 'LoadState', 'ActiveState', 'SubState', 'UnitFileState'];
+
+    const { stdout, stderr } = await execFileProm('systemctl',
+      ['show', serviceName, '--property=' + properties.join(',')]);
+
+    const lines = stdout.split('\n');
+    const lineRegex = /(?<key>[^=]+)=(?<value>.*)/;
+    for (const line of lines) {
+      const found = line.match(lineRegex);
+      if (found) {
+        const key = found.groups?.key;
+        const value = found.groups?.value.trim();
+
+        switch (key) {
+          case "Description":
+            resultValue.description = value;
+            break;
+          case "LoadState":
+            resultValue.loadState = value;
+            break;
+          case "ActiveState":
+            resultValue.activeState = value;
+            break;
+          case "SubState":
+            resultValue.subState = value;
+            break;
+          case "UnitFileState":
+            resultValue.unitFileState = value;
+            break;
+        }
+      }
+    }
+
+    return resultValue;
   }
 
-  async postInstall(): Promise<void> {
-    // TODO: implement
-    console.log("Executing postInstall");
-    return;
+  async preInstallAdminScript(
+    packagesToInstall: Array<string>,
+    needUserInDockerGroup: boolean,
+    needToEnableDockerService: boolean,
+    needToStartDockerService: boolean): Promise<boolean> {
+
+    if (
+      packagesToInstall.length > 0 ||
+      needUserInDockerGroup ||
+      needToEnableDockerService ||
+      needToStartDockerService
+    ) {
+      // We need to perform some admin commands.
+      // Create script and execute it with sudo. This will minimize the amount of password prompts.
+
+      let commandResult = false;
+
+      await withDir(async dirResult => {
+
+        const scriptPath = path.join(dirResult.path, 'commands.sh');
+
+        const scriptFile = await open(scriptPath, 'w');
+        await scriptFile.write('#!/bin/bash\n');
+
+        // Install APT packages
+        if (packagesToInstall.length > 0) {
+          await scriptFile.write('apt -y update\n');
+          await scriptFile.write('apt -y install ' + commandJoin(packagesToInstall) + '\n');
+        }
+
+        // Enable docker service
+        if (needToEnableDockerService) {
+          await scriptFile.write('systemctl enable --now ' + commandJoin([dockerServiceName]) + '\n');
+        }
+
+        // Start docker service
+        if (needToStartDockerService) {
+          await scriptFile.write('systemctl start ' + commandJoin([dockerServiceName]) + '\n');
+        }
+
+        // Add user in docker group
+        if (needUserInDockerGroup) {
+          const userName = await this.getUsername();
+
+          await scriptFile.write(`usermod -aG ${dockerGroupName} ${userName}\n`);
+        }
+
+        await scriptFile.chmod(0o500);
+        await scriptFile.close();
+
+        const promise = new Promise<boolean>(async (resolve, reject) => {
+          const options = {
+            name: this.title
+          };
+          try {
+            sudo.exec(scriptPath, options,
+              function (error, stdout, stderr) {
+                if (error) reject(error);
+                resolve(true);
+              }
+            );
+          } catch (error) {
+            resolve(false);
+          }
+        });
+
+        await promise.then(result => {
+          commandResult = result;
+        }).catch(reason => {
+          commandResult = false;
+        }).finally(async () => {
+          await rm(scriptPath);
+        });
+
+      });
+
+      return commandResult;
+    } else {
+      return true;
+    }
   }
 
-  async stopNodes(): Promise<void> {
-    // TODO: implement
-    console.log("Executing stopNodes");
-    return;
+  async getUsername(): Promise<string> {
+    const { stdout, stderr } = await execFileProm('whoami');
+    const userName = stdout.trim();
+
+    return userName;
   }
 
-  async startNodes(): Promise<void> {
-    // TODO: implement
-    console.log("Executing startNodes");
-    return;
+  async isUserInGroup(groupName: string): Promise<boolean> {
+    const userName = await this.getUsername();
+
+    const { stdout, stderr } = await execFileProm('groups', [userName]);
+    const groups = stdout.trim().split(' ');
+    return groups.findIndex(val => val === groupName) >= 0;
+  }
+
+  async checkForInstalledUbuntuPackage(packageName: string): Promise<boolean> {
+    const { stdout, stderr } = await execFileProm('apt', ['-qq', 'list', packageName]);
+    return stdout.indexOf('[installed]') > 0
+  }
+
+  async install(details: InstallDetails): Promise<boolean> {
+    // Install and update eth-docker
+    if (!await this.installUpdateEthDockerCode(details.network)) {
+      return false;
+    }
+
+    // Create .env file with all the configuration details
+    if (!await this.createEthDockerEnvFile(details)) {
+      return false;
+    }
+
+    // Build the clients
+    if (!await this.buildClients(details.network)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async buildClients(network: Network): Promise<boolean> {
+    const networkPath = path.join(installPath, network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethdCommand = path.join(ethDockerPath, 'ethd');
+    const bashScript = `
+/usr/bin/newgrp ${dockerGroupName} <<EONG
+${ethdCommand} cmd build --pull
+EONG
+    `;
+
+    const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
+    const { stdout, stderr } = await returnProm;
+
+    if (returnProm.child.exitCode !== 0) {
+      console.log('We failed to build eth-docker clients.');
+      return false;
+    }
+
+    return true;
+  }
+
+  async createEthDockerEnvFile(details: InstallDetails): Promise<boolean> {
+    const networkPath = path.join(installPath, details.network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    // Start with the default env file.
+    const defaultEnvPath = path.join(ethDockerPath, 'default.env');
+    const envPath = path.join(ethDockerPath, '.env');
+
+    // Open default env file and update the configs.
+    const defaultEnvFile = await open(defaultEnvPath, 'r');
+    const defaultEnvConfigs = await defaultEnvFile.readFile({ encoding: 'utf8' });
+    await defaultEnvFile.close();
+
+    let envConfigs = defaultEnvConfigs;
+
+    // Writing consensus network
+    const networkValue = details.network.toLowerCase();
+    envConfigs = envConfigs.replace(/NETWORK=(.*)/, `NETWORK=${networkValue}`);
+
+    // Writing execution network
+    const ecNetworkValue = networkToExecution.get(details.network)?.toLowerCase() as string;
+    envConfigs = envConfigs.replace(/EC_NETWORK=(.*)/, `EC_NETWORK=${ecNetworkValue}`);
+
+    let composeFileValues = new Array<string>();
+
+    switch (details.consensusClient) {
+      case ConsensusClient.LIGHTHOUSE:
+        composeFileValues.push('lh-base.yml');
+        break;
+      case ConsensusClient.NIMBUS:
+        composeFileValues.push('nimbus-base.yml');
+        break;
+      case ConsensusClient.PRYSM:
+        composeFileValues.push('prysm-base.yml');
+        break;
+      case ConsensusClient.TEKU:
+        composeFileValues.push('teku-base.yml');
+        break;
+      case ConsensusClient.LODESTAR:
+        composeFileValues.push('lodestar-base.yml');
+        break;
+    }
+
+    switch (details.executionClient) {
+      case ExecutionClient.GETH:
+        composeFileValues.push('geth.yml');
+        break;
+      case ExecutionClient.NETHERMIND:
+        composeFileValues.push('nm.yml');
+        break;
+      case ExecutionClient.BESU:
+        composeFileValues.push('besu.yml');
+        break;
+      case ExecutionClient.ERIGON:
+        composeFileValues.push('erigon.yml');
+        break;
+    }
+
+    const composeFileValue = composeFileValues.join(':');
+    envConfigs = envConfigs.replace(/COMPOSE_FILE=(.*)/, `COMPOSE_FILE=${composeFileValue}`);
+
+    // Write our new env file
+    const envFile = await open(envPath, 'w');
+    envFile.writeFile(envConfigs, { encoding: 'utf8' });
+    await envFile.close();
+
+    return true;
+  }
+
+  async installUpdateEthDockerCode(network: Network): Promise<boolean> {
+    const networkPath = path.join(installPath, network.toLowerCase());
+
+    // Make sure the networkPath is a directory
+    const networkPathExists = await doesFileExist(networkPath);
+    const networkPathIsDir = networkPathExists && await doesDirectoryExist(networkPath);
+    if (!networkPathExists) {
+      await mkdir(networkPath, { recursive: true });
+    } else if (networkPathExists && !networkPathIsDir) {
+      await rm(networkPath);
+      await mkdir(networkPath, { recursive: true });
+    }
+
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethDockerPathExists = await doesFileExist(ethDockerPath);
+    const ethDockerPathIsDir = ethDockerPathExists && await doesDirectoryExist(ethDockerPath);
+    let needToClone = !ethDockerPathExists;
+
+    if (ethDockerPathExists && !ethDockerPathIsDir) {
+      await rm(ethDockerPath);
+      needToClone = true;
+    } else if (ethDockerPathIsDir) {
+      // Check if eth-docker was already cloned.
+      const returnProm = execFileProm('git', ['remote', 'show', 'origin'], { cwd: ethDockerPath });
+      const { stdout, stderr } = await returnProm;
+
+      if (returnProm.child.exitCode === 0) {
+        // Check for origin being ethDockerGitRepository
+        const remoteMatch = stdout.match(/Fetch URL: (?<remote>.+)/);
+        if (remoteMatch) {
+          if (remoteMatch.groups?.remote.trim() === ethDockerGitRepository) {
+            needToClone = false;
+          } else {
+            // Git repository with the wrong remote.
+            await rm(ethDockerPath, { recursive: true, force: true });
+            needToClone = true;
+          }
+        } else {
+          console.log('Cannot parse `git remote show origin` output.');
+          return false;
+        }
+      } else {
+        // Not a git repository or does not have origin remote
+        await rm(ethDockerPath, { recursive: true, force: true });
+        needToClone = true;
+      }
+    }
+
+    if (needToClone) {
+      // Clone repository if needed
+      const returnProm = execFileProm('git', ['clone', ethDockerGitRepository], { cwd: networkPath });
+      const { stdout, stderr } = await returnProm;
+
+      if (returnProm.child.exitCode !== 0) {
+        console.log('We failed to clone eth-docker repository.');
+        return false;
+      }
+
+      // Generate Prysm wallet password and store it in plain text
+      const walletPassword = generate_password({
+        length: 32,
+        numbers: true
+      });
+      const walletPasswordPath = path.join(ethDockerPath, prysmWalletPasswordFileName);
+      const walletPasswordFile = await open(walletPasswordPath, 'w');
+      await walletPasswordFile.write(walletPassword);
+      await walletPasswordFile.close();
+    } else {
+      // Update repository
+      const returnProm = execFileProm('git', ['pull'], { cwd: ethDockerPath });
+      const { stdout, stderr } = await returnProm;
+
+      if (returnProm.child.exitCode !== 0) {
+        console.log('We failed to update eth-docker repository.');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  async postInstall(network: Network): Promise<boolean> {
+    return this.startNodes(network);
+  }
+
+  async stopNodes(network: Network): Promise<boolean> {
+    const networkPath = path.join(installPath, network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethdCommand = path.join(ethDockerPath, 'ethd');
+    const bashScript = `
+/usr/bin/newgrp ${dockerGroupName} <<EONG
+${ethdCommand} stop
+EONG
+    `;
+
+    const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
+    const { stdout, stderr } = await returnProm;
+
+    if (returnProm.child.exitCode !== 0) {
+      console.log('We failed to stop eth-docker clients.');
+      return false;
+    }
+
+    return true;
+  }
+
+  async startNodes(network: Network): Promise<boolean> {
+    const networkPath = path.join(installPath, network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethdCommand = path.join(ethDockerPath, 'ethd');
+    const bashScript = `
+/usr/bin/newgrp ${dockerGroupName} <<EONG
+${ethdCommand} start
+EONG
+    `;
+
+    const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
+    const { stdout, stderr } = await returnProm;
+
+    if (returnProm.child.exitCode !== 0) {
+      console.log('We failed to start eth-docker clients.');
+      return false;
+    }
+
+    return true;
   }
 
   async updateExecutionClient(): Promise<void> {
@@ -44,54 +482,61 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     return;
   }
 
-  async importKeys(keyStorePaths: string[]): Promise<KeyImportResult[]> {
-    // TODO: implement
-    console.log("Executing importKeys");
-    const results: KeyImportResult[] = [
-      {
-        path: "path1",
-        success: true,
-      }, {
-        path: "path2",
-        success: false,
-      }
-    ]
+  async importKeys(
+    network: Network,
+    keyStoreDirectoryPath: string,
+    keyStorePassword: string): Promise<boolean> {
 
-    return results;
+    const networkPath = path.join(installPath, network.toLowerCase());
+    const ethDockerPath = path.join(networkPath, 'eth-docker');
+
+    const ethdCommand = path.join(ethDockerPath, 'ethd');
+    const argKeyStoreDirectoryPath = commandJoin([keyStoreDirectoryPath]);
+    const argKeyStorePassword = commandJoin([keyStorePassword]);
+
+    const walletPasswordPath = path.join(ethDockerPath, prysmWalletPasswordFileName);
+    const walletPasswordFile = await open(walletPasswordPath, 'r');
+    const walletPassword = commandJoin([await walletPasswordFile.readFile({ encoding: 'utf8' })]);
+    await walletPasswordFile.close();
+
+    const bashScript = `
+/usr/bin/newgrp ${dockerGroupName} <<EONG
+WALLET_PASSWORD=${walletPassword} KEYSTORE_PASSWORD=${argKeyStorePassword} ${ethdCommand} keyimport --non-interactive --path ${argKeyStoreDirectoryPath}
+EONG
+    `;
+
+    const returnProm = execProm(bashScript, { shell: '/bin/bash', cwd: ethDockerPath });
+    const { stdout, stderr } = await returnProm;
+
+    if (returnProm.child.exitCode !== 0) {
+      console.log('We failed to import keys with eth-docker.');
+      return false;
+    }
+
+    return true;
   }
 
-  async exportKeys(keyStorePaths: string[]): Promise<KeyImportResult[]> {
+  async exportKeys(): Promise<void> {
     // TODO: implement
-    console.log("Executing exportKeys");
-    const results: KeyImportResult[] = [
-      {
-        path: "path1",
-        success: true,
-      }, {
-        path: "path2",
-        success: false,
-      }
-    ]
-
-    return results;
+    return;
   }
 
-  async switchExecutionClient(targetClient: ExecutionClient): Promise<void> {
+  async switchExecutionClient(targetClient: ExecutionClient): Promise<boolean> {
     // TODO: implement
     console.log("Executing switchExecutionClient");
-    return;
+    return false;
   }
 
-  async switchConsensusClient(targetClient: ConsensusClient): Promise<void> {
+  async switchConsensusClient(targetClient: ConsensusClient): Promise<boolean> {
     // TODO: implement
     console.log("Executing switchConsensusClient");
-    return;
+    return false;
   }
 
-  async uninstall(): Promise<void> {
+  async uninstall(): Promise<boolean> {
     // TODO: implement
     console.log("Executing uninstall");
-    return;
+    return false;
   }
 
 

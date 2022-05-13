@@ -13,8 +13,6 @@ import { access, stat } from 'fs/promises';
 
 import path from "path";
 
-import { fileSync } from "tmp";
-
 const readdirProm = promisify(readdir);
 
 /**
@@ -48,35 +46,6 @@ const doesDirectoryExist = async (directory: string): Promise<boolean> => {
 }
 
 /**
- * Check if we can write a file in a directory.
- * 
- * @param directory The path to the directory.
- * 
- * @returns Returns true if the directory is writable and if a file can be written in the
- *          directory. Returns false if not.
- */
-const isDirectoryWritable = async (directory: string): Promise<boolean> => {
-  let tempFile = null;
-  try {
-    await access(directory, constants.W_OK);
-
-    /**
-    * On Windows, checking for W_OK on a directory is not enough to tell if we can write a file in
-    * it. We need to actually write a temporary file to check.
-    */
-    tempFile = fileSync({ keep: false, tmpdir: directory });
-
-    return true;
-  } catch (err) {
-    return false;
-  } finally {
-    if (tempFile != null) {
-      tempFile.removeCallback();
-    }
-  }
-}
-
-/**
  * Find the first file whom filename starts with some value in a directory.
  * 
  * @param directory The path to the directory.
@@ -100,6 +69,5 @@ const findFirstFile = async (directory: string, startsWith: string): Promise<str
 export {
   doesFileExist,
   doesDirectoryExist,
-  isDirectoryWritable,
   findFirstFile
 };

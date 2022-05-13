@@ -296,6 +296,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@improved/node@npm:^1.0.0":
+  version: 1.1.1
+  resolution: "@improved/node@npm:1.1.1"
+  checksum: 39dca64da0e948c3595dd1966428948abb091e5ebc28ad0829b914afa026a0ede5b43ba1f3e5b32d576ab0346695b0f582652d686aed2fdd063a59178713820c
+  languageName: node
+  linkType: hard
+
 "@malept/cross-spawn-promise@npm:^1.1.0":
   version: 1.1.1
   resolution: "@malept/cross-spawn-promise@npm:1.1.1"
@@ -739,13 +746,6 @@ __metadata:
   version: 0.16.2
   resolution: "@types/scheduler@npm:0.16.2"
   checksum: b6b4dcfeae6deba2e06a70941860fb1435730576d3689225a421280b7742318d1548b3d22c1f66ab68e414f346a9542f29240bc955b6332c5b11e561077583bc
-  languageName: node
-  linkType: hard
-
-"@types/tmp@npm:^0.2.2":
-  version: 0.2.3
-  resolution: "@types/tmp@npm:0.2.3"
-  checksum: 0ca45e99b3b3c6959d5c4f4555f73c8007db540cfb0fbbb9373217f9ab85e67eef75193f51a1d6564b0ee6c6f5ffa259d1034d7f7530a5b7ce80acb94cfc4daa
   languageName: node
   linkType: hard
 
@@ -1660,6 +1660,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"command-join@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "command-join@npm:3.0.0"
+  dependencies:
+    "@improved/node": ^1.0.0
+  checksum: afdfe94848dc3a78d98e0cf22e685c6456ab835c8fcf6ac00f5862a3f186cb722ae975c1826d6ce2183edefaf0a0a7b84f5402657b2b1ac380e61f7be09cdebd
+  languageName: node
+  linkType: hard
+
 "commander@npm:2.9.0":
   version: 2.9.0
   resolution: "commander@npm:2.9.0"
@@ -2540,6 +2549,13 @@ __metadata:
     strip-ansi: ^6.0.1
     wide-align: ^1.1.2
   checksum: 637b34c84f518defa89319dbef68211a24e9302182ad2a619e3be1be5b7dcf2a962c8359e889294af667440f4722e7e6e61671859e00bd8ec280a136ded89b25
+  languageName: node
+  linkType: hard
+
+"generate-password@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "generate-password@npm:1.7.0"
+  checksum: c0d13e9a9c72d84adc4365a0c0dbd28463f2da1975b4ec83f34a126b95122551274755db641418e5aa11c8d94c1d216c8da8314f38e56e05378e1a43792f4614
   languageName: node
   linkType: hard
 
@@ -4714,6 +4730,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sudo-prompt@npm:^9.2.1":
+  version: 9.2.1
+  resolution: "sudo-prompt@npm:9.2.1"
+  checksum: 50a29eec2f264f2b78d891452a64112d839a30bffbff4ec065dba4af691a35b23cdb8f9107d413e25c1a9f1925644a19994c00602495cab033d53f585fdfd665
+  languageName: node
+  linkType: hard
+
 "sumchecker@npm:^3.0.1":
   version: 3.0.1
   resolution: "sumchecker@npm:3.0.1"
@@ -4828,7 +4851,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tmp-promise@npm:^3.0.2":
+"tmp-promise@npm:^3.0.2, tmp-promise@npm:^3.0.3":
   version: 3.0.3
   resolution: "tmp-promise@npm:3.0.3"
   dependencies:
@@ -5082,10 +5105,11 @@ __metadata:
     "@types/react": ^17.0.14
     "@types/react-dom": ^17.0.9
     "@types/react-router-dom": ^5.1.8
-    "@types/tmp": ^0.2.2
+    command-join: ^3.0.0
     css-loader: ^6.7.0
     electron: ^17.1.0
     electron-builder: ^22.14.5
+    generate-password: ^1.7.0
     git-revision-webpack-plugin: ^5.0.0
     html-webpack-plugin: ^5.5.0
     react: ^17.0.2
@@ -5093,6 +5117,8 @@ __metadata:
     react-router-dom: ^6.2.2
     shebang-loader: ^0.0.1
     style-loader: ^3.3.1
+    sudo-prompt: ^9.2.1
+    tmp-promise: ^3.0.3
     ts-loader: ^9.2.3
     typescript: ^4.3.5
     webpack: ^5.64.3

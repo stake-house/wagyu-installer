@@ -7,6 +7,7 @@ import { HomeIcon } from "../components/icons/HomeIcon";
 import { NetworkPicker } from "../components/NetworkPicker";
 import { Network, StepSequenceKey } from '../types'
 import VersionFooter from "../components/VersionFooter";
+import { ConsensusClient, ExecutionClient, InstallDetails } from "../../electron/IMultiClientInstaller";
 
 const StyledMuiContainer = styled(Container)`
   display: flex;
@@ -99,6 +100,39 @@ const Home: FC<HomeProps> = (props): ReactElement => {
   }
 
   const handleEnter = () => {
+
+    // Backend usage example
+    /*window.ethDocker.preInstall().then(preInstallResult => {
+      console.log(`preInstall ${preInstallResult}`);
+      if (preInstallResult) {
+        const installationDetails: InstallDetails = {
+          network: props.network,
+          executionClient: ExecutionClient.GETH,
+          consensusClient: ConsensusClient.LIGHTHOUSE
+        };
+
+        window.ethDocker.install(installationDetails).then(installResult => {
+          console.log(`install ${installResult}`);
+          if (installResult) {
+            window.ethDocker.importKeys(
+              props.network,
+              '/home/remy/keys',
+              'password').then(importKeysResult => {
+                console.log(`importKeys ${importKeysResult}`);
+
+                if (importKeysResult) {
+                  window.ethDocker.postInstall(props.network).then(postInstallResult => {
+                    console.log(`postInstall ${postInstallResult}`);
+                  });
+                }
+
+              });
+          }
+
+        });
+      }
+    });*/
+
     setEnterSelected(true);
 
     if (!networkModalWasOpened) {

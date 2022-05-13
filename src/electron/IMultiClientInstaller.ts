@@ -1,23 +1,28 @@
+import { Network } from "../react/types"
+
 export interface IMultiClientInstaller {
 
   // Functionality
-  preInstall: () => Promise<void>,
-  install: () => Promise<void>,
-  postInstall: () => Promise<void>,
+  preInstall: () => Promise<boolean>,
+  install: (details: InstallDetails) => Promise<boolean>,
+  postInstall: (network: Network) => Promise<boolean>,
 
-  stopNodes: () => Promise<void>,
-  startNodes: () => Promise<void>,
+  stopNodes: (network: Network) => Promise<boolean>,
+  startNodes: (network: Network) => Promise<boolean>,
 
   updateExecutionClient: () => Promise<void>,
   updateConsensusClient: () => Promise<void>,
 
-  importKeys: (keyStorePaths: string[]) => Promise<KeyImportResult[]>,
-  exportKeys: (keyStorePaths: string[]) => Promise<KeyImportResult[]>,
+  importKeys: (
+    network: Network,
+    keyStoreDirectoryPath: string,
+    keyStorePassword: string) => Promise<boolean>,
+  exportKeys: () => Promise<void>,
 
-  switchExecutionClient: (targetClient: ExecutionClient) => Promise<void>,
-  switchConsensusClient: (targetClient: ConsensusClient) => Promise<void>,
+  switchExecutionClient: (targetClient: ExecutionClient) => Promise<boolean>,
+  switchConsensusClient: (targetClient: ConsensusClient) => Promise<boolean>,
 
-  uninstall: () => Promise<void>,
+  uninstall: () => Promise<boolean>,
 
 
   // Data
@@ -45,9 +50,10 @@ export interface IMultiClientInstaller {
   // TODO: logs stream
 }
 
-export type KeyImportResult = {
-  path: string,
-  success: boolean,
+export type InstallDetails = {
+  network: Network,
+  executionClient: ExecutionClient,
+  consensusClient: ConsensusClient,
 }
 
 export enum NodeStatus {
@@ -68,6 +74,8 @@ export enum ValidatorStatus {
 export enum ExecutionClient {
   GETH = "geth",
   NETHERMIND = "nethermind",
+  BESU = "besu",
+  ERIGON = "erigon"
 }
 
 export enum ConsensusClient {
@@ -75,4 +83,5 @@ export enum ConsensusClient {
   NIMBUS = "nimbus",
   LIGHTHOUSE = "lighthouse",
   PRYSM = "prysm",
+  LODESTAR = "lodestar"
 }

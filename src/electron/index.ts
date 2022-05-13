@@ -27,7 +27,7 @@ const doesFileExist = (filename: string): boolean => {
 app.on("ready", () => {
   var iconPath = path.join("static", "icon.png");
   const bundledIconPath = path.join(process.resourcesPath, "..", "static", "icon.png");
-  
+
   if (doesFileExist(bundledIconPath)) {
     iconPath = bundledIconPath;
   }
@@ -66,10 +66,10 @@ app.on("ready", () => {
    * Allow for refreshing of the React app within Electron without reopening.
    * This feature is used for development and will be disabled before production deployment.
    */
-	globalShortcut.register('CommandOrControl+R', function() {
-		console.log('CommandOrControl+R was pressed, refreshing the React app within Electron.')
-		window.reload()
-	})
+  globalShortcut.register('CommandOrControl+R', function () {
+    console.log('CommandOrControl+R was pressed, refreshing the React app within Electron.')
+    window.reload()
+  })
 
   /**
    * This logic closes the application when the window is closed, explicitly.
@@ -83,7 +83,7 @@ app.on("ready", () => {
    * Provides the renderer a way to call the dialog.showOpenDialog function using IPC.
    */
   ipcMain.handle('showOpenDialog', async (event, options) => {
-    return await dialog.showOpenDialog(<OpenDialogOptions> options);
+    return await dialog.showOpenDialog(<OpenDialogOptions>options);
   });
 
   /**
