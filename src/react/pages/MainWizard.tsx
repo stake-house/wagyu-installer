@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useState } from 'react';
+import React, { FC, ReactElement, SetStateAction, useState, Dispatch } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { Stepper, Step, StepLabel, Grid, Typography } from '@mui/material';
 import styled from '@emotion/styled';
@@ -9,6 +9,7 @@ import VersionFooter from '../components/VersionFooter';
 import Install from '../components/InstallFlow/2-Install';
 import Configuration from '../components/InstallFlow/1-Configuration';
 import SystemCheck from '../components/InstallFlow/0-SystemCheck';
+import { InstallDetails } from '../../electron/IMultiClientInstaller';
 
 const stepSequenceMap: Record<string, StepKey[]> = {
   install: [
@@ -30,7 +31,8 @@ type RouteParams = {
 };
 
 type WizardProps = {
-  network: Network
+  installationDetails: InstallDetails,
+  setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>
 }
 
 /**
@@ -85,10 +87,13 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
     </Grid>
   );
 
+
   const commonProps = {
     onStepForward,
     onStepBack,
-    children: stepper
+    installationDetails: props.installationDetails,
+    setInstallationDetails: props.setInstallationDetails,
+    children: stepper,
   };
 
   /**
@@ -120,7 +125,7 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
         <Grid item xs={10} />
         <Grid item xs={2}>
           <Typography variant="caption" style={{ color: "gray" }}>
-            Network: {props.network}
+            Network: {props.installationDetails.network}
           </Typography>
         </Grid>
       </Grid>

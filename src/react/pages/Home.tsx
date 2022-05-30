@@ -57,8 +57,8 @@ const ContentGrid = styled(Grid)`
 `;
 
 type HomeProps = {
-  network: Network,
-  setNetwork: Dispatch<SetStateAction<Network>>
+  installationDetails: InstallDetails,
+  setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>
 }
 
 /**
@@ -151,7 +151,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
   return (
     <StyledMuiContainer>
       <NetworkDiv>
-        Select Network: <Button color="primary" onClick={handleOpenNetworkModal} tabIndex={tabIndex(1)}>{props.network}</Button>
+        Select Network: <Button color="primary" onClick={handleOpenNetworkModal} tabIndex={tabIndex(1)}>{props.installationDetails.network}</Button>
       </NetworkDiv>
       <Modal
         open={showNetworkModal}
@@ -159,7 +159,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       >
         {/* Added <div> here per the following link to fix error https://stackoverflow.com/a/63521049/5949270 */}
         <div>
-          <NetworkPicker handleCloseNetworkModal={handleCloseNetworkModal} setNetwork={props.setNetwork} network={props.network}></NetworkPicker>
+          <NetworkPicker handleCloseNetworkModal={handleCloseNetworkModal} setInstallationDetails={props.setInstallationDetails} installationDetails={props.installationDetails}></NetworkPicker>
         </div>
       </Modal>
 

@@ -1,14 +1,17 @@
-import React, { FC, ReactElement } from 'react';
+import React, { Dispatch, FC, ReactElement, SetStateAction, useState, useRef, useEffect, MouseEventHandler } from 'react';
 import { Grid, Typography, Fab, CircularProgress, Box } from '@mui/material';
 import StepNavigation from '../StepNavigation';
 import { DoneOutline, DownloadingOutlined, ComputerOutlined, RocketLaunchOutlined  } from '@mui/icons-material';
 import styled from '@emotion/styled';
 
 import { green } from '@mui/material/colors';
+import { InstallDetails } from '../../../electron/IMultiClientInstaller';
 
 type InstallProps = {
   onStepBack: () => void,
   onStepForward: () => void,
+  installationDetails: InstallDetails,
+  setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>
 }
 
 const ContentGrid = styled(Grid)`
@@ -26,15 +29,19 @@ const ContentGrid = styled(Grid)`
  */
 const Install: FC<InstallProps> = (props): ReactElement => {
 
-  const [loadingPreInstall, setLoadingPreInstall] = React.useState(false);
-  const [loadingInstall, setLoadingInstall] = React.useState(false);
-  const [loadingPostInstall, setLoadingPostInstall] = React.useState(false);
-  const [successPreInstall, setSuccessPreInstall] = React.useState(false);
-  const [successInstall, setSuccessInstall] = React.useState(false);
-  const [successPostInstall, setSuccessPostInstall] = React.useState(false);
-  const timerPreInstall = React.useRef<number>();
-  const timerInstall = React.useRef<number>();
-  const timerPostInstall = React.useRef<number>();
+  const [loadingPreInstall, setLoadingPreInstall] = useState(false);
+  const [loadingInstall, setLoadingInstall] = useState(false);
+  const [loadingPostInstall, setLoadingPostInstall] = useState(false);
+  const [successPreInstall, setSuccessPreInstall] = useState(false);
+  const [successInstall, setSuccessInstall] = useState(false);
+  const [successPostInstall, setSuccessPostInstall] = useState(false);
+  const timerPreInstall = useRef<number>();
+  const timerInstall = useRef<number>();
+  const timerPostInstall = useRef<number>();
+  const timerWaitBeforeStart = useRef<number>();
+
+  const [disableBack, setDisableBack] = useState<boolean>(true)
+  const [disableForward, setDisableForward] = useState<boolean>(true)
 
   const buttonPreInstallSx = {
     ...(successPreInstall && {
@@ -63,65 +70,109 @@ const Install: FC<InstallProps> = (props): ReactElement => {
     }),
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       clearTimeout(timerPostInstall.current);
       clearTimeout(timerPreInstall.current);
       clearTimeout(timerInstall.current);
+      clearTimeout(timerWaitBeforeStart.current)
     };
   }, []);
 
 
-  const handlePreInstall = () => {
-    if (!loadingPreInstall) {
-      setSuccessPreInstall(false);
-      setLoadingPreInstall(true);
-      timerPreInstall.current = window.setTimeout(() => {
-        setSuccessPreInstall(true);
-        setLoadingPreInstall(false);
-      }, 2000);
-    }
+  const handlePreInstall: () => Promise<boolean> = () => {
+    return new Promise((resolve) => {
+      if (!loadingPreInstall) {
+        setSuccessPreInstall(false);
+        setLoadingPreInstall(true);
+        
+        window.ethDocker.preInstall()
+        .then((preInstallResult) => {
+          setSuccessPreInstall(true);
+          setLoadingPreInstall(false);
+          resolve(preInstallResult)
+        })
+        
+      }
+    })
   };
-  const handleInstall = () => {
-    if (!loadingInstall) {
-      setSuccessInstall(false);
-      setLoadingInstall(true);
-      timerInstall.current = window.setTimeout(() => {
-        setSuccessInstall(true);
-        setLoadingInstall(false);
-      }, 2000);
-    }
+
+  const handleInstall: () => Promise<boolean> = () => {
+    return new Promise((resolve) => {
+      if (!loadingInstall) {
+        setSuccessInstall(false);
+        setLoadingInstall(true);
+
+        window.ethDocker.install(props.installationDetails)
+        .then(res => {
+          setSuccessInstall(true);
+          setLoadingInstall(false);
+          resolve(res)
+        })       
+      }
+    })
   };
-  const handlePostInstall = () => {
-    if (!loadingPostInstall) {
-      setSuccessPostInstall(false);
-      setLoadingPostInstall(true);
-      timerPostInstall.current = window.setTimeout(() => {
-        setSuccessPostInstall(true);
-        setLoadingPostInstall(false);
-      }, 2000);
-    }
+
+  const handlePostInstall: () => Promise<boolean> = () => {
+    return new Promise((resolve) => {
+      if (!loadingPostInstall) {
+        setSuccessPostInstall(false);
+        setLoadingPostInstall(true);
+
+        window.ethDocker.importKeys(props.installationDetails.network, '/home/remy/keys', 'password')
+        .then((importKeyResult) => {
+          if(importKeyResult) {
+            window.ethDocker.postInstall(props.installationDetails.network)
+            .then((res) => {
+                resolve(res)
+              }
+            )
+          }
+        })
+      }
+    })
   };
+
+  const install = async () => {
+    let preInstallResult = await handlePreInstall()
+    if (!preInstallResult) {
+      return
+    }
+    let installResult = await handleInstall()
+    if (!installResult) {
+      return
+    }
+    let postInstallResult = await handlePostInstall()
+    if (!postInstallResult) {
+      setDisableForward(false)
+    }
+  }
+
+  useEffect(() => {
+    install()
+  }, [])
 
   return (
     <Grid item container direction="column" spacing={2}>
       <Grid item>
         <Typography variant="h1" align='center'>
-          Installing
+          Installing 
         </Typography>
       </Grid>
       <ContentGrid item container>
         <Grid item container>
-          <Grid item xs={2}></Grid>
-          <Grid item container justifyContent="center" alignItems="center" xs={3}>
+          <Grid item xs={3}></Grid>
+          <Grid item container justifyContent="center" alignItems="center" xs={2}>
             <Box sx={{ m: 1, position: 'relative' }}>
             <Fab
                 aria-label="save"
                 color="primary"
                 sx={buttonPreInstallSx}
-                onClick={handlePreInstall}
+                disabled
               >
-                {successPreInstall ? <DoneOutline /> : <DownloadingOutlined />}
+                {successPreInstall ? <DoneOutline sx={{
+                  color: green[500],
+                }}/> : <DownloadingOutlined />}
               </Fab>
               {loadingPreInstall && (
                 <CircularProgress
@@ -137,22 +188,25 @@ const Install: FC<InstallProps> = (props): ReactElement => {
               )}
               </Box>
           </Grid>
-          <Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
+          <Grid item xs={1}></Grid>
+          <Grid item container justifyContent="flex-start" alignItems="center" xs={3}>
                   <span>Downloading dependencies</span>
           </Grid>
           <Grid item xs={3}></Grid>
         </Grid>
         <Grid item container>
-          <Grid item xs={2}></Grid>
-          <Grid item container justifyContent="center" alignItems="center" xs={3}>
+          <Grid item xs={3}></Grid>
+          <Grid item container justifyContent="center" alignItems="center" xs={2}>
             <Box sx={{ m: 1, position: 'relative' }}>
             <Fab
                 aria-label="save"
                 color="primary"
                 sx={buttonInstallSx}
-                onClick={handleInstall}
+                disabled
               >
-                {successInstall ? <DoneOutline /> : <ComputerOutlined />}
+                {successInstall ? <DoneOutline sx={{
+                  color: green[500],
+                }} /> : <ComputerOutlined />}
               </Fab>
               {loadingInstall && (
                 <CircularProgress
@@ -168,22 +222,26 @@ const Install: FC<InstallProps> = (props): ReactElement => {
               )}
               </Box>
           </Grid>
+          <Grid item xs={1}></Grid>
           <Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
                   <span>Installing services</span>
           </Grid>
           <Grid item xs={3}></Grid>
         </Grid>
         <Grid item container>
-          <Grid item xs={2}></Grid>
-          <Grid item container justifyContent="center" alignItems="center" xs={3}>
+          <Grid item xs={3}></Grid>
+          <Grid item container justifyContent="center" alignItems="center" xs={2}>
             <Box sx={{ m: 1, position: 'relative' }}>
             <Fab
                 aria-label="save"
                 color="primary"
                 sx={buttonPostInstallSx}
-                onClick={handlePostInstall}
+                disabled
               >
-                {successPostInstall ? <DoneOutline /> : <RocketLaunchOutlined />}
+                {successPostInstall ? 
+                <DoneOutline sx={{
+                  color: green[500],
+                }} /> : <RocketLaunchOutlined />}
               </Fab>
               {loadingPostInstall && (
                 <CircularProgress
@@ -199,6 +257,7 @@ const Install: FC<InstallProps> = (props): ReactElement => {
               )}
               </Box>
           </Grid>
+          <Grid item xs={1}></Grid>
           <Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
                   <span>Configuring and launching</span>
           </Grid>
@@ -212,8 +271,8 @@ const Install: FC<InstallProps> = (props): ReactElement => {
         onNext={props.onStepForward}
         backLabel={"Back"}
         nextLabel={"Finish"}
-        disableBack={false}
-        disableNext={false}
+        disableBack={disableBack}
+        disableNext={disableForward}
       />
     </Grid>
   );

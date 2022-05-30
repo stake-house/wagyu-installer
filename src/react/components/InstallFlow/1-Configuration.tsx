@@ -1,16 +1,17 @@
-import React, { ChangeEvent, FC, FormEvent, ReactElement, useState } from 'react';
+import React, { ChangeEvent, Dispatch, FC, FormEvent, ReactElement, SetStateAction, useState } from 'react';
 import { Grid, Typography, FormControl, Select, MenuItem, InputLabel, SelectChangeEvent, Modal, Box, Button, TextField, InputAdornment } from '@mui/material';
 import { Folder, Link } from '@mui/icons-material'
 import StepNavigation from '../StepNavigation';
 import styled from '@emotion/styled';
 import { ConsensusClients, ExecutionClients, IConsensusClient, IExecutionClient } from '../../constants'
-import { ConsensusClient } from '../../../electron/IMultiClientInstaller';
+import { ConsensusClient, ExecutionClient, InstallDetails } from '../../../electron/IMultiClientInstaller';
 import { BackgroundLight, } from '../../colors';
-
 
 type ConfigurationProps = {
   onStepBack: () => void,
   onStepForward: () => void,
+  installationDetails: InstallDetails,
+  setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>
 }
 
 const ContentGrid = styled(Grid)`
@@ -41,26 +42,26 @@ const ModalStyle = {
  * @returns 
  */
 const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
-  const [consensusClient, setConsensusClient] = useState('prysm');
-  const [executionClient, setExecutionClient] = useState('geth');
+  const [consensusClient, setConsensusClient] = useState<ConsensusClient>(props.installationDetails.consensusClient);
+  const [executionClient, setExecutionClient] = useState<ExecutionClient>(props.installationDetails.executionClient);
   const [isModalOpen, setModalOpen] = useState(false)
   const [checkpointSync, setCheckpointSync] = useState('');
   const [executionClientFallback, setExecutionClientFallback] = useState('');
   const [installationPath, setInstallationPath] = useState('');
 
   const handleConsensusClientChange = (ev: SelectChangeEvent<string>) => {
-    setConsensusClient(ev.target.value)
+    setConsensusClient(ev.target.value as ConsensusClient)
   }
 
   const handleExecutionClientChange = (ev: SelectChangeEvent<string>) => {
-    setExecutionClient(ev.target.value)
+    setExecutionClient(ev.target.value as ExecutionClient)
   }
 
   const handleCheckpointSyncChange = (ev: ChangeEvent<HTMLInputElement>) => {
     setCheckpointSync(ev.target.value)
   }
   const handleExecutionClientFallbackChange = (ev: ChangeEvent<HTMLInputElement>) => {
-    setExecutionClient(ev.target.value)
+    setExecutionClientFallback(ev.target.value)
   }
   const handleInstallationPathChange = (ev: ChangeEvent<HTMLInputElement>) => {
     setInstallationPath(ev.target.value)
@@ -151,9 +152,8 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                       placeholder="https://beaconcha.in/checkpoint"
                       type={'url'}
                       sx={{ my: 2, minWidth: '215' }}
-                      // label="Checkpoint URL" 
                       variant="outlined"
-                      disabled
+                      value={checkpointSync}
                       InputProps={{
                         startAdornment: <InputAdornment position="start"><Link /></InputAdornment>,
                       }}
@@ -172,11 +172,11 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                       sx={{ my: 2, minWidth: '215' }}
                       // label="Fallback URL" 
                       variant="outlined"
-                      disabled
+                      value={executionClientFallback}
                       InputProps={{
                         startAdornment: <InputAdornment position="start"><Link /></InputAdornment>,
                       }}
-                      onChange={handleInstallationPathChange}
+                      onChange={handleExecutionClientFallbackChange}
                     />
                   </Grid>
                 </Grid>
@@ -191,6 +191,7 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                       sx={{ my: 2, minWidth: '215' }}
                       variant="outlined"
                       disabled
+                      value={installationPath}
                       InputProps={{
                         startAdornment: <InputAdornment position="start"><Folder /></InputAdornment>,
                       }}
@@ -207,7 +208,18 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
       {props.children}
       <StepNavigation
         onPrev={props.onStepBack}
-        onNext={props.onStepForward}
+        onNext={() => {
+
+          let installationDetails: InstallDetails = {
+            consensusClient,
+            executionClient,
+            network: props.installationDetails.network
+          }
+
+          props.setInstallationDetails(installationDetails)
+
+          props.onStepForward()
+        }}
         backLabel={"Back"}
         nextLabel={"Install"}
         disableBack={false}
