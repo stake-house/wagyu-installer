@@ -11,8 +11,35 @@ import {
   OpenDialogOptions,
   OpenDialogReturnValue
 } from "electron";
+import { Network } from "../react/types";
 
-import { doesDirectoryExist, isDirectoryWritable, findFirstFile } from './BashUtils';
+import { doesDirectoryExist, findFirstFile } from './BashUtils';
+
+import { EthDockerInstaller } from './EthDockerInstaller';
+import { InstallDetails } from "./IMultiClientInstaller";
+
+const ethDockerInstaller = new EthDockerInstaller();
+const ethDockerPreInstall = async (): Promise<boolean> => {
+  return ethDockerInstaller.preInstall();
+};
+const ethDockerInstall = async (details: InstallDetails): Promise<boolean> => {
+  return ethDockerInstaller.install(details);
+};
+const ethDockerImportKeys = async (
+  network: Network,
+  keyStoreDirectoryPath: string,
+  keyStorePassword: string): Promise<boolean> => {
+  return ethDockerInstaller.importKeys(network, keyStoreDirectoryPath, keyStorePassword);
+};
+const ethDockerPostInstall = async (network: Network): Promise<boolean> => {
+  return ethDockerInstaller.postInstall(network);
+};
+const ethDockerStartNodes = async (network: Network): Promise<boolean> => {
+  return ethDockerInstaller.startNodes(network);
+};
+const ethDockerStopNodes = async (network: Network): Promise<boolean> => {
+  return ethDockerInstaller.stopNodes(network);
+};
 
 const ipcRendererSendClose = () => {
   ipcRenderer.send('close');
@@ -32,6 +59,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 contextBridge.exposeInMainWorld('bashUtils', {
   'doesDirectoryExist': doesDirectoryExist,
-  'isDirectoryWritable': isDirectoryWritable,
   'findFirstFile': findFirstFile
+});
+
+contextBridge.exposeInMainWorld('ethDocker', {
+  'preInstall': ethDockerPreInstall,
+  'install': ethDockerInstall,
+  'importKeys': ethDockerImportKeys,
+  'postInstall': ethDockerPostInstall,
+  'startNodes': ethDockerStartNodes,
+  'stopNodes': ethDockerStopNodes
 });

@@ -23,6 +23,11 @@ import {
   ChildProcess
 } from "child_process"
 
+import {
+  EthDockerInstaller
+} from './EthDockerInstaller'
+import { InstallDetails } from "./IMultiClientInstaller";
+
 export interface IElectronAPI {
   shellOpenExternal: (url: string, options?: Electron.OpenExternalOptions | undefined) => Promise<void>,
   shellShowItemInFolder: (fullPath: string) => void,
@@ -37,9 +42,23 @@ export interface IBashUtilsAPI {
   findFirstFile: (directory: string, startsWith: string) => Promise<string>
 }
 
+
+export interface IEthDockerAPI {
+  preInstall: () => Promise<boolean>,
+  install: (details: InstallDetails) => Promise<boolean>,
+  importKeys: (
+    network: Network,
+    keyStoreDirectoryPath: string,
+    keyStorePassword: string) => Promise<boolean>,
+  postInstall: (network: Network) => Promise<boolean>,
+  startNodes: (network: Network) => Promise<boolean>,
+  stopNodes: (network: Network) => Promise<boolean>,
+}
+
 declare global {
   interface Window {
     electronAPI: IElectronAPI,
-    bashUtils: IBashUtilsAPI
+    bashUtils: IBashUtilsAPI,
+    ethDocker: IEthDockerAPI
   }
 }
