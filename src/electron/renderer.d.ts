@@ -26,7 +26,7 @@ import {
 import {
   EthDockerInstaller
 } from './EthDockerInstaller'
-import { InstallDetails } from "./IMultiClientInstaller";
+import { InstallDetails, OutputLogs } from "./IMultiClientInstaller";
 
 export interface IElectronAPI {
   shellOpenExternal: (url: string, options?: Electron.OpenExternalOptions | undefined) => Promise<void>,
@@ -44,7 +44,7 @@ export interface IBashUtilsAPI {
 
 
 export interface IEthDockerAPI {
-  preInstall: () => Promise<boolean>,
+  preInstall: (outputLogs?: OutputLogs) => Promise<boolean>,
   install: (details: InstallDetails) => Promise<boolean>,
   importKeys: (
     network: Network,

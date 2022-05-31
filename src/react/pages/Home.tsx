@@ -7,7 +7,7 @@ import { HomeIcon } from "../components/icons/HomeIcon";
 import { NetworkPicker } from "../components/NetworkPicker";
 import { Network, StepSequenceKey } from '../types'
 import VersionFooter from "../components/VersionFooter";
-import { ConsensusClient, ExecutionClient, InstallDetails } from "../../electron/IMultiClientInstaller";
+import { ConsensusClient, ExecutionClient, InstallDetails, OutputLogs } from "../../electron/IMultiClientInstaller";
 
 const StyledMuiContainer = styled(Container)`
   display: flex;
@@ -102,9 +102,13 @@ const Home: FC<HomeProps> = (props): ReactElement => {
   const handleEnter = () => {
 
     // Backend usage example
-    /*window.ethDocker.preInstall().then(preInstallResult => {
+    const consoleWrite: OutputLogs = (message: string): void => {
+      console.log(message);
+    };
+
+    window.ethDocker.preInstall(consoleWrite).then(preInstallResult => {
       console.log(`preInstall ${preInstallResult}`);
-      if (preInstallResult) {
+      /*if (preInstallResult) {
         const installationDetails: InstallDetails = {
           network: props.network,
           executionClient: ExecutionClient.GETH,
@@ -130,10 +134,10 @@ const Home: FC<HomeProps> = (props): ReactElement => {
           }
 
         });
-      }
-    });*/
+      }*/
+    });
 
-    setEnterSelected(true);
+    /*setEnterSelected(true);
 
     if (!networkModalWasOpened) {
       handleOpenNetworkModal();
@@ -143,7 +147,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       }
 
       navigate(location);
-    }
+    }*/
   }
 
   const tabIndex = (priority: number) => showNetworkModal ? -1 : priority;

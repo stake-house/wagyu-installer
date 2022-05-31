@@ -1,28 +1,29 @@
-import { Network } from "../react/types"
+import { Network } from "../react/types";
 
 export interface IMultiClientInstaller {
 
   // Functionality
-  preInstall: () => Promise<boolean>,
-  install: (details: InstallDetails) => Promise<boolean>,
-  postInstall: (network: Network) => Promise<boolean>,
+  preInstall: (outputLogs?: OutputLogs) => Promise<boolean>,
+  install: (details: InstallDetails, outputLogs?: OutputLogs) => Promise<boolean>,
+  postInstall: (network: Network, outputLogs?: OutputLogs) => Promise<boolean>,
 
-  stopNodes: (network: Network) => Promise<boolean>,
-  startNodes: (network: Network) => Promise<boolean>,
+  stopNodes: (network: Network, outputLogs?: OutputLogs) => Promise<boolean>,
+  startNodes: (network: Network, outputLogs?: OutputLogs) => Promise<boolean>,
 
-  updateExecutionClient: () => Promise<void>,
-  updateConsensusClient: () => Promise<void>,
+  updateExecutionClient: (outputLogs?: OutputLogs) => Promise<void>,
+  updateConsensusClient: (outputLogs?: OutputLogs) => Promise<void>,
 
   importKeys: (
     network: Network,
     keyStoreDirectoryPath: string,
-    keyStorePassword: string) => Promise<boolean>,
+    keyStorePassword: string,
+    outputLogs?: OutputLogs) => Promise<boolean>,
   exportKeys: () => Promise<void>,
 
-  switchExecutionClient: (targetClient: ExecutionClient) => Promise<boolean>,
-  switchConsensusClient: (targetClient: ConsensusClient) => Promise<boolean>,
+  switchExecutionClient: (targetClient: ExecutionClient, outputLogs?: OutputLogs) => Promise<boolean>,
+  switchConsensusClient: (targetClient: ConsensusClient, outputLogs?: OutputLogs) => Promise<boolean>,
 
-  uninstall: () => Promise<boolean>,
+  uninstall: (outputLogs?: OutputLogs) => Promise<boolean>,
 
 
   // Data
@@ -48,6 +49,10 @@ export interface IMultiClientInstaller {
   consensusClientLatestBlock: () => Promise<number>,
 
   // TODO: logs stream
+}
+
+export interface OutputLogs {
+  (message: string): void;
 }
 
 export type InstallDetails = {

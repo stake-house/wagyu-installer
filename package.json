@@ -1,7 +1,7 @@
 {
   "name": "wagyuinstaller",
   "productName": "Wagyu Installer",
-  "version": "0.5.0",
+  "version": "0.5.3",
   "description": "Application aimed at lowering the technical bar to staking on Ethereum",
   "main": "./build/electron/index.js",
   "author": "Colfax Selby <colfax.selby@gmail.com>",

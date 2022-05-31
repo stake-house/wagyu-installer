@@ -16,11 +16,13 @@ import { Network } from "../react/types";
 import { doesDirectoryExist, findFirstFile } from './BashUtils';
 
 import { EthDockerInstaller } from './EthDockerInstaller';
-import { InstallDetails } from "./IMultiClientInstaller";
+import { InstallDetails, OutputLogs } from "./IMultiClientInstaller";
+
+import { Writable } from 'stream';
 
 const ethDockerInstaller = new EthDockerInstaller();
-const ethDockerPreInstall = async (): Promise<boolean> => {
-  return ethDockerInstaller.preInstall();
+const ethDockerPreInstall = async (outputLogs?: OutputLogs): Promise<boolean> => {
+  return ethDockerInstaller.preInstall(outputLogs);
 };
 const ethDockerInstall = async (details: InstallDetails): Promise<boolean> => {
   return ethDockerInstaller.install(details);
