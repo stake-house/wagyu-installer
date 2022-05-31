@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import { ConsensusClients, ExecutionClients, IConsensusClient, IExecutionClient } from '../../constants'
 import { ConsensusClient, ExecutionClient, InstallDetails } from '../../../electron/IMultiClientInstaller';
 import { BackgroundLight, } from '../../colors';
+import { ImportKeystore } from '../ImportKeystore';
 
 type ConfigurationProps = {
   onStepBack: () => void,
@@ -94,7 +95,7 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                 >
                   {ConsensusClients.map((c: IConsensusClient) => {
                     return (
-                      <MenuItem value={c.key}>{c.label}</MenuItem>
+                      <MenuItem key={c.key} value={c.key}>{c.label}</MenuItem>
                     )
                   })}
                 </Select>
@@ -120,7 +121,7 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                 >
                   {ExecutionClients.map((c: IExecutionClient) => {
                     return (
-                      <MenuItem value={c.key}>{c.label}</MenuItem>
+                      <MenuItem key={c.key} value={c.key}>{c.label}</MenuItem>
                     )
                   })}
                 </Select>

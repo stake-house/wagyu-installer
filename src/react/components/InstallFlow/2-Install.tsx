@@ -1,11 +1,13 @@
 import React, { Dispatch, FC, ReactElement, SetStateAction, useState, useRef, useEffect, MouseEventHandler } from 'react';
-import { Grid, Typography, Fab, CircularProgress, Box } from '@mui/material';
+import { Grid, Typography, Fab, CircularProgress, Box, InputAdornment, Link, Modal, TextField } from '@mui/material';
 import StepNavigation from '../StepNavigation';
-import { DoneOutline, DownloadingOutlined, ComputerOutlined, RocketLaunchOutlined  } from '@mui/icons-material';
+import { DoneOutline, DownloadingOutlined, ComputerOutlined, RocketLaunchOutlined, Folder  } from '@mui/icons-material';
 import styled from '@emotion/styled';
 
 import { green } from '@mui/material/colors';
 import { InstallDetails } from '../../../electron/IMultiClientInstaller';
+import { BackgroundLight } from '../../colors';
+import { ImportKeystore } from '../ImportKeystore'
 
 type InstallProps = {
   onStepBack: () => void,
@@ -35,10 +37,10 @@ const Install: FC<InstallProps> = (props): ReactElement => {
   const [successPreInstall, setSuccessPreInstall] = useState(false);
   const [successInstall, setSuccessInstall] = useState(false);
   const [successPostInstall, setSuccessPostInstall] = useState(false);
-  const timerPreInstall = useRef<number>();
-  const timerInstall = useRef<number>();
-  const timerPostInstall = useRef<number>();
-  const timerWaitBeforeStart = useRef<number>();
+  // const timerPreInstall = useRef<number>();
+  // const timerInstall = useRef<number>();
+  // const timerPostInstall = useRef<number>();
+  // const timerWaitBeforeStart = useRef<number>();
 
   const [disableBack, setDisableBack] = useState<boolean>(true)
   const [disableForward, setDisableForward] = useState<boolean>(true)
@@ -70,14 +72,33 @@ const Install: FC<InstallProps> = (props): ReactElement => {
     }),
   };
 
-  useEffect(() => {
-    return () => {
-      clearTimeout(timerPostInstall.current);
-      clearTimeout(timerPreInstall.current);
-      clearTimeout(timerInstall.current);
-      clearTimeout(timerWaitBeforeStart.current)
-    };
-  }, []);
+  const ModalStyle = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  padding: '20px',
+  borderRadius: '20px',
+  background: BackgroundLight,
+  // border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
+const [isModalOpen, setModalOpen] = useState<boolean>(false)
+const [keyStorePath, setKeystorePath] = useState<string>('')
+const [keystorePassword, setKeystorePassword] = useState<string>('')
+const [resolveModal, setResolveModal] = useState<() => void>(() => {})
+
+  // useEffect(() => {
+  //   return () => {
+  //     clearTimeout(timerPostInstall.current);
+  //     clearTimeout(timerPreInstall.current);
+  //     clearTimeout(timerInstall.current);
+  //     clearTimeout(timerWaitBeforeStart.current)
+  //   };
+  // }, []);
 
 
   const handlePreInstall: () => Promise<boolean> = () => {
@@ -91,8 +112,9 @@ const Install: FC<InstallProps> = (props): ReactElement => {
           setSuccessPreInstall(true);
           setLoadingPreInstall(false);
           resolve(preInstallResult)
+        }).catch(err => {
+          console.error('preinstall failed', err)
         })
-        
       }
     })
   };
@@ -108,10 +130,24 @@ const Install: FC<InstallProps> = (props): ReactElement => {
           setSuccessInstall(true);
           setLoadingInstall(false);
           resolve(res)
-        })       
+        })
       }
     })
   };
+
+  const handleKeyImportModal: () => Promise<boolean> = () => {
+    return new Promise((resolve) => {
+      setModalOpen(true)
+      setResolveModal(() => resolve(null))
+    }).then(() => {
+      return new Promise((resolve) => {
+        window.ethDocker.importKeys(props.installationDetails.network, keyStorePath, keystorePassword)
+        .then((importKeyResult) => {
+          resolve(importKeyResult)
+        })
+      })
+    })
+  }
 
   const handlePostInstall: () => Promise<boolean> = () => {
     return new Promise((resolve) => {
@@ -119,38 +155,52 @@ const Install: FC<InstallProps> = (props): ReactElement => {
         setSuccessPostInstall(false);
         setLoadingPostInstall(true);
 
-        window.ethDocker.importKeys(props.installationDetails.network, '/home/remy/keys', 'password')
-        .then((importKeyResult) => {
-          if(importKeyResult) {
-            window.ethDocker.postInstall(props.installationDetails.network)
-            .then((res) => {
-                resolve(res)
-              }
-            )
+        window.ethDocker.postInstall(props.installationDetails.network)
+        .then((res) => {
+            resolve(res)
           }
-        })
+        )
       }
     })
   };
 
   const install = async () => {
+    console.log('pre install')
     let preInstallResult = await handlePreInstall()
+    console.log('preinstall result', preInstallResult)
     if (!preInstallResult) {
+      props.onStepBack()
       return
     }
+    console.log('install')
     let installResult = await handleInstall()
+    console.log('install result', preInstallResult)
     if (!installResult) {
+      props.onStepBack()
       return
     }
-    let postInstallResult = await handlePostInstall()
-    if (!postInstallResult) {
-      setDisableForward(false)
+    console.log('key import')
+    let keyImportResult = await handleKeyImportModal()
+    console.log('key import', keyImportResult)
+    if (!keyImportResult) {
+      props.onStepBack()
+      return
     }
+    console.log('post install')
+    let postInstallResult = await handlePostInstall()
+    console.log('post install result', preInstallResult)
+    if (!postInstallResult) {
+      props.onStepBack()
+      return
+    }
+    setDisableForward(false)
   }
 
   useEffect(() => {
     install()
   }, [])
+
+
 
   return (
     <Grid item container direction="column" spacing={2}>
@@ -273,6 +323,15 @@ const Install: FC<InstallProps> = (props): ReactElement => {
         nextLabel={"Finish"}
         disableBack={disableBack}
         disableNext={disableForward}
+      />
+      <ImportKeystore
+        setModalOpen={setModalOpen}
+        isModalOpen={isModalOpen}
+        setKeystorePassword={setKeystorePassword}
+        setKeystorePath={setKeystorePath}
+        keyStorePath={keyStorePath}
+        keystorePassword={keystorePassword}
+        resolve={resolveModal}
       />
     </Grid>
   );
