@@ -5,7 +5,7 @@ import { generate as generate_password } from "generate-password";
 
 import { exec, execFile } from 'child_process';
 import { promisify } from 'util';
-import { withDir } from 'tmp-promise'
+import { withDir } from 'tmp-promise';
 
 import { open, rm, mkdir } from 'fs/promises';
 
@@ -18,7 +18,8 @@ import {
   IMultiClientInstaller,
   NodeStatus,
   ValidatorStatus,
-  InstallDetails
+  InstallDetails,
+  OutputLogs
 } from "./IMultiClientInstaller";
 import { Network, networkToExecution } from '../react/types';
 import { doesFileExist, doesDirectoryExist } from './BashUtils';
@@ -40,20 +41,30 @@ type SystemdServiceDetails = {
   unitFileState: string | undefined;
 }
 
+const writeOutput = (message: string, outputLogs?: OutputLogs): void => {
+  if (outputLogs) {
+    outputLogs(message);
+  }
+};
+
 export class EthDockerInstaller implements IMultiClientInstaller {
 
   title = 'Electron';
 
-  async preInstall(): Promise<boolean> {
+  async preInstall(outputLogs?: OutputLogs): Promise<boolean> {
 
     let packagesToInstall = new Array<string>();
 
     // We need git installed
     const gitPackageName = 'git';
 
+    writeOutput(`Checking if ${gitPackageName} is installed.`, outputLogs);
     const gitInstalled = await this.checkForInstalledUbuntuPackage(gitPackageName);
     if (!gitInstalled) {
+      writeOutput(`${gitPackageName} is not installed. We will install it.`, outputLogs);
       packagesToInstall.push(gitPackageName);
+    } else {
+      writeOutput(`${gitPackageName} is already installed. We will not install it.`, outputLogs);
     }
 
     // We need docker installed, enabled and running
@@ -61,26 +72,43 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     let needToEnableDockerService = true;
     let needToStartDockerService = false;
 
+    writeOutput(`Checking if ${dockerPackageName} is installed.`, outputLogs);
     const dockerInstalled = await this.checkForInstalledUbuntuPackage(dockerPackageName);
     if (!dockerInstalled) {
+      writeOutput(`${dockerPackageName} is not installed. We will install it.`, outputLogs);
       packagesToInstall.push(dockerPackageName);
     } else {
+      writeOutput(`${dockerPackageName} is already installed. We will not install it.`, outputLogs);
+
+      writeOutput(`Checking if we need to enable or start the ${dockerServiceName} service.`, outputLogs);
       const dockerServiceDetails = await this.getSystemdServiceDetails(dockerServiceName);
       needToEnableDockerService = dockerServiceDetails.unitFileState != 'enabled';
+      if (needToEnableDockerService) {
+        writeOutput(`The ${dockerServiceName} service is not enabled. We will enable it.`, outputLogs);
+      }
       needToStartDockerService = dockerServiceDetails.subState != 'running';
+      if (needToStartDockerService) {
+        writeOutput(`The ${dockerServiceName} service is not started. We will start it.`, outputLogs);
+      }
     }
 
     // We need our user to be in docker group
+    writeOutput(`Checking if current user is in ${dockerGroupName} group.`, outputLogs);
     const needUserInDockerGroup = !await this.isUserInGroup(dockerGroupName);
+    if (needUserInDockerGroup) {
+      writeOutput(`Current user is not in ${dockerGroupName} group. We will add it.`, outputLogs);
+    }
 
     // We need our installPath directory
+    writeOutput(`Creating install directory in ${installPath}.`, outputLogs);
     await mkdir(installPath, { recursive: true });
 
     return await this.preInstallAdminScript(
       packagesToInstall,
       needUserInDockerGroup,
       needToEnableDockerService,
-      needToStartDockerService);
+      needToStartDockerService,
+      outputLogs);
   }
 
   async getSystemdServiceDetails(serviceName: string): Promise<SystemdServiceDetails> {
@@ -132,7 +160,8 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     packagesToInstall: Array<string>,
     needUserInDockerGroup: boolean,
     needToEnableDockerService: boolean,
-    needToStartDockerService: boolean): Promise<boolean> {
+    needToStartDockerService: boolean,
+    outputLogs?: OutputLogs): Promise<boolean> {
 
     if (
       packagesToInstall.length > 0 ||
@@ -148,35 +177,54 @@ export class EthDockerInstaller implements IMultiClientInstaller {
       await withDir(async dirResult => {
 
         const scriptPath = path.join(dirResult.path, 'commands.sh');
+        let scriptContent = '';
 
         const scriptFile = await open(scriptPath, 'w');
         await scriptFile.write('#!/bin/bash\n');
 
         // Install APT packages
         if (packagesToInstall.length > 0) {
-          await scriptFile.write('apt -y update\n');
-          await scriptFile.write('apt -y install ' + commandJoin(packagesToInstall) + '\n');
+          const aptUpdate = 'apt -y update\n';
+          const aptInstall = 'apt -y install ' + commandJoin(packagesToInstall) + '\n';
+
+          scriptContent += aptUpdate + aptInstall;
+
+          await scriptFile.write(aptUpdate);
+          await scriptFile.write(aptInstall);
         }
 
         // Enable docker service
         if (needToEnableDockerService) {
-          await scriptFile.write('systemctl enable --now ' + commandJoin([dockerServiceName]) + '\n');
+          const systemctlEnable = 'systemctl enable --now ' + commandJoin([dockerServiceName]) + '\n';
+
+          scriptContent += systemctlEnable;
+
+          await scriptFile.write(systemctlEnable);
         }
 
         // Start docker service
         if (needToStartDockerService) {
-          await scriptFile.write('systemctl start ' + commandJoin([dockerServiceName]) + '\n');
+          const systemctlStart = 'systemctl start ' + commandJoin([dockerServiceName]) + '\n';
+
+          scriptContent += systemctlStart;
+
+          await scriptFile.write(systemctlStart);
         }
 
         // Add user in docker group
         if (needUserInDockerGroup) {
           const userName = await this.getUsername();
+          const usermodUser = `usermod -aG ${dockerGroupName} ${userName}\n`;
 
-          await scriptFile.write(`usermod -aG ${dockerGroupName} ${userName}\n`);
+          scriptContent += usermodUser;
+
+          await scriptFile.write(usermodUser);
         }
 
         await scriptFile.chmod(0o500);
         await scriptFile.close();
+
+        writeOutput(`Running script ${scriptPath} with the following content as root:\n${scriptContent}`, outputLogs);
 
         const promise = new Promise<boolean>(async (resolve, reject) => {
           const options = {
@@ -186,6 +234,9 @@ export class EthDockerInstaller implements IMultiClientInstaller {
             sudo.exec(scriptPath, options,
               function (error, stdout, stderr) {
                 if (error) reject(error);
+                if (stdout) {
+                  writeOutput(stdout.toString(), outputLogs);
+                }
                 resolve(true);
               }
             );
@@ -230,7 +281,7 @@ export class EthDockerInstaller implements IMultiClientInstaller {
     return stdout.indexOf('[installed]') > 0
   }
 
-  async install(details: InstallDetails): Promise<boolean> {
+  async install(details: InstallDetails, outputLogs?: OutputLogs): Promise<boolean> {
     // Install and update eth-docker
     if (!await this.installUpdateEthDockerCode(details.network)) {
       return false;
@@ -422,11 +473,11 @@ EONG
     return true;
   }
 
-  async postInstall(network: Network): Promise<boolean> {
-    return this.startNodes(network);
+  async postInstall(network: Network, outputLogs?: OutputLogs): Promise<boolean> {
+    return this.startNodes(network, outputLogs);
   }
 
-  async stopNodes(network: Network): Promise<boolean> {
+  async stopNodes(network: Network, outputLogs?: OutputLogs): Promise<boolean> {
     const networkPath = path.join(installPath, network.toLowerCase());
     const ethDockerPath = path.join(networkPath, 'eth-docker');
 
@@ -448,7 +499,7 @@ EONG
     return true;
   }
 
-  async startNodes(network: Network): Promise<boolean> {
+  async startNodes(network: Network, outputLogs?: OutputLogs): Promise<boolean> {
     const networkPath = path.join(installPath, network.toLowerCase());
     const ethDockerPath = path.join(networkPath, 'eth-docker');
 
@@ -470,13 +521,13 @@ EONG
     return true;
   }
 
-  async updateExecutionClient(): Promise<void> {
+  async updateExecutionClient(outputLogs?: OutputLogs): Promise<void> {
     // TODO: implement
     console.log("Executing updateExecutionClient");
     return;
   }
 
-  async updateConsensusClient(): Promise<void> {
+  async updateConsensusClient(outputLogs?: OutputLogs): Promise<void> {
     // TODO: implement
     console.log("Executing updateConsensusClient");
     return;
@@ -485,7 +536,8 @@ EONG
   async importKeys(
     network: Network,
     keyStoreDirectoryPath: string,
-    keyStorePassword: string): Promise<boolean> {
+    keyStorePassword: string,
+    outputLogs?: OutputLogs): Promise<boolean> {
 
     const networkPath = path.join(installPath, network.toLowerCase());
     const ethDockerPath = path.join(networkPath, 'eth-docker');
