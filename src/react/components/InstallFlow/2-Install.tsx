@@ -1,10 +1,10 @@
 import React, { Dispatch, FC, ReactElement, SetStateAction, useState, useRef, useEffect, MouseEventHandler } from 'react';
 import { Grid, Typography, Fab, CircularProgress, Box, InputAdornment, Link, Modal, TextField } from '@mui/material';
 import StepNavigation from '../StepNavigation';
-import { DoneOutline, DownloadingOutlined, ComputerOutlined, RocketLaunchOutlined, Folder  } from '@mui/icons-material';
+import { DoneOutline, DownloadingOutlined, ComputerOutlined, RocketLaunchOutlined, Folder, KeyOutlined, ErrorOutline } from '@mui/icons-material';
 import styled from '@emotion/styled';
 
-import { green } from '@mui/material/colors';
+import { green, red } from '@mui/material/colors';
 import { InstallDetails } from '../../../electron/IMultiClientInstaller';
 import { BackgroundLight } from '../../colors';
 import { ImportKeystore } from '../ImportKeystore'
@@ -33,14 +33,23 @@ const Install: FC<InstallProps> = (props): ReactElement => {
 
   const [loadingPreInstall, setLoadingPreInstall] = useState(false);
   const [loadingInstall, setLoadingInstall] = useState(false);
+  const [loadingKeyImport, setLoadingKeyImport] = useState(false);
   const [loadingPostInstall, setLoadingPostInstall] = useState(false);
+
+  const [failedPreInstall, setFailedPreInstall] = useState(false);
+  const [failedInstall, setFailedInstall] = useState(false);
+  const [failedKeyImport, setFailedKeyImport] = useState(false);
+  const [failedPostInstall, setFailedPostInstall] = useState(false);
+
   const [successPreInstall, setSuccessPreInstall] = useState(false);
   const [successInstall, setSuccessInstall] = useState(false);
+  const [successKeyImport, setSuccessKeyImport] = useState(false);
   const [successPostInstall, setSuccessPostInstall] = useState(false);
   // const timerPreInstall = useRef<number>();
   // const timerInstall = useRef<number>();
   // const timerPostInstall = useRef<number>();
   // const timerWaitBeforeStart = useRef<number>();
+  const resolveModal = useRef<(arg: () => Promise<boolean>) => void>();
 
   const [disableBack, setDisableBack] = useState<boolean>(true)
   const [disableForward, setDisableForward] = useState<boolean>(true)
@@ -89,7 +98,7 @@ const Install: FC<InstallProps> = (props): ReactElement => {
 const [isModalOpen, setModalOpen] = useState<boolean>(false)
 const [keyStorePath, setKeystorePath] = useState<string>('')
 const [keystorePassword, setKeystorePassword] = useState<string>('')
-const [resolveModal, setResolveModal] = useState<() => void>(() => {})
+// const [resolveModal, setResolveModal] = useState<() => void>(() => {})
 
   // useEffect(() => {
   //   return () => {
@@ -100,20 +109,32 @@ const [resolveModal, setResolveModal] = useState<() => void>(() => {})
   //   };
   // }, []);
 
+  const bufferLoad:() => Promise<boolean> = () => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(true), 1500)
+    })
+  }
+
+  const empty: () => Promise<boolean> = () => {
+    return new Promise((resolve) => {
+      resolve(true)
+    })
+  }
 
   const handlePreInstall: () => Promise<boolean> = () => {
     return new Promise((resolve) => {
       if (!loadingPreInstall) {
         setSuccessPreInstall(false);
         setLoadingPreInstall(true);
-        
-        window.ethDocker.preInstall()
-        .then((preInstallResult) => {
+
+        function consoleWrite(info: string) {
+          console.log(info)
+        }
+
+         Promise.all([window.ethDocker.preInstall(consoleWrite), bufferLoad()]).then((res) => {
           setSuccessPreInstall(true);
           setLoadingPreInstall(false);
-          resolve(preInstallResult)
-        }).catch(err => {
-          console.error('preinstall failed', err)
+          resolve(res[0])
         })
       }
     })
@@ -125,26 +146,29 @@ const [resolveModal, setResolveModal] = useState<() => void>(() => {})
         setSuccessInstall(false);
         setLoadingInstall(true);
 
-        window.ethDocker.install(props.installationDetails)
-        .then(res => {
+        Promise.all([window.ethDocker.install(props.installationDetails), bufferLoad()]).then((res) => {
           setSuccessInstall(true);
           setLoadingInstall(false);
-          resolve(res)
+          resolve(res[0]) 
         })
       }
     })
   };
 
   const handleKeyImportModal: () => Promise<boolean> = () => {
-    return new Promise((resolve) => {
+    return new Promise((resolve: (arg: () => Promise<boolean>) => void) => {
+      setSuccessKeyImport(false)
+      setLoadingKeyImport(true);
       setModalOpen(true)
-      setResolveModal(() => resolve(null))
-    }).then(() => {
+      resolveModal.current = resolve
+
+    }).then((keyImp: () => Promise<boolean>) => {
       return new Promise((resolve) => {
-        window.ethDocker.importKeys(props.installationDetails.network, keyStorePath, keystorePassword)
-        .then((importKeyResult) => {
-          resolve(importKeyResult)
-        })
+          Promise.all([keyImp(), bufferLoad()]).then(res => {
+            setSuccessKeyImport(true)
+            setLoadingKeyImport(false);
+            resolve(res[0])
+          })
       })
     })
   }
@@ -155,11 +179,11 @@ const [resolveModal, setResolveModal] = useState<() => void>(() => {})
         setSuccessPostInstall(false);
         setLoadingPostInstall(true);
 
-        window.ethDocker.postInstall(props.installationDetails.network)
-        .then((res) => {
-            resolve(res)
-          }
-        )
+         Promise.all([ window.ethDocker.postInstall(props.installationDetails.network), bufferLoad()]).then((res) => {
+            setSuccessPostInstall(true);
+            setLoadingPostInstall(false);
+            resolve(res[0])
+        })
       }
     })
   };
@@ -169,28 +193,32 @@ const [resolveModal, setResolveModal] = useState<() => void>(() => {})
     let preInstallResult = await handlePreInstall()
     console.log('preinstall result', preInstallResult)
     if (!preInstallResult) {
-      props.onStepBack()
+      setFailedPreInstall(true)
+      setDisableBack(false)
       return
     }
     console.log('install')
     let installResult = await handleInstall()
-    console.log('install result', preInstallResult)
+    console.log('install result', installResult)
     if (!installResult) {
-      props.onStepBack()
+      setFailedInstall(true)
+      setDisableBack(false)
       return
     }
     console.log('key import')
     let keyImportResult = await handleKeyImportModal()
     console.log('key import', keyImportResult)
     if (!keyImportResult) {
-      props.onStepBack()
+      setFailedKeyImport(true)
+      setDisableBack(false)
       return
     }
     console.log('post install')
     let postInstallResult = await handlePostInstall()
-    console.log('post install result', preInstallResult)
+    console.log('post install result', postInstallResult)
     if (!postInstallResult) {
-      props.onStepBack()
+      setFailedPostInstall(true)
+      setDisableBack(false)
       return
     }
     setDisableForward(false)
@@ -220,9 +248,11 @@ const [resolveModal, setResolveModal] = useState<() => void>(() => {})
                 sx={buttonPreInstallSx}
                 disabled
               >
-                {successPreInstall ? <DoneOutline sx={{
+              {
+                !failedPreInstall ? successPreInstall ? <DoneOutline sx={{
                   color: green[500],
-                }}/> : <DownloadingOutlined />}
+                }}/> : <DownloadingOutlined /> : <ErrorOutline sx={{ color: red[500] }} />
+              }
               </Fab>
               {loadingPreInstall && (
                 <CircularProgress
@@ -254,9 +284,11 @@ const [resolveModal, setResolveModal] = useState<() => void>(() => {})
                 sx={buttonInstallSx}
                 disabled
               >
-                {successInstall ? <DoneOutline sx={{
+                {
+                !failedInstall ? successInstall ? <DoneOutline sx={{
                   color: green[500],
-                }} /> : <ComputerOutlined />}
+                }} /> : <ComputerOutlined /> : <ErrorOutline sx={{ color: red[500] }} /> 
+                }
               </Fab>
               {loadingInstall && (
                 <CircularProgress
@@ -285,13 +317,51 @@ const [resolveModal, setResolveModal] = useState<() => void>(() => {})
             <Fab
                 aria-label="save"
                 color="primary"
+                sx={buttonInstallSx}
+                disabled
+              >
+                {
+                !failedKeyImport ? successKeyImport ? <DoneOutline sx={{
+                  color: green[500],
+                }} /> : <KeyOutlined />: <ErrorOutline sx={{ color: red[500] }} />
+                }
+              </Fab>
+              {loadingKeyImport && (
+                <CircularProgress
+                  size={68}
+                  sx={{
+                    color: green[500],
+                    position: 'absolute',
+                    top: -6,
+                    left: -6,
+                    zIndex: 1,
+                  }}
+                />
+              )}
+              </Box>
+          </Grid>
+          <Grid item xs={1}></Grid>
+          <Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
+                  <span>Key Import</span>
+          </Grid>
+          <Grid item xs={3}></Grid>
+        </Grid>
+        <Grid item container>
+          <Grid item xs={3}></Grid>
+          <Grid item container justifyContent="center" alignItems="center" xs={2}>
+            <Box sx={{ m: 1, position: 'relative' }}>
+            <Fab
+                aria-label="save"
+                color="primary"
                 sx={buttonPostInstallSx}
                 disabled
               >
-                {successPostInstall ? 
+                {
+                !failedPostInstall ? successPostInstall ? 
                 <DoneOutline sx={{
                   color: green[500],
-                }} /> : <RocketLaunchOutlined />}
+                }} /> : <RocketLaunchOutlined /> : <ErrorOutline sx={{ color: red[500] }} />
+                }
               </Fab>
               {loadingPostInstall && (
                 <CircularProgress
@@ -331,7 +401,8 @@ const [resolveModal, setResolveModal] = useState<() => void>(() => {})
         setKeystorePath={setKeystorePath}
         keyStorePath={keyStorePath}
         keystorePassword={keystorePassword}
-        resolve={resolveModal}
+        closing={resolveModal}
+        installationDetails={props.installationDetails}
       />
     </Grid>
   );

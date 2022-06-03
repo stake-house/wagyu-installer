@@ -102,12 +102,12 @@ const Home: FC<HomeProps> = (props): ReactElement => {
   const handleEnter = () => {
 
     // Backend usage example
-    const consoleWrite: OutputLogs = (message: string): void => {
-      console.log(message);
-    };
+    // const consoleWrite: OutputLogs = (message: string): void => {
+    //   console.log(message);
+    // };
 
-    window.ethDocker.preInstall(consoleWrite).then(preInstallResult => {
-      console.log(`preInstall ${preInstallResult}`);
+    // window.ethDocker.preInstall(consoleWrite).then(preInstallResult => {
+    //   console.log(`preInstall ${preInstallResult}`);
       /*if (preInstallResult) {
         const installationDetails: InstallDetails = {
           network: props.network,
@@ -135,9 +135,9 @@ const Home: FC<HomeProps> = (props): ReactElement => {
 
         });
       }*/
-    });
+    // });
 
-    /*setEnterSelected(true);
+    setEnterSelected(true);
 
     if (!networkModalWasOpened) {
       handleOpenNetworkModal();
@@ -147,7 +147,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       }
 
       navigate(location);
-    }*/
+    }
   }
 
   const tabIndex = (priority: number) => showNetworkModal ? -1 : priority;

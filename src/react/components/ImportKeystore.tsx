@@ -1,6 +1,6 @@
 import { BackgroundLight, } from '../colors';
-import { Button, FormControl, FormControlLabel, Radio, RadioGroup, Typography, Box, Grid, Modal, InputAdornment, TextField, styled, OutlinedInputProps, TextFieldProps } from '@mui/material';
-import React, { FC, ChangeEvent, Dispatch, ReactElement, SetStateAction, useState } from 'react';
+import {  Button, FormControl, FormControlLabel, Radio, RadioGroup, Typography, Box, Grid, Modal, InputAdornment, TextField, styled, OutlinedInputProps, TextFieldProps } from '@mui/material';
+import React, { FC, ChangeEvent, Dispatch, ReactElement, SetStateAction, useState, MutableRefObject } from 'react';
 
 import { FileCopy, LockOpen } from '@mui/icons-material'
 import { Network } from '../types';
@@ -48,7 +48,8 @@ type ImportKeystoreProps = {
   keystorePassword: string
   setKeystorePath: Dispatch<SetStateAction<string>>
   setKeystorePassword: Dispatch<SetStateAction<string>>
-  resolve: () => void
+  closing: MutableRefObject<((arg: () => Promise<boolean>) => void) | undefined>
+  installationDetails: InstallDetails
 
 
 //   setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>,
@@ -74,6 +75,9 @@ export const ImportKeystore: FC<ImportKeystoreProps> = (props): ReactElement => 
     const handlePasswordChange = (ev: ChangeEvent<HTMLInputElement>) => {
         props.setKeystorePassword(ev.target.value)
       }
+
+      // console.log('IMPORT resolve: ', props.closing, props.closing.current)
+
 
   return (
     <Modal
@@ -105,7 +109,8 @@ export const ImportKeystore: FC<ImportKeystoreProps> = (props): ReactElement => 
                     ev.preventDefault()
                     console.log('clicking keystore')
                     window.electronAPI.invokeShowOpenDialog({
-                        properties: ['openFile']
+
+                        properties: ['openDirectory']
                     }).then(DialogResponse => {
                         if (DialogResponse.filePaths && DialogResponse.filePaths.length) {
                             props.setKeystorePath(DialogResponse.filePaths[0])
@@ -138,8 +143,11 @@ export const ImportKeystore: FC<ImportKeystoreProps> = (props): ReactElement => 
         <Grid item xs={12} textAlign='center' my={2}>
             <Button 
                 variant="contained" color="primary" onClick={() => {
+                    console.log('importing keys', props.keyStorePath, props.keystorePassword)
                     props.setModalOpen(false)
-                    props.resolve()
+                    if (props.closing && props.closing.current) {
+                      props.closing.current(() => window.ethDocker.importKeys(props.installationDetails.network, props.keyStorePath, props.keystorePassword))
+                    }
                 } 
             }>Import</Button>
         </Grid>
