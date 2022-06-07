@@ -53,9 +53,14 @@ const Install: FC<InstallProps> = (props): ReactElement => {
 
   const [disableBack, setDisableBack] = useState<boolean>(true)
   const [disableForward, setDisableForward] = useState<boolean>(true)
-
+  
   const buttonPreInstallSx = {
-    ...(successPreInstall && {
+    ...(failedPreInstall ? {
+        bgcolor: '#ffc107',
+        '&:hover': {
+          bgcolor: '#ffc107',
+        },
+    } : successPreInstall && {
       bgcolor: green[500],
       '&:hover': {
         bgcolor: green[700],
@@ -64,7 +69,26 @@ const Install: FC<InstallProps> = (props): ReactElement => {
   };
 
   const buttonInstallSx = {
-    ...(successInstall && {
+    ...(failedInstall ? {
+      bgcolor: '#ffc107',
+      '&:hover': {
+        bgcolor: '#ffc107',
+      },
+  } :successInstall && {
+      bgcolor: green[500],
+      '&:hover': {
+        bgcolor: green[700],
+      },
+    }),
+  };
+
+  const buttonKeyImportSx = {
+    ...(failedKeyImport ? {
+      bgcolor: '#ffc107',
+      '&:hover': {
+        bgcolor: '#ffc107',
+      },
+  } : successKeyImport && {
       bgcolor: green[500],
       '&:hover': {
         bgcolor: green[700],
@@ -73,7 +97,12 @@ const Install: FC<InstallProps> = (props): ReactElement => {
   };
 
   const buttonPostInstallSx = {
-    ...(successPostInstall && {
+    ...(failedPostInstall ? {
+      bgcolor: '#ffc107',
+      '&:hover': {
+        bgcolor: '#ffc107',
+      },
+  } : successPostInstall && {
       bgcolor: green[500],
       '&:hover': {
         bgcolor: green[700],
@@ -81,19 +110,6 @@ const Install: FC<InstallProps> = (props): ReactElement => {
     }),
   };
 
-  const ModalStyle = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 600,
-  padding: '20px',
-  borderRadius: '20px',
-  background: BackgroundLight,
-  // border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
 const [isModalOpen, setModalOpen] = useState<boolean>(false)
 const [keyStorePath, setKeystorePath] = useState<string>('')
@@ -161,15 +177,22 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
       setLoadingKeyImport(true);
       setModalOpen(true)
       resolveModal.current = resolve
-
     }).then((keyImp: () => Promise<boolean>) => {
-      return new Promise((resolve) => {
+      return new Promise((resolve: (arg: boolean) => void ) => {
           Promise.all([keyImp(), bufferLoad()]).then(res => {
             setSuccessKeyImport(true)
             setLoadingKeyImport(false);
             resolve(res[0])
+          }).catch(err => {
+            console.error('error importing key: ',err)
+            setLoadingKeyImport(false);
+            resolve(false)
           })
       })
+    }).catch(err => {
+      console.error('error filling out key import modal: ',err)
+      setLoadingKeyImport(false);
+      return false
     })
   }
 
@@ -188,44 +211,66 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
     })
   };
 
-  const install = async () => {
-    console.log('pre install')
-    let preInstallResult = await handlePreInstall()
-    console.log('preinstall result', preInstallResult)
-    if (!preInstallResult) {
-      setFailedPreInstall(true)
-      setDisableBack(false)
-      return
+  const install = async (step: number) => {
+    console.log('step:', step)
+    if (!step) {
+      step = 0
     }
-    console.log('install')
-    let installResult = await handleInstall()
-    console.log('install result', installResult)
-    if (!installResult) {
-      setFailedInstall(true)
-      setDisableBack(false)
-      return
+
+    switch (step) {
+      case 0:
+        setFailedPreInstall(false)
+        console.log('pre-install')
+        let preInstallResult = await handlePreInstall()
+        console.log('preinstall result', preInstallResult)
+        if (!preInstallResult) {
+          setFailedPreInstall(true)
+          setDisableBack(false)
+          return
+        }
+        step = 1
+      case 1:
+        setFailedInstall(false)
+        console.log('install')
+        let installResult = await handleInstall()
+        console.log('install result', installResult)
+        if (!installResult) {
+          setFailedInstall(true)
+          setDisableBack(false)
+          return
+        }
+        step += 1
+      
+      case 2:
+        setFailedKeyImport(false)
+        console.log('key import')
+        let keyImportResult = await handleKeyImportModal()
+        console.log('key import', keyImportResult)
+        if (!keyImportResult) {
+          setFailedKeyImport(true)
+          setDisableBack(false)
+          return
+        }
+        step += 1
+
+      case 3:
+        setFailedPostInstall(false)
+        console.log('post install')
+        let postInstallResult = await handlePostInstall()
+        console.log('post install result', postInstallResult)
+        if (!postInstallResult) {
+          setFailedPostInstall(true)
+          setDisableBack(false)
+          return
+        }
     }
-    console.log('key import')
-    let keyImportResult = await handleKeyImportModal()
-    console.log('key import', keyImportResult)
-    if (!keyImportResult) {
-      setFailedKeyImport(true)
-      setDisableBack(false)
-      return
-    }
-    console.log('post install')
-    let postInstallResult = await handlePostInstall()
-    console.log('post install result', postInstallResult)
-    if (!postInstallResult) {
-      setFailedPostInstall(true)
-      setDisableBack(false)
-      return
-    }
-    setDisableForward(false)
+     
+      setDisableForward(false)
+      setDisableBack(true)
   }
 
   useEffect(() => {
-    install()
+    install(0)
   }, [])
 
 
@@ -234,7 +279,7 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
     <Grid item container direction="column" spacing={2}>
       <Grid item>
         <Typography variant="h1" align='center'>
-          Installing 
+          Installing
         </Typography>
       </Grid>
       <ContentGrid item container>
@@ -246,7 +291,8 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
                 aria-label="save"
                 color="primary"
                 sx={buttonPreInstallSx}
-                disabled
+                disabled={!failedPreInstall}
+                onClick={failedPreInstall ? () => install(0) : () => {}}
               >
               {
                 !failedPreInstall ? successPreInstall ? <DoneOutline sx={{
@@ -282,7 +328,8 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
                 aria-label="save"
                 color="primary"
                 sx={buttonInstallSx}
-                disabled
+                disabled={!failedInstall}
+                onClick={failedInstall ? () => install(1) : () => {}}
               >
                 {
                 !failedInstall ? successInstall ? <DoneOutline sx={{
@@ -317,8 +364,9 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
             <Fab
                 aria-label="save"
                 color="primary"
-                sx={buttonInstallSx}
-                disabled
+                sx={buttonKeyImportSx}
+                disabled={!failedKeyImport}
+                onClick={failedKeyImport ? () => install(2) : () => {}}
               >
                 {
                 !failedKeyImport ? successKeyImport ? <DoneOutline sx={{
@@ -354,7 +402,8 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
                 aria-label="save"
                 color="primary"
                 sx={buttonPostInstallSx}
-                disabled
+                disabled={!failedPostInstall}
+                onClick={failedPostInstall ? () => install(3) : () => {}}
               >
                 {
                 !failedPostInstall ? successPostInstall ? 

@@ -14,16 +14,11 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install \
     curl \
     gnupg \
     lsb-release
-# RUN mkdir -p /etc/apt/keyrings
-# RUN  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-# RUN echo \
-#     "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-#     $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 RUN curl -fsSL https://get.docker.com | sh
-RUN curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-RUN chmod +x /usr/local/bin/docker-compose
-# RUN sudo groupadd docker
+# RUN echo 'alias docker-compose="docker compose"' >> /home/node/.bashrc
+RUN apt-get install docker-compose
+
 
 WORKDIR /app
 COPY . .

@@ -95,11 +95,11 @@ export const ImportKeystore: FC<ImportKeystoreProps> = (props): ReactElement => 
         <Grid xs={12} item container justifyContent={'flex-start'} direction={'column'}>
         <Grid item container alignItems={'center'} p={2} spacing={2}>
             <Grid item xs={6}>
-            <span>Keystore File</span>
+            <span>Keystore Directory</span>
             </Grid>
             <Grid item xs={6}>
             <FileUploadField
-                placeholder='keystore.json'
+                placeholder='/validator_keys/'
                 sx={{ my: 2, minWidth: '215', cursor: 'pointer !important' }}
                 variant="outlined"
                 onChange={handleKeystorePathChange}
