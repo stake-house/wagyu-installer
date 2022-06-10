@@ -41,10 +41,19 @@ export const ConsensusClients: IConsensusClient[] = [{
 }
 ]
 export const ExecutionClients: IExecutionClient[] = [{
-	key: ExecutionClient.GETH,
-	label: 'Geth',
-}, {
-	key: ExecutionClient.NETHERMIND,
-	label: 'Nethermind'
-},
+		key: ExecutionClient.GETH,
+		label: 'Geth',
+	}, 
+	{
+		key: ExecutionClient.ERIGON,
+		label: 'Erigon'
+	},
+	{
+		key: ExecutionClient.BESU,
+		label: 'Besu'
+	},
+	{
+		key: ExecutionClient.NETHERMIND,
+		label: 'Nethermind'
+	},
 ]
