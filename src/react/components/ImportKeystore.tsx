@@ -72,8 +72,6 @@ export const ImportKeystore: FC<ImportKeystoreProps> = (props): ReactElement => 
         props.setKeystorePassword(ev.target.value)
       }
 
-      // console.log('IMPORT resolve: ', props.closing, props.closing.current)
-
 
   return (
     <Modal
@@ -103,7 +101,6 @@ export const ImportKeystore: FC<ImportKeystoreProps> = (props): ReactElement => 
                 InputProps={{
                 startAdornment: <InputAdornment sx={{paddingLeft: '14px'}} onClick={(ev) => {
                     ev.preventDefault()
-                    console.log('clicking keystore')
                     window.electronAPI.invokeShowOpenDialog({
 
                         properties: ['openDirectory']
@@ -139,7 +136,6 @@ export const ImportKeystore: FC<ImportKeystoreProps> = (props): ReactElement => 
         <Grid item xs={12} textAlign='center' my={2}>
             <Button 
                 variant="contained" color="primary" onClick={() => {
-                    console.log('importing keys', props.keyStorePath, props.keystorePassword)
                     props.setModalOpen(false)
                     if (props.closing && props.closing.current) {
                       props.closing.current(() => window.ethDocker.importKeys(props.installationDetails.network, props.keyStorePath, props.keystorePassword))

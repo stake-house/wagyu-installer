@@ -122,11 +122,7 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
         setSuccessPreInstall(false);
         setLoadingPreInstall(true);
 
-        function consoleWrite(info: string) {
-          console.log(info)
-        }
-
-         Promise.all([window.ethDocker.preInstall(consoleWrite), bufferLoad()]).then((res) => {
+         Promise.all([window.ethDocker.preInstall(), bufferLoad()]).then((res) => {
           setSuccessPreInstall(true);
           setLoadingPreInstall(false);
           resolve(res[0])
@@ -191,7 +187,6 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
   };
 
   const install = async (step: number) => {
-    console.log('step:', step)
     if (!step) {
       step = 0
     }
@@ -199,9 +194,7 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
     switch (step) {
       case 0:
         setFailedPreInstall(false)
-        console.log('pre-install')
         let preInstallResult = await handlePreInstall()
-        console.log('preinstall result', preInstallResult)
         if (!preInstallResult) {
           setFailedPreInstall(true)
           setDisableBack(false)
@@ -210,9 +203,7 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
         step = 1
       case 1:
         setFailedInstall(false)
-        console.log('install')
         let installResult = await handleInstall()
-        console.log('install result', installResult)
         if (!installResult) {
           setFailedInstall(true)
           setDisableBack(false)
@@ -222,9 +213,7 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
       
       case 2:
         setFailedKeyImport(false)
-        console.log('key import')
         let keyImportResult = await handleKeyImportModal()
-        console.log('key import', keyImportResult)
         if (!keyImportResult) {
           setFailedKeyImport(true)
           setDisableBack(false)
@@ -234,9 +223,7 @@ const [keystorePassword, setKeystorePassword] = useState<string>('')
 
       case 3:
         setFailedPostInstall(false)
-        console.log('post install')
         let postInstallResult = await handlePostInstall()
-        console.log('post install result', postInstallResult)
         if (!postInstallResult) {
           setFailedPostInstall(true)
           setDisableBack(false)

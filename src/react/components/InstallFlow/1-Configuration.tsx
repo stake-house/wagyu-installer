@@ -180,7 +180,7 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                   <Grid item xs={6}>
                     <TextField
                       placeholder='.wagyu/'
-                      onClick={(ev) => { ev.preventDefault(); console.log('lols') }}
+                      onClick={(ev) => { ev.preventDefault(); }}
                       sx={{ my: 2, minWidth: '215' }}
                       variant="outlined"
                       disabled
