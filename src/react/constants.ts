@@ -27,7 +27,7 @@ export interface IConsensusClient {
 
 export const ConsensusClients: IConsensusClient[] = [{
 	key: ConsensusClient.PRYSM,
-	label: 'Prysm (recommended)',
+	label: 'Prysm',
 },
 {
 	key: ConsensusClient.LIGHTHOUSE,
@@ -42,7 +42,7 @@ export const ConsensusClients: IConsensusClient[] = [{
 ]
 export const ExecutionClients: IExecutionClient[] = [{
 	key: ExecutionClient.GETH,
-	label: 'Geth (recommended)',
+	label: 'Geth',
 }, {
 	key: ExecutionClient.NETHERMIND,
 	label: 'Nethermind'
