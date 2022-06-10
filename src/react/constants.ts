@@ -26,19 +26,23 @@ export interface IConsensusClient {
 
 
 export const ConsensusClients: IConsensusClient[] = [{
-	key: ConsensusClient.PRYSM,
-	label: 'Prysm',
-},
-{
-	key: ConsensusClient.LIGHTHOUSE,
-	label: 'Lighthouse',
-}, {
-	key: ConsensusClient.NIMBUS,
-	label: 'Nimbus',
-}, {
-	key: ConsensusClient.TEKU,
-	label: 'Teku'
-}
+		key: ConsensusClient.PRYSM,
+		label: 'Prysm',
+	},
+	{
+		key: ConsensusClient.LIGHTHOUSE,
+		label: 'Lighthouse',
+	}, {
+		key: ConsensusClient.NIMBUS,
+		label: 'Nimbus',
+	}, {
+		key: ConsensusClient.TEKU,
+		label: 'Teku'
+	},
+	{
+		key: ConsensusClient.LODESTAR,
+		label: 'Lodestar'
+	},
 ]
 export const ExecutionClients: IExecutionClient[] = [{
 		key: ExecutionClient.GETH,
