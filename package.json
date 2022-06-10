@@ -1,10 +1,10 @@
 {
   "name": "wagyuinstaller",
   "productName": "Wagyu Installer",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "Application aimed at lowering the technical bar to staking on Ethereum",
   "main": "./build/electron/index.js",
-  "author": "Colfax Selby <colfax.selby@gmail.com>",
+  "author": "Rémy Roy <remyroy@remyroy.com>",
   "license": "GPL",
   "devDependencies": {
     "@types/react": "^17.0.14",
