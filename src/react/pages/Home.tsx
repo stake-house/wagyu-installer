@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import React, { FC, ReactElement, useState, Dispatch, SetStateAction } from "react";
 import styled from '@emotion/styled';
-import { Container, Divider, Grid, Modal, Tooltip, Typography } from '@mui/material';
+import { Container, Grid, Modal, Typography } from '@mui/material';
 import { Button } from '@mui/material';
 import { HomeIcon } from "../components/icons/HomeIcon";
 import { NetworkPicker } from "../components/NetworkPicker";
-import { Network, StepSequenceKey } from '../types'
+import { StepSequenceKey } from '../types'
 import VersionFooter from "../components/VersionFooter";
-import { ConsensusClient, ExecutionClient, InstallDetails } from "../../electron/IMultiClientInstaller";
+import { InstallDetails } from "../../electron/IMultiClientInstaller";
 
 const StyledMuiContainer = styled(Container)`
   display: flex;
@@ -57,8 +57,8 @@ const ContentGrid = styled(Grid)`
 `;
 
 type HomeProps = {
-  network: Network,
-  setNetwork: Dispatch<SetStateAction<Network>>
+  installationDetails: InstallDetails,
+  setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>
 }
 
 /**
@@ -102,9 +102,13 @@ const Home: FC<HomeProps> = (props): ReactElement => {
   const handleEnter = () => {
 
     // Backend usage example
-    /*window.ethDocker.preInstall().then(preInstallResult => {
-      console.log(`preInstall ${preInstallResult}`);
-      if (preInstallResult) {
+    // const consoleWrite: OutputLogs = (message: string): void => {
+    //   console.log(message);
+    // };
+
+    // window.ethDocker.preInstall(consoleWrite).then(preInstallResult => {
+    //   console.log(`preInstall ${preInstallResult}`);
+      /*if (preInstallResult) {
         const installationDetails: InstallDetails = {
           network: props.network,
           executionClient: ExecutionClient.GETH,
@@ -130,8 +134,8 @@ const Home: FC<HomeProps> = (props): ReactElement => {
           }
 
         });
-      }
-    });*/
+      }*/
+    // });
 
     setEnterSelected(true);
 
@@ -151,7 +155,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
   return (
     <StyledMuiContainer>
       <NetworkDiv>
-        Select Network: <Button color="primary" onClick={handleOpenNetworkModal} tabIndex={tabIndex(1)}>{props.network}</Button>
+        Select Network: <Button color="primary" onClick={handleOpenNetworkModal} tabIndex={tabIndex(1)}>{props.installationDetails.network}</Button>
       </NetworkDiv>
       <Modal
         open={showNetworkModal}
@@ -159,7 +163,7 @@ const Home: FC<HomeProps> = (props): ReactElement => {
       >
         {/* Added <div> here per the following link to fix error https://stackoverflow.com/a/63521049/5949270 */}
         <div>
-          <NetworkPicker handleCloseNetworkModal={handleCloseNetworkModal} setNetwork={props.setNetwork} network={props.network}></NetworkPicker>
+          <NetworkPicker handleCloseNetworkModal={handleCloseNetworkModal} setInstallationDetails={props.setInstallationDetails} installationDetails={props.installationDetails}></NetworkPicker>
         </div>
       </Modal>
 

@@ -1,3 +1,4 @@
+import { ConsensusClient, ExecutionClient } from '../electron/IMultiClientInstaller';
 import { StepKey } from './types';
 
 export const errors = {
@@ -11,3 +12,52 @@ export const stepLabels = {
 	[StepKey.Configuration]: 'Configuration',
 	[StepKey.Installing]: 'Install',
 };
+
+
+export interface IExecutionClient {
+	key: ExecutionClient;
+	label: string;
+}
+
+export interface IConsensusClient {
+	key: ConsensusClient;
+	label: string;
+}
+
+
+export const ConsensusClients: IConsensusClient[] = [{
+		key: ConsensusClient.PRYSM,
+		label: 'Prysm',
+	},
+	{
+		key: ConsensusClient.LIGHTHOUSE,
+		label: 'Lighthouse',
+	}, {
+		key: ConsensusClient.NIMBUS,
+		label: 'Nimbus',
+	}, {
+		key: ConsensusClient.TEKU,
+		label: 'Teku'
+	},
+	{
+		key: ConsensusClient.LODESTAR,
+		label: 'Lodestar'
+	},
+]
+export const ExecutionClients: IExecutionClient[] = [{
+		key: ExecutionClient.GETH,
+		label: 'Geth',
+	}, 
+	{
+		key: ExecutionClient.ERIGON,
+		label: 'Erigon'
+	},
+	{
+		key: ExecutionClient.BESU,
+		label: 'Besu'
+	},
+	{
+		key: ExecutionClient.NETHERMIND,
+		label: 'Nethermind'
+	},
+]

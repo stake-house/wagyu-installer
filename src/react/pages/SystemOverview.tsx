@@ -1,8 +1,8 @@
 import React, { FC, ReactElement } from "react";
 import { Grid, Typography } from '@mui/material';
-import { Network } from "../types";
 import styled from '@emotion/styled';
 import VersionFooter from "../components/VersionFooter";
+import { InstallDetails } from "../../electron/IMultiClientInstaller";
 
 const MainGrid = styled(Grid)`
   width: 100%;
@@ -11,7 +11,7 @@ const MainGrid = styled(Grid)`
 `;
 
 type SystemOverviewProps = {
-  network: Network
+  installationDetails: InstallDetails
 }
 
 const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
@@ -21,14 +21,20 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
         <Grid item xs={10} />
         <Grid item xs={2}>
           <Typography variant="caption" style={{ color: "gray" }}>
-            Network: {props.network}
+            Network: {props.installationDetails.network}
           </Typography>
         </Grid>
       </Grid>
       <Grid item>
         <Typography variant="h1">
-          System Overview
+          {/* System Overview */}
+          Installation Complete
         </Typography>
+        <ul style={{ margin: '0 auto', width: '350px', marginTop: '3rem', textAlign: 'left'}}>
+          <li>Network: {props.installationDetails.network}</li>
+          <li>Consensus Client: {props.installationDetails.consensusClient}</li>
+          <li>Execution Client: {props.installationDetails.executionClient}</li>
+        </ul>
       </Grid>
       <VersionFooter />
     </MainGrid>

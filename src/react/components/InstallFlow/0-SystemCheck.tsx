@@ -11,6 +11,7 @@ type SystemCheckProps = {
 const ContentGrid = styled(Grid)`
   height: 320px;
   margin-top: 16px;
+  margin-bottom: 16px;
 `;
 
 /**
@@ -22,9 +23,9 @@ const ContentGrid = styled(Grid)`
 const SystemCheck: FC<SystemCheckProps> = (props): ReactElement => {
 
   return (
-    <Grid container direction="column" spacing={2}>
+    <Grid item container direction="column" spacing={2}>
       <Grid item>
-        <Typography variant="h1">
+        <Typography variant="h1" align='center'>
           System Check
         </Typography>
       </Grid>

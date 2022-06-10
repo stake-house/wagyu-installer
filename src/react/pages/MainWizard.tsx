@@ -1,27 +1,25 @@
-import React, { FC, ReactElement, useState } from 'react';
+import React, { FC, ReactElement, SetStateAction, useState, Dispatch } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { Stepper, Step, StepLabel, Grid, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import { StepKey } from '../types';
 import { stepLabels } from '../constants';
-import { Network, StepSequenceKey } from '../types';
+import { StepSequenceKey } from '../types';
 import VersionFooter from '../components/VersionFooter';
 import Install from '../components/InstallFlow/2-Install';
 import Configuration from '../components/InstallFlow/1-Configuration';
 import SystemCheck from '../components/InstallFlow/0-SystemCheck';
+import { InstallDetails } from '../../electron/IMultiClientInstaller';
 
 const stepSequenceMap: Record<string, StepKey[]> = {
   install: [
-    StepKey.SystemCheck,
+    // StepKey.SystemCheck,
     StepKey.Configuration,
     StepKey.Installing,
   ]
 }
 
 const MainGrid = styled(Grid)`
-  width: 100%;
-  margin: 0px;
-  text-align: center;
 `;
 
 const StyledStepper = styled(Stepper)`
@@ -33,7 +31,8 @@ type RouteParams = {
 };
 
 type WizardProps = {
-  network: Network
+  installationDetails: InstallDetails,
+  setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>
 }
 
 /**
@@ -77,7 +76,7 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
    * This is the UI stepper component rendering where the user is in the process
    */
   const stepper = (
-    <Grid item>
+    <Grid item my={3}>
       <StyledStepper activeStep={activeStepIndex} alternativeLabel>
         {stepSequence.map((stepKey: StepKey) => (
           <Step key={stepKey}>
@@ -88,10 +87,13 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
     </Grid>
   );
 
+
   const commonProps = {
     onStepForward,
     onStepBack,
-    children: stepper
+    installationDetails: props.installationDetails,
+    setInstallationDetails: props.setInstallationDetails,
+    children: stepper,
   };
 
   /**
@@ -118,12 +120,12 @@ const Wizard: FC<WizardProps> = (props): ReactElement => {
   }
 
   return (
-    <MainGrid container spacing={5} direction="column">
+    <MainGrid container direction="column">
       <Grid item container>
         <Grid item xs={10} />
         <Grid item xs={2}>
           <Typography variant="caption" style={{ color: "gray" }}>
-            Network: {props.network}
+            Network: {props.installationDetails.network}
           </Typography>
         </Grid>
       </Grid>
