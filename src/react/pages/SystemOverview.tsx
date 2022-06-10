@@ -1,6 +1,5 @@
 import React, { FC, ReactElement } from "react";
 import { Grid, Typography } from '@mui/material';
-import { Network } from "../types";
 import styled from '@emotion/styled';
 import VersionFooter from "../components/VersionFooter";
 import { InstallDetails } from "../../electron/IMultiClientInstaller";

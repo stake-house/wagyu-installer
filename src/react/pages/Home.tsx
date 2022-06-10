@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import React, { FC, ReactElement, useState, Dispatch, SetStateAction } from "react";
 import styled from '@emotion/styled';
-import { Container, Divider, Grid, Modal, Tooltip, Typography } from '@mui/material';
+import { Container, Grid, Modal, Typography } from '@mui/material';
 import { Button } from '@mui/material';
 import { HomeIcon } from "../components/icons/HomeIcon";
 import { NetworkPicker } from "../components/NetworkPicker";
-import { Network, StepSequenceKey } from '../types'
+import { StepSequenceKey } from '../types'
 import VersionFooter from "../components/VersionFooter";
-import { ConsensusClient, ExecutionClient, InstallDetails, OutputLogs } from "../../electron/IMultiClientInstaller";
+import { InstallDetails } from "../../electron/IMultiClientInstaller";
 
 const StyledMuiContainer = styled(Container)`
   display: flex;

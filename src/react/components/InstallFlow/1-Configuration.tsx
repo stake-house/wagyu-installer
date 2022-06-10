@@ -1,12 +1,11 @@
-import React, { ChangeEvent, Dispatch, FC, FormEvent, ReactElement, SetStateAction, useState } from 'react';
-import { Grid, Typography, FormControl, Select, MenuItem, InputLabel, SelectChangeEvent, Modal, Box, Button, TextField, InputAdornment } from '@mui/material';
+import React, { ChangeEvent, Dispatch, FC, ReactElement, SetStateAction, useState } from 'react';
+import { Grid, Typography, FormControl, Select, MenuItem, SelectChangeEvent, Modal, Box, Button, TextField, InputAdornment } from '@mui/material';
 import { Folder, Link } from '@mui/icons-material'
 import StepNavigation from '../StepNavigation';
 import styled from '@emotion/styled';
 import { ConsensusClients, ExecutionClients, IConsensusClient, IExecutionClient } from '../../constants'
 import { ConsensusClient, ExecutionClient, InstallDetails } from '../../../electron/IMultiClientInstaller';
 import { BackgroundLight, } from '../../colors';
-import { ImportKeystore } from '../ImportKeystore';
 
 type ConfigurationProps = {
   onStepBack: () => void,
@@ -31,7 +30,6 @@ const ModalStyle = {
   padding: '20px',
   borderRadius: '20px',
   background: BackgroundLight,
-  // border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -85,12 +83,9 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
             <Grid item xs={2}></Grid>
             <Grid item xs={4}>
               <FormControl sx={{ my: 2, minWidth: '215' }}>
-                {/* <InputLabel id="consensus-client-label">Consensus Client</InputLabel> */}
                 <Select
-                  // labelId="consensus-client-label"
                   id="consensus-client"
                   value={consensusClient}
-                  // label="Consensus Client"
                   onChange={handleConsensusClientChange}
                 >
                   {ConsensusClients.map((c: IConsensusClient) => {
@@ -111,12 +106,9 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
             <Grid item xs={2}></Grid>
             <Grid item xs={4}>
               <FormControl sx={{ my: 2, minWidth: '215' }}>
-                {/* <InputLabel id="execution-client-label">Execution Client</InputLabel> */}
                 <Select
-                  // labelId="execution-client-label"
                   id="execution-client"
                   value={executionClient}
-                  // label="Execution Client"
                   onChange={handleExecutionClientChange}
                 >
                   {ExecutionClients.map((c: IExecutionClient) => {
@@ -130,7 +122,7 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
             <Grid item xs={1}></Grid>
           </Grid>
         </Grid>
-        <Button onClick={() => setModalOpen(true)}>Advanced Options</Button>
+        <Button disabled onClick={() => setModalOpen(true)}>Advanced Options</Button>
         <Modal
           open={isModalOpen}
           onClose={() => setModalOpen(false)}
@@ -205,7 +197,6 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
           </Box>
         </Modal>
       </ContentGrid>
-      {/* props.children is the stepper */}
       {props.children}
       <StepNavigation
         onPrev={props.onStepBack}

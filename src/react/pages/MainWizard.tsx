@@ -4,7 +4,7 @@ import { Stepper, Step, StepLabel, Grid, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import { StepKey } from '../types';
 import { stepLabels } from '../constants';
-import { Network, StepSequenceKey } from '../types';
+import { StepSequenceKey } from '../types';
 import VersionFooter from '../components/VersionFooter';
 import Install from '../components/InstallFlow/2-Install';
 import Configuration from '../components/InstallFlow/1-Configuration';

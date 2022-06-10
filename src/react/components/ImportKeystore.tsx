@@ -1,9 +1,8 @@
 import { BackgroundLight, } from '../colors';
-import {  Button, FormControl, FormControlLabel, Radio, RadioGroup, Typography, Box, Grid, Modal, InputAdornment, TextField, styled, OutlinedInputProps, TextFieldProps } from '@mui/material';
-import React, { FC, ChangeEvent, Dispatch, ReactElement, SetStateAction, useState, MutableRefObject } from 'react';
+import {  Button, Typography, Box, Grid, Modal, InputAdornment, TextField, styled } from '@mui/material';
+import React, { FC, ChangeEvent, Dispatch, ReactElement, SetStateAction, MutableRefObject } from 'react';
 
 import { FileCopy, LockOpen } from '@mui/icons-material'
-import { Network } from '../types';
 import { InstallDetails } from '../../electron/IMultiClientInstaller';
 
 
@@ -16,7 +15,6 @@ const ModalStyle = {
     padding: '20px',
     borderRadius: '20px',
     background: BackgroundLight,
-    // border: '2px solid #000',
     boxShadow: 24,
     p: 4,
   };
@@ -50,22 +48,20 @@ type ImportKeystoreProps = {
   setKeystorePassword: Dispatch<SetStateAction<string>>
   closing: MutableRefObject<((arg: () => Promise<boolean>) => void) | undefined>
   installationDetails: InstallDetails
-
-
-//   setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>,
-//   installationDetails: InstallDetails,
 }
-
-// console.log(dialog.showOpenDialog({ properties: ['openFile'] }))
-
 
 /**
  * This is the network picker modal component where the user selects the desired network.
  * 
- * @param props.handleCloseNetworkModal function to handle closing the network modal
- * @param props.setInstallationDetails the currently set installation details
+ * @param props.isModalOpen the current open state of the modal
+ * @param props.setModalOpen a function to set the modal open state
+ * @param props.keyStorePath the path to the directory where the validator keys are stored
+ * @param props.setKeystorePath set the path to the directory where the validator keys are stored
+ * @param props.keystorePassword the password to unlock the validator key
+ * @param props.setKeystorePassword sets the password used to unlock the validator keys
+ * @param props.closing sets the function that will be called after the modal is closed
  * @param props.installationDetails the current installation details
- * @returns the network picker element to render
+ * @returns the import validator key modal
  */
 export const ImportKeystore: FC<ImportKeystoreProps> = (props): ReactElement => {
 

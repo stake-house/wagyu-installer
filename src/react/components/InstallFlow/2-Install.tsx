@@ -1,12 +1,11 @@
-import React, { Dispatch, FC, ReactElement, SetStateAction, useState, useRef, useEffect, MouseEventHandler } from 'react';
-import { Grid, Typography, Fab, CircularProgress, Box, InputAdornment, Link, Modal, TextField } from '@mui/material';
+import React, { Dispatch, FC, ReactElement, SetStateAction, useState, useRef, useEffect } from 'react';
+import { Grid, Typography, Fab, CircularProgress, Box } from '@mui/material';
 import StepNavigation from '../StepNavigation';
-import { DoneOutline, DownloadingOutlined, ComputerOutlined, RocketLaunchOutlined, Folder, KeyOutlined, ErrorOutline } from '@mui/icons-material';
+import { DoneOutline, DownloadingOutlined, ComputerOutlined, RocketLaunchOutlined, KeyOutlined, ErrorOutline } from '@mui/icons-material';
 import styled from '@emotion/styled';
 
 import { green, red } from '@mui/material/colors';
 import { InstallDetails } from '../../../electron/IMultiClientInstaller';
-import { BackgroundLight } from '../../colors';
 import { ImportKeystore } from '../ImportKeystore'
 
 type InstallProps = {
@@ -45,10 +44,6 @@ const Install: FC<InstallProps> = (props): ReactElement => {
   const [successInstall, setSuccessInstall] = useState(false);
   const [successKeyImport, setSuccessKeyImport] = useState(false);
   const [successPostInstall, setSuccessPostInstall] = useState(false);
-  // const timerPreInstall = useRef<number>();
-  // const timerInstall = useRef<number>();
-  // const timerPostInstall = useRef<number>();
-  // const timerWaitBeforeStart = useRef<number>();
   const resolveModal = useRef<(arg: () => Promise<boolean>) => void>();
 
   const [disableBack, setDisableBack] = useState<boolean>(true)
@@ -114,26 +109,10 @@ const Install: FC<InstallProps> = (props): ReactElement => {
 const [isModalOpen, setModalOpen] = useState<boolean>(false)
 const [keyStorePath, setKeystorePath] = useState<string>('')
 const [keystorePassword, setKeystorePassword] = useState<string>('')
-// const [resolveModal, setResolveModal] = useState<() => void>(() => {})
-
-  // useEffect(() => {
-  //   return () => {
-  //     clearTimeout(timerPostInstall.current);
-  //     clearTimeout(timerPreInstall.current);
-  //     clearTimeout(timerInstall.current);
-  //     clearTimeout(timerWaitBeforeStart.current)
-  //   };
-  // }, []);
 
   const bufferLoad:() => Promise<boolean> = () => {
     return new Promise((resolve) => {
       setTimeout(() => resolve(true), 1500)
-    })
-  }
-
-  const empty: () => Promise<boolean> = () => {
-    return new Promise((resolve) => {
-      resolve(true)
     })
   }
 
