@@ -1,5 +1,7 @@
 # Wagyu
 
+[![gitpoap badge](https://public-api.gitpoap.io/v1/repo/stake-house/wagyu-installer/badge)](https://www.gitpoap.io/gh/stake-house/wagyu-installer)
+
 ## Download at [https://wagyu.gg](https://wagyu.gg)
 
 Wagyu (formerly known as StakeHouse) is an application aimed at lowering the technical bar to staking on Ethereum 2.0.
