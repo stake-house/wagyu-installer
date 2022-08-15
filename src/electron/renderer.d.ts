@@ -55,10 +55,17 @@ export interface IEthDockerAPI {
   stopNodes: (network: Network) => Promise<boolean>,
 }
 
+export interface IInstallerConfigAPI {
+  initInstallerConfig: () => Promise<void>,
+  setInstallPath: (installPath: string) => Promise<void>,
+  getInstallPath: () => Promise<string | undefined>
+}
+
 declare global {
   interface Window {
     electronAPI: IElectronAPI,
     bashUtils: IBashUtilsAPI,
-    ethDocker: IEthDockerAPI
+    ethDocker: IEthDockerAPI,
+    installerConfig: IInstallerConfigAPI
   }
 }

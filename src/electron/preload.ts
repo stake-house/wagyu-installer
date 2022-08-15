@@ -17,6 +17,7 @@ import { doesDirectoryExist, findFirstFile } from './BashUtils';
 
 import { EthDockerInstaller } from './EthDockerInstaller';
 import { InstallDetails, OutputLogs } from "./IMultiClientInstaller";
+import { initInstallerConfig, getInstallPath, setInstallPath } from "./InstallerConfig";
 
 import { Writable } from 'stream';
 
@@ -71,4 +72,10 @@ contextBridge.exposeInMainWorld('ethDocker', {
   'postInstall': ethDockerPostInstall,
   'startNodes': ethDockerStartNodes,
   'stopNodes': ethDockerStopNodes
+});
+
+contextBridge.exposeInMainWorld('installerConfig', {
+  'initInstallerConfig': initInstallerConfig,
+  'getInstallPath': getInstallPath,
+  'setInstallPath': setInstallPath
 });
