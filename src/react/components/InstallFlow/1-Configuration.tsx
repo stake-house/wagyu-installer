@@ -1,25 +1,36 @@
 import React, { ChangeEvent, Dispatch, FC, ReactElement, SetStateAction, useState } from 'react';
-import { Grid, Typography, FormControl, Select, MenuItem, SelectChangeEvent, Modal, Box, Button, TextField, InputAdornment } from '@mui/material';
-import { Folder, Link } from '@mui/icons-material'
+import {
+  Grid,
+  Typography,
+  FormControl,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+  Modal,
+  Box,
+  Button,
+  TextField,
+  InputAdornment,
+} from '@mui/material';
+import { Folder, Link } from '@mui/icons-material';
 import StepNavigation from '../StepNavigation';
 import styled from '@emotion/styled';
-import { ConsensusClients, ExecutionClients, IConsensusClient, IExecutionClient } from '../../constants'
+import { ConsensusClients, ExecutionClients, IConsensusClient, IExecutionClient } from '../../constants';
 import { ConsensusClient, ExecutionClient, InstallDetails } from '../../../electron/IMultiClientInstaller';
-import { BackgroundLight, } from '../../colors';
+import { BackgroundLight } from '../../colors';
 
 type ConfigurationProps = {
-  onStepBack: () => void,
-  onStepForward: () => void,
-  installationDetails: InstallDetails,
-  setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>
-}
+  onStepBack: () => void;
+  onStepForward: () => void;
+  installationDetails: InstallDetails;
+  setInstallationDetails: Dispatch<SetStateAction<InstallDetails>>;
+};
 
 const ContentGrid = styled(Grid)`
   height: 320px;
   margin-top: 16px;
   margin-bottom: 16px;
 `;
-
 
 const ModalStyle = {
   position: 'absolute' as 'absolute',
@@ -36,45 +47,52 @@ const ModalStyle = {
 
 /**
  * This page is the second step of the install process where the user inputs their configuration.
- * 
+ *
  * @param props the data and functions passed in, they are self documenting
- * @returns 
+ * @returns
  */
 const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
   const [consensusClient, setConsensusClient] = useState<ConsensusClient>(props.installationDetails.consensusClient);
   const [executionClient, setExecutionClient] = useState<ExecutionClient>(props.installationDetails.executionClient);
-  const [isModalOpen, setModalOpen] = useState(false)
+  const [isModalOpen, setModalOpen] = useState(false);
   const [checkpointSync, setCheckpointSync] = useState('');
   const [executionClientFallback, setExecutionClientFallback] = useState('');
   const [installationPath, setInstallationPath] = useState('');
 
   const handleConsensusClientChange = (ev: SelectChangeEvent<string>) => {
-    setConsensusClient(ev.target.value as ConsensusClient)
-  }
+    setConsensusClient(ev.target.value as ConsensusClient);
+  };
 
   const handleExecutionClientChange = (ev: SelectChangeEvent<string>) => {
-    setExecutionClient(ev.target.value as ExecutionClient)
-  }
+    setExecutionClient(ev.target.value as ExecutionClient);
+  };
 
   const handleCheckpointSyncChange = (ev: ChangeEvent<HTMLInputElement>) => {
-    setCheckpointSync(ev.target.value)
-  }
+    setCheckpointSync(ev.target.value);
+  };
   const handleExecutionClientFallbackChange = (ev: ChangeEvent<HTMLInputElement>) => {
-    setExecutionClientFallback(ev.target.value)
-  }
+    setExecutionClientFallback(ev.target.value);
+  };
   const handleInstallationPathChange = (ev: ChangeEvent<HTMLInputElement>) => {
-    setInstallationPath(ev.target.value)
-  }
+    setInstallationPath(ev.target.value);
+  };
 
   return (
     <Grid item container direction="column" spacing={2}>
       <Grid item>
-        <Typography variant="h1" align='center'>
+        <Typography variant="h1" align="center">
           Configuration
         </Typography>
       </Grid>
       <ContentGrid item container justifyContent={'center'}>
-        <Grid xs={11} style={{ border: '1px solid orange' }} item container justifyContent={'center'} direction={'column'}>
+        <Grid
+          xs={11}
+          style={{ border: '1px solid orange' }}
+          item
+          container
+          justifyContent={'center'}
+          direction={'column'}
+        >
           <Grid item container alignItems={'center'} p={2} spacing={2}>
             <Grid item xs={1}></Grid>
             <Grid item xs={4}>
@@ -83,15 +101,13 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
             <Grid item xs={2}></Grid>
             <Grid item xs={4}>
               <FormControl sx={{ my: 2, minWidth: '215' }}>
-                <Select
-                  id="consensus-client"
-                  value={consensusClient}
-                  onChange={handleConsensusClientChange}
-                >
+                <Select id="consensus-client" value={consensusClient} onChange={handleConsensusClientChange}>
                   {ConsensusClients.map((c: IConsensusClient) => {
                     return (
-                      <MenuItem key={c.key} value={c.key}>{c.label}</MenuItem>
-                    )
+                      <MenuItem key={c.key} value={c.key}>
+                        {c.label}
+                      </MenuItem>
+                    );
                   })}
                 </Select>
               </FormControl>
@@ -99,22 +115,20 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
             <Grid item xs={1}></Grid>
           </Grid>
           <Grid item container alignItems={'center'} p={2} spacing={2}>
-          <Grid item xs={1}></Grid>
+            <Grid item xs={1}></Grid>
             <Grid item xs={4}>
               <span>Execution Client</span>
             </Grid>
             <Grid item xs={2}></Grid>
             <Grid item xs={4}>
               <FormControl sx={{ my: 2, minWidth: '215' }}>
-                <Select
-                  id="execution-client"
-                  value={executionClient}
-                  onChange={handleExecutionClientChange}
-                >
+                <Select id="execution-client" value={executionClient} onChange={handleExecutionClientChange}>
                   {ExecutionClients.map((c: IExecutionClient) => {
                     return (
-                      <MenuItem key={c.key} value={c.key}>{c.label}</MenuItem>
-                    )
+                      <MenuItem key={c.key} value={c.key}>
+                        {c.label}
+                      </MenuItem>
+                    );
                   })}
                 </Select>
               </FormControl>
@@ -122,7 +136,9 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
             <Grid item xs={1}></Grid>
           </Grid>
         </Grid>
-        <Button disabled onClick={() => setModalOpen(true)}>Advanced Options</Button>
+        <Button disabled onClick={() => setModalOpen(true)}>
+          Advanced Options
+        </Button>
         <Modal
           open={isModalOpen}
           onClose={() => setModalOpen(false)}
@@ -130,7 +146,7 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={ModalStyle}>
-            <Typography id="modal-modal-title" align='center' variant="h4" component="h2">
+            <Typography id="modal-modal-title" align="center" variant="h4" component="h2">
               Advanced options
             </Typography>
             <hr style={{ borderColor: 'orange' }} />
@@ -148,7 +164,11 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                       variant="outlined"
                       value={checkpointSync}
                       InputProps={{
-                        startAdornment: <InputAdornment position="start"><Link /></InputAdornment>,
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Link />
+                          </InputAdornment>
+                        ),
                       }}
                       onChange={handleCheckpointSyncChange}
                     />
@@ -163,11 +183,15 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                       placeholder="http://localhost:8545"
                       type={'url'}
                       sx={{ my: 2, minWidth: '215' }}
-                      // label="Fallback URL" 
+                      // label="Fallback URL"
                       variant="outlined"
                       value={executionClientFallback}
                       InputProps={{
-                        startAdornment: <InputAdornment position="start"><Link /></InputAdornment>,
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Link />
+                          </InputAdornment>
+                        ),
                       }}
                       onChange={handleExecutionClientFallbackChange}
                     />
@@ -179,14 +203,20 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
-                      placeholder='.wagyu/'
-                      onClick={(ev) => { ev.preventDefault(); }}
+                      placeholder=".wagyu/"
+                      onClick={(ev) => {
+                        ev.preventDefault();
+                      }}
                       sx={{ my: 2, minWidth: '215' }}
                       variant="outlined"
                       disabled
                       value={installationPath}
                       InputProps={{
-                        startAdornment: <InputAdornment position="start"><Folder /></InputAdornment>,
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Folder />
+                          </InputAdornment>
+                        ),
                       }}
                       onChange={handleInstallationPathChange}
                     />
@@ -201,24 +231,24 @@ const Configuration: FC<ConfigurationProps> = (props): ReactElement => {
       <StepNavigation
         onPrev={props.onStepBack}
         onNext={() => {
-
           let installationDetails: InstallDetails = {
+            debug: props.installationDetails.debug,
             consensusClient,
             executionClient,
-            network: props.installationDetails.network
-          }
+            network: props.installationDetails.network,
+          };
 
-          props.setInstallationDetails(installationDetails)
+          props.setInstallationDetails(installationDetails);
 
-          props.onStepForward()
+          props.onStepForward();
         }}
-        backLabel={"Back"}
-        nextLabel={"Install"}
+        backLabel={'Back'}
+        nextLabel={'Install'}
         disableBack={false}
         disableNext={false}
       />
     </Grid>
   );
-}
+};
 
 export default Configuration;

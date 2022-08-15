@@ -13,7 +13,7 @@ const SoftText = styled(Typography)`
 
 const Container = styled.div`
   position: fixed;
-  bottom: 35;
+  bottom: 15;
   width: 100%;
 `;
 

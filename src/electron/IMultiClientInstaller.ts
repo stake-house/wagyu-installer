@@ -56,6 +56,7 @@ export interface OutputLogs {
 }
 
 export type InstallDetails = {
+  debug: boolean,
   network: Network,
   executionClient: ExecutionClient,
   consensusClient: ConsensusClient,

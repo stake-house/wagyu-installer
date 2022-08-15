@@ -19,6 +19,12 @@ const theme = createTheme({
     ].join(','),
     h1: {
       fontSize: "36px"
+    },
+    h2: {
+      fontSize: "26px",
+    },
+    h3: {
+      fontSize: "1.4rem",
     }
   }
 });

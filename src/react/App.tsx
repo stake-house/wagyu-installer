@@ -14,8 +14,11 @@ import { ConsensusClient, ExecutionClient, InstallDetails } from "../electron/IM
 const Container = styled.main`
   display: block;
   padding: 20px;
+  height: inherit;
+  width: inherit;
+  padding-bottom: 45px;
 `;
-
+// /systemOverview
 /**
  * The React app top level including theme and routing.
  * 
@@ -24,6 +27,7 @@ const Container = styled.main`
 const App: FC = (): ReactElement => {
   // const [network, setNetwork] = useState<Network>(Network.PRATER);
   const [installationDetails, setInstallationDetails] = useState<InstallDetails>({
+      debug: true,
       consensusClient: ConsensusClient.PRYSM,
       executionClient: ExecutionClient.GETH,
       network: Network.PRATER
@@ -35,9 +39,10 @@ const App: FC = (): ReactElement => {
       <HashRouter>
         <Container>
           <Routes>
-            <Route path="/" element={<Home installationDetails={installationDetails} setInstallationDetails={setInstallationDetails} />} />
-            <Route path="/wizard/:stepSequenceKey" element={<MainWizard installationDetails={installationDetails} setInstallationDetails={setInstallationDetails} />} />
-            <Route path="/systemOverview" element={<SystemOverview installationDetails={installationDetails} />} />
+            {/* <Route path="/" element={<Home installationDetails={installationDetails} setInstallationDetails={setInstallationDetails} />} /> */}
+            {/* <Route path="/wizard/:stepSequenceKey" element={<MainWizard installationDetails={installationDetails} setInstallationDetails={setInstallationDetails} />} /> */}
+            <Route path="/" element={<SystemOverview installationDetails={installationDetails} />} />
+            
           </Routes>
         </Container>
       </HashRouter>
