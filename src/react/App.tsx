@@ -24,10 +24,12 @@ const Container = styled.main`
 const App: FC = (): ReactElement => {
   // const [network, setNetwork] = useState<Network>(Network.PRATER);
   const [installationDetails, setInstallationDetails] = useState<InstallDetails>({
-      consensusClient: ConsensusClient.PRYSM,
-      executionClient: ExecutionClient.GETH,
-      network: Network.PRATER
+    consensusClient: ConsensusClient.PRYSM,
+    executionClient: ExecutionClient.GETH,
+    network: Network.PRATER
   })
+
+  window.installerConfig.initInstallerConfig();
 
   return (
     <ThemeProvider theme={theme}>
