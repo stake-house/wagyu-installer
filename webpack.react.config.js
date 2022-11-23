@@ -1,4 +1,3 @@
-
 'use strict';
 
 // pull in the 'path' module from node
@@ -32,13 +31,16 @@ module.exports = {
       {
         test: /\.tsx?$/,
         loader: 'ts-loader',
-      }, {
+      },
+      {
         test: /node_modules\/JSONStream\/index\.js$/,
-        loader: 'shebang-loader'
-      }, {
+        loader: 'shebang-loader',
+      },
+      {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
-      }, {
+      },
+      {
         test: /\.(woff|woff2|eot|ttf|svg)$/,
         type: 'asset/resource',
       },
@@ -59,7 +61,8 @@ module.exports = {
       COMMITHASH: JSON.stringify(gitRevisionPlugin.commithash()),
       BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
       LASTCOMMITDATETIME: JSON.stringify(gitRevisionPlugin.lastcommitdatetime()),
-    })
+    }),
   ],
-  target: 'electron-renderer'
+  // target: 'electron-renderer'
+  target: 'web',
 };
