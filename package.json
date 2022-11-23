@@ -7,24 +7,32 @@
   "author": "Colfax Selby <colfax.selby@gmail.com>",
   "license": "GPL",
   "devDependencies": {
+    "@types/jest": "^29.2.3",
     "@types/react": "^17.0.14",
     "@types/react-dom": "^17.0.9",
     "@types/react-router-dom": "^5.1.8",
     "css-loader": "^6.7.0",
     "electron": "^17.1.0",
     "electron-builder": "^22.14.5",
+    "electron-mock-ipc": "^0.3.12",
+    "jest": "^29.3.1",
     "style-loader": "^3.3.1",
+    "ts-jest": "^29.0.3",
     "ts-loader": "^9.2.3",
+    "ts-node": "^10.9.1",
     "typescript": "^4.3.5",
     "webpack": "^5.64.3",
-    "webpack-cli": "^4.9.1"
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.11.1"
   },
   "scripts": {
     "build": "webpack --config webpack.react.config.js --config webpack.electron.config.js",
     "build:watch": "webpack --config webpack.react.config.js --config webpack.electron.config.js --watch",
+    "dev": "",
     "start": "electron ./build/electron/index.js",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "test": "jest"
   },
   "dependencies": {
     "@emotion/react": "^11.8.1",
