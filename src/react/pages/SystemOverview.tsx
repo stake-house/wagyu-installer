@@ -1,11 +1,28 @@
-import React, { FC, ReactElement, useState, useRef, useMemo } from 'react';
-import { Grid, Typography, Button, IconButton, Tooltip, Alert, Snackbar, AlertColor } from '@mui/material';
-import styled from '@emotion/styled';
-import VersionFooter from '../components/VersionFooter';
-import { InstallDetails } from '../../electron/IMultiClientInstaller';
-import { Capitalize } from '../../utility';
-import { Settings, Add, Stop, PlayArrow, Notifications, Upgrade } from '@mui/icons-material';
-import { ImportKeystore } from '../components/ImportKeystore';
+import React, { FC, ReactElement, useState, useRef, useMemo } from "react";
+import {
+  Grid,
+  Typography,
+  Button,
+  IconButton,
+  Tooltip,
+  Alert,
+  Snackbar,
+  AlertColor,
+} from "@mui/material";
+import styled from "@emotion/styled";
+import VersionFooter from "../components/VersionFooter";
+import { InstallDetails } from "../../electron/IMultiClientInstaller";
+import { Capitalize } from "../../utility";
+import {
+  Settings,
+  Add,
+  Stop,
+  PlayArrow,
+  Notifications,
+  Upgrade,
+} from "@mui/icons-material";
+import { ImportKeystore } from "../components/ImportKeystore";
+import { ManageValidators } from "../components/modals/ManageValidators";
 
 const MainGrid = styled(Grid)`
   width: inherit;
@@ -20,7 +37,7 @@ const Card = styled(Grid)`
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 `;
 
-const HorizontalLine = styled('div')`
+const HorizontalLine = styled("div")`
   position: absolute;
   top: 25%;
   bottom: 25%;
@@ -32,15 +49,22 @@ type SystemOverviewProps = {
   installationDetails: InstallDetails;
 };
 
-export type NodeState = 'syncing' | 'installing' | 'synced' | 'waiting' | 'stopped' | 'stopping' | 'starting';
+export type NodeState =
+  | "syncing"
+  | "installing"
+  | "synced"
+  | "waiting"
+  | "stopped"
+  | "stopping"
+  | "starting";
 
 const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
-  const [statusConsensusNode, setStatusConsensusNode] = useState<NodeState>('syncing');
+  const [statusConsensusNode, setStatusConsensusNode] = useState<NodeState>("syncing");
   const [consensusUpdateAvailable, setConsensusUpdateAvailable] = useState<boolean>(true);
   const [peersConsensusNode, setPeersConsensusNode] = useState(0);
   const [currentEpoch, setCurrentEpoch] = useState(0);
-  const [syncTimeLeft, setSyncTimeLeft] = useState('1 hour');
-  const [consensusVersion, setConsensusVersion] = useState('2.1');
+  const [syncTimeLeft, setSyncTimeLeft] = useState("1 hour");
+  const [consensusVersion, setConsensusVersion] = useState("2.1");
 
   const UpdateConsensusNodeIcon = () =>
     useMemo(() => {
@@ -62,12 +86,12 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
     }, [consensusUpdateAvailable]);
 
   const handleConsensusNodeUpdate = () => {
-    setStatusConsensusNode('installing');
+    setStatusConsensusNode("installing");
     setConsensusUpdateAvailable(false);
     setTimeout(() => {
-      setStatusConsensusNode('starting');
+      setStatusConsensusNode("starting");
       setTimeout(() => {
-        setStatusConsensusNode('synced');
+        setStatusConsensusNode("synced");
       }, 3000);
     }, 3000);
   };
@@ -75,52 +99,68 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
   const StartStopConsensusNodeIcon = () =>
     useMemo(() => {
       switch (statusConsensusNode) {
-        case 'syncing':
+        case "syncing":
           return (
             <Tooltip title="Stop Consensus Node">
-              <IconButton color="primary" onClick={toggleRunningStateConsensus} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateConsensus}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
           );
-        case 'installing':
+        case "installing":
           return (
             <IconButton disabled color="primary" tabIndex={1}>
               <Stop />
             </IconButton>
           );
-        case 'stopping':
+        case "stopping":
           return (
             <IconButton disabled color="primary" tabIndex={1}>
               <PlayArrow />
             </IconButton>
           );
-        case 'stopped':
+        case "stopped":
           return (
             <Tooltip title="Start Consensus Node">
-              <IconButton color="primary" onClick={toggleRunningStateConsensus} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateConsensus}
+                tabIndex={1}
+              >
                 <PlayArrow />
               </IconButton>
             </Tooltip>
           );
-        case 'starting':
+        case "starting":
           return (
             <IconButton disabled color="primary" tabIndex={1}>
               <Stop />
             </IconButton>
           );
-        case 'waiting':
+        case "waiting":
           return (
             <Tooltip title="Stop Consensus Node">
-              <IconButton color="primary" onClick={toggleRunningStateConsensus} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateConsensus}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
           );
-        case 'synced':
+        case "synced":
           return (
             <Tooltip title="Stop Consensus Node">
-              <IconButton color="primary" onClick={toggleRunningStateConsensus} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateConsensus}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
@@ -129,71 +169,102 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
     }, [statusConsensusNode]);
 
   const toggleRunningStateConsensus = () => {
-    if (statusConsensusNode === 'stopped') {
-      setStatusConsensusNode('starting');
+    if (statusConsensusNode === "stopped") {
+      setStatusConsensusNode("starting");
       setTimeout(() => {
-        setStatusConsensusNode('synced');
+        setStatusConsensusNode("synced");
       }, 3000);
     } else {
-      setStatusConsensusNode('stopping');
+      setStatusConsensusNode("stopping");
       setTimeout(() => {
-        setStatusConsensusNode('stopped');
+        setStatusConsensusNode("stopped");
       }, 3000);
     }
   };
 
-  const [statusValidator, setStatusValidator] = useState<NodeState>('waiting');
-  const [validatorVersion, setValidatorVersion] = useState('2.1');
+  const [statusValidator, setStatusValidator] = useState<NodeState>("waiting");
+  const [validatorVersion, setValidatorVersion] = useState("2.1");
 
   const StartStopValidatorClientIcon = () =>
     useMemo(() => {
       switch (statusValidator) {
-        case 'syncing':
+        case "syncing":
           return (
             <Tooltip title="Stop Validator Client">
-              <IconButton color="primary" onClick={toggleRunningStateValidator} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateValidator}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
           );
-        case 'installing':
+        case "installing":
           return (
-            <IconButton disabled color="primary" onClick={toggleRunningStateValidator} tabIndex={1}>
+            <IconButton
+              disabled
+              color="primary"
+              onClick={toggleRunningStateValidator}
+              tabIndex={1}
+            >
               <Stop />
             </IconButton>
           );
-        case 'stopping':
+        case "stopping":
           return (
-            <IconButton disabled color="primary" onClick={toggleRunningStateValidator} tabIndex={1}>
+            <IconButton
+              disabled
+              color="primary"
+              onClick={toggleRunningStateValidator}
+              tabIndex={1}
+            >
               <PlayArrow />
             </IconButton>
           );
-        case 'stopped':
+        case "stopped":
           return (
             <Tooltip title="Start Validator Client">
-              <IconButton color="primary" onClick={toggleRunningStateValidator} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateValidator}
+                tabIndex={1}
+              >
                 <PlayArrow />
               </IconButton>
             </Tooltip>
           );
-        case 'starting':
+        case "starting":
           return (
-            <IconButton disabled color="primary" onClick={toggleRunningStateValidator} tabIndex={1}>
+            <IconButton
+              disabled
+              color="primary"
+              onClick={toggleRunningStateValidator}
+              tabIndex={1}
+            >
               <Stop />
             </IconButton>
           );
-        case 'waiting':
+        case "waiting":
           return (
             <Tooltip title="Stop Validator Client">
-              <IconButton color="primary" onClick={toggleRunningStateValidator} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateValidator}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
           );
-        case 'synced':
+        case "synced":
           return (
             <Tooltip title="Stop Validator client">
-              <IconButton color="primary" onClick={toggleRunningStateValidator} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateValidator}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
@@ -202,22 +273,22 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
     }, [statusValidator]);
 
   const toggleRunningStateValidator = () => {
-    if (statusValidator === 'stopped') {
-      setStatusValidator('starting');
+    if (statusValidator === "stopped") {
+      setStatusValidator("starting");
       setTimeout(() => {
-        setStatusValidator('synced');
+        setStatusValidator("synced");
       }, 3000);
     } else {
-      setStatusValidator('stopping');
+      setStatusValidator("stopping");
       setTimeout(() => {
-        setStatusValidator('stopped');
+        setStatusValidator("stopped");
       }, 3000);
     }
   };
 
-  const [statusExecutionNode, setStatusExecutionNode] = useState<NodeState>('syncing');
+  const [statusExecutionNode, setStatusExecutionNode] = useState<NodeState>("syncing");
   const [peersExecutionNode, setPeersExecutionNode] = useState(0);
-  const [executionVersion, setExecutionVersion] = useState('2.1');
+  const [executionVersion, setExecutionVersion] = useState("2.1");
   const [executionUpdateAvailable, setExecutionUpdateAvailable] = useState<boolean>(true);
 
   const UpdateExecutionNodeIcon = () =>
@@ -240,12 +311,12 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
     }, [executionUpdateAvailable]);
 
   const handleExecutionNodeUpdate = () => {
-    setStatusExecutionNode('installing');
+    setStatusExecutionNode("installing");
     setExecutionUpdateAvailable(false);
     setTimeout(() => {
-      setStatusExecutionNode('starting');
+      setStatusExecutionNode("starting");
       setTimeout(() => {
-        setStatusExecutionNode('synced');
+        setStatusExecutionNode("synced");
       }, 3000);
     }, 3000);
   };
@@ -253,52 +324,83 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
   const StartStopExecutionClientIcon = () =>
     useMemo(() => {
       switch (statusExecutionNode) {
-        case 'syncing':
+        case "syncing":
           return (
             <Tooltip title="Stop Execution Node">
-              <IconButton color="primary" onClick={toggleRunningStateExecutionNode} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateExecutionNode}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
           );
-        case 'installing':
+        case "installing":
           return (
-            <IconButton disabled color="primary" onClick={toggleRunningStateExecutionNode} tabIndex={1}>
+            <IconButton
+              disabled
+              color="primary"
+              onClick={toggleRunningStateExecutionNode}
+              tabIndex={1}
+            >
               <Stop />
             </IconButton>
           );
-        case 'stopping':
+        case "stopping":
           return (
-            <IconButton disabled color="primary" onClick={toggleRunningStateExecutionNode} tabIndex={1}>
+            <IconButton
+              disabled
+              color="primary"
+              onClick={toggleRunningStateExecutionNode}
+              tabIndex={1}
+            >
               <PlayArrow />
             </IconButton>
           );
-        case 'stopped':
+        case "stopped":
           return (
             <Tooltip title="Start Execution Node">
-              <IconButton color="primary" onClick={toggleRunningStateExecutionNode} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateExecutionNode}
+                tabIndex={1}
+              >
                 <PlayArrow />
               </IconButton>
             </Tooltip>
           );
-        case 'starting':
+        case "starting":
           return (
-            <IconButton disabled color="primary" onClick={toggleRunningStateExecutionNode} tabIndex={1}>
+            <IconButton
+              disabled
+              color="primary"
+              onClick={toggleRunningStateExecutionNode}
+              tabIndex={1}
+            >
               <Stop />
             </IconButton>
           );
-        case 'waiting':
+        case "waiting":
           return (
             <Tooltip title="Stop Execution Node">
-              <IconButton color="primary" onClick={toggleRunningStateExecutionNode} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateExecutionNode}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
           );
-        case 'synced':
+        case "synced":
           return (
             <Tooltip title="Stop Execution Node">
-              <IconButton color="primary" onClick={toggleRunningStateExecutionNode} tabIndex={1}>
+              <IconButton
+                color="primary"
+                onClick={toggleRunningStateExecutionNode}
+                tabIndex={1}
+              >
                 <Stop />
               </IconButton>
             </Tooltip>
@@ -307,22 +409,25 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
     }, [statusExecutionNode]);
 
   const toggleRunningStateExecutionNode = () => {
-    if (statusValidator === 'stopped') {
-      setStatusExecutionNode('starting');
+    if (statusValidator === "stopped") {
+      setStatusExecutionNode("starting");
       setTimeout(() => {
-        setStatusExecutionNode('synced');
+        setStatusExecutionNode("synced");
       }, 3000);
     } else {
-      setStatusExecutionNode('stopping');
+      setStatusExecutionNode("stopping");
       setTimeout(() => {
-        setStatusExecutionNode('stopped');
+        setStatusExecutionNode("stopped");
       }, 3000);
     }
   };
 
+  const [isManageValidatorModalOpen, setManageValidatorModalOpen] =
+    useState<boolean>(false);
+
   const [isImportKeyModalOpen, setImportKeyModalOpen] = useState<boolean>(false);
-  const [keyStorePath, setKeystorePath] = useState<string>('');
-  const [keystorePassword, setKeystorePassword] = useState<string>('');
+  const [keyStorePath, setKeystorePath] = useState<string>("");
+  const [keystorePassword, setKeystorePassword] = useState<string>("");
   const resolveModal = useRef<(arg: () => Promise<boolean>) => void>();
 
   new Promise((resolve: (arg: () => Promise<boolean>) => void) => {
@@ -333,24 +438,24 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
         .then((key) => {
           console.log(key);
           if (key) {
-            toggleAlert('Keystore import successful', 'success');
+            toggleAlert("Keystore import successful", "success");
           } else {
-            toggleAlert('Keystore import failed', 'error');
+            toggleAlert("Keystore import failed", "error");
           }
         })
         .catch((err) => {
-          toggleAlert('Keystore import failed', 'error');
-          console.error('error key import modal rejected with', err);
+          toggleAlert("Keystore import failed", "error");
+          console.error("error key import modal rejected with", err);
         });
     })
     .catch((err) => {
-      toggleAlert('Keystore import failed', 'error');
-      console.error('error key import modal rejected with', err);
+      toggleAlert("Keystore import failed", "error");
+      console.error("error key import modal rejected with", err);
     });
 
   const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('This is an error');
-  const [alertSeverity, setAlertSeverity] = useState('success' as AlertColor);
+  const [alertMessage, setAlertMessage] = useState("This is an error");
+  const [alertSeverity, setAlertSeverity] = useState("success" as AlertColor);
 
   const toggleAlert = (message: string, severity: AlertColor) => {
     setAlertMessage(message);
@@ -359,7 +464,7 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
   };
 
   const handleAlertClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
 
@@ -367,20 +472,31 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
   };
 
   return (
-    <MainGrid container direction={'column'}>
+    <MainGrid container direction={"column"}>
       <Grid xs={1} item>
         <Typography variant="h1" align="center">
           Overview
         </Typography>
       </Grid>
       <Grid xs={11} container item>
-        <Grid xs={6} paddingY={2} paddingX={1} container item direction={'column'}>
+        <Grid
+          xs={6}
+          paddingY={2}
+          paddingX={1}
+          container
+          item
+          direction={"column"}
+          justifyContent="space-around"
+        >
           <Grid xs={2} item container>
             <Grid container item justifyContent="space-between" alignItems="center">
               <Grid item xs={6}>
                 <Typography variant="h3" align="left">
                   {Capitalize(props.installationDetails.consensusClient)} Node
-                  <span style={{ fontSize: '1rem', opacity: '0.8' }}> v{consensusVersion}</span>
+                  <span style={{ fontSize: "1rem", opacity: "0.8" }}>
+                    {" "}
+                    v{consensusVersion}
+                  </span>
                 </Typography>
               </Grid>
               <Grid container item xs={6} justifyContent="flex-end">
@@ -393,24 +509,52 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
               </Grid>
             </Grid>
           </Grid>
-          <Card position="relative" xs={8} item container justifyContent="stretch">
+          <Card xs={9} position="relative" item container justifyContent="stretch">
             <HorizontalLine />
             <Grid xs={12} padding={2} container item alignItems="center">
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Status</Grid>
                 <Grid item>
                   <span>{statusConsensusNode}</span>
                 </Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Epoch</Grid>
                 <Grid item>{currentEpoch}</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Peers</Grid>
                 <Grid item>{peersConsensusNode}</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Remaining</Grid>
                 <Grid item>{syncTimeLeft}</Grid>
               </Grid>
@@ -439,13 +583,24 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
             </Grid>
           </Card>
         </Grid>
-        <Grid xs={6} paddingY={2} paddingX={1} container item direction={'column'}>
-          <Grid xs={2} item container>
+        <Grid
+          xs={6}
+          paddingY={2}
+          paddingX={1}
+          container
+          item
+          direction={"column"}
+          justifyContent="space-around"
+        >
+          <Grid xs={2} item container alignItems="center">
             <Grid container item justifyContent="space-between" alignItems="center">
               <Grid item xs={6}>
                 <Typography variant="h3" align="left">
                   Validator Client
-                  <span style={{ fontSize: '1rem', opacity: '0.8' }}> v{validatorVersion}</span>
+                  <span style={{ fontSize: "1rem", opacity: "0.8" }}>
+                    {" "}
+                    v{validatorVersion}
+                  </span>
                 </Typography>
               </Grid>
               <Grid xs={6} container item justifyContent="flex-end">
@@ -463,40 +618,94 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
                   </Tooltip>
                 </Grid>
                 <Grid item>
+                  <Tooltip title="Manage Validators">
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        setManageValidatorModalOpen(true);
+                      }}
+                      tabIndex={1}
+                    >
+                      <Settings />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+                <Grid item>
                   <StartStopValidatorClientIcon />
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
-          <Card position="relative" xs={8} item container justifyContent="stretch">
+          <Card xs={9} position="relative" item container justifyContent="stretch">
             <HorizontalLine />
             <Grid xs={12} padding={2} container item alignItems="center">
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Status</Grid>
                 <Grid item>{statusValidator}</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
-                <Grid item>Remaining</Grid>
-                <Grid item>1 hour</Grid>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
+                <Grid item>
+                  <span>Validators</span>
+                </Grid>
+                <Grid item>5</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>DB Path</Grid>
                 <Grid item>/home/</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Node</Grid>
                 <Grid item>Local</Grid>
               </Grid>
             </Grid>
           </Card>
         </Grid>
-        <Grid xs={6} paddingY={2} paddingX={1} container item direction={'column'}>
-          <Grid xs={2} item>
+        <Grid
+          xs={6}
+          paddingY={2}
+          paddingX={1}
+          container
+          item
+          direction={"column"}
+          justifyContent="space-around"
+        >
+          <Grid xs={2} item alignItems="center">
             <Grid container item justifyContent="space-between" alignItems="center">
               <Grid xs={6} item>
                 <Typography variant="h3" align="left">
                   {Capitalize(props.installationDetails.executionClient)} Node
-                  <span style={{ fontSize: '1rem', opacity: '0.8' }}> v{executionVersion}</span>
+                  <span style={{ fontSize: "1rem", opacity: "0.8" }}>
+                    {" "}
+                    v{executionVersion}
+                  </span>
                 </Typography>
               </Grid>
               <Grid container item xs={6} justifyContent="flex-end">
@@ -509,43 +718,79 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
               </Grid>
             </Grid>
           </Grid>
-          <Card position="relative" xs={8} item container justifyContent="stretch">
+          <Card xs={9} position="relative" item container justifyContent="stretch">
             <HorizontalLine />
             <Grid xs={12} padding={2} container item alignItems="center">
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Status</Grid>
                 <Grid item>{statusExecutionNode}</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Remaining</Grid>
                 <Grid item>1 hour</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>DB Path</Grid>
                 <Grid item>/home/</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Peers</Grid>
                 <Grid item>{peersExecutionNode}</Grid>
               </Grid>
             </Grid>
           </Card>
         </Grid>
-        <Grid xs={6} paddingY={2} paddingX={1} container item direction={'column'}>
-          <Grid xs={2} item>
+        <Grid
+          xs={6}
+          paddingY={2}
+          paddingX={1}
+          container
+          item
+          direction={"column"}
+          justifyContent="space-around"
+        >
+          <Grid xs={2} item alignItems="center">
             <Grid container item justifyContent="space-between" alignItems="center">
-              <Grid item>
+              <Grid xs={6} item>
                 <Typography variant="h3" align="left">
                   System
                 </Typography>
               </Grid>
-              <Grid container item xs={2} justifyContent="flex-end">
+              <Grid container item xs={6} justifyContent="flex-end">
                 <Grid item>
                   <Tooltip title="Configure alerts">
                     <IconButton
                       color="primary"
                       onClick={() => {
-                        window.open('https://beaconcha.in/user/notifications');
+                        window.open("https://beaconcha.in/user/notifications");
                       }}
                       tabIndex={1}
                     >
@@ -556,22 +801,50 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
               </Grid>
             </Grid>
           </Grid>
-          <Card position="relative" xs={8} item container justifyContent="stretch">
+          <Card xs={9} position="relative" item container justifyContent="stretch">
             <HorizontalLine />
             <Grid xs={12} padding={2} container item alignItems="center">
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Storage</Grid>
                 <Grid item>600 GB</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>RAM</Grid>
                 <Grid item>3 GB</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>Growth</Grid>
                 <Grid item>10 GB/mo</Grid>
               </Grid>
-              <Grid justifyContent="space-between" container xs={6} paddingY={1} paddingX={2} item>
+              <Grid
+                justifyContent="space-between"
+                container
+                xs={6}
+                paddingY={1}
+                paddingX={2}
+                item
+              >
                 <Grid item>CPU</Grid>
                 <Grid item>30%</Grid>
               </Grid>
@@ -591,13 +864,22 @@ const SystemOverview: FC<SystemOverviewProps> = (props): ReactElement => {
         installationDetails={props.installationDetails}
       />
 
+      <ManageValidators
+        setModalOpen={setManageValidatorModalOpen}
+        isModalOpen={isManageValidatorModalOpen}
+        validators={[
+          "97754fa1198496c4918f30ad7dc634cc5dceea36bf7d27c2e2c6c798b88484e458811e2d8ef833b8d750b83ae63dc33a",
+          "94bb7f930d0d142d97a99cc9d6b98c04f247eda6d463b699bcc0460be371b9b7e22922bb10239f11b1fc44937cd16b8e",
+        ]}
+      />
+
       <Snackbar
         open={alertOpen}
         autoHideDuration={6000}
         onClose={handleAlertClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <Alert onClose={handleAlertClose} severity={alertSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleAlertClose} severity={alertSeverity} sx={{ width: "100%" }}>
           {alertMessage}
         </Alert>
       </Snackbar>

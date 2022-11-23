@@ -1,8 +1,9 @@
 {
     "formatter": {
       "enabled": true,
-      "indentStyle": "tab",
-      "lineWidth": 180
+      "indentStyle": "space",
+      "indentSize": 2,
+      "lineWidth": 90
     },
     "linter": {
       "enabled": false

@@ -6,9 +6,9 @@ import React, {
   useState,
   useRef,
   useEffect,
-} from 'react';
-import { Grid, Typography, Fab, CircularProgress, Box } from '@mui/material';
-import StepNavigation from '../StepNavigation';
+} from "react";
+import { Grid, Typography, Fab, CircularProgress, Box } from "@mui/material";
+import StepNavigation from "../StepNavigation";
 import {
   DoneOutline,
   DownloadingOutlined,
@@ -16,12 +16,12 @@ import {
   RocketLaunchOutlined,
   KeyOutlined,
   ErrorOutline,
-} from '@mui/icons-material';
-import styled from '@emotion/styled';
+} from "@mui/icons-material";
+import styled from "@emotion/styled";
 
-import { green, red } from '@mui/material/colors';
-import { InstallDetails } from '../../../electron/IMultiClientInstaller';
-import { ImportKeystore } from '../ImportKeystore';
+import { green, red } from "@mui/material/colors";
+import { InstallDetails, OutputLogs } from "../../../electron/IMultiClientInstaller";
+// import { ImportKeystore } from "../ImportKeystore";
 
 type InstallProps = {
   onStepBack: () => void;
@@ -45,18 +45,23 @@ const ContentGrid = styled(Grid)`
 const Install: FC<InstallProps> = (props): ReactElement => {
   const [loadingPreInstall, setLoadingPreInstall] = useState(false);
   const [loadingInstall, setLoadingInstall] = useState(false);
-  const [loadingKeyImport, setLoadingKeyImport] = useState(false);
+  // const [loadingKeyImport, setLoadingKeyImport] = useState(false);
   const [loadingPostInstall, setLoadingPostInstall] = useState(false);
 
   const [failedPreInstall, setFailedPreInstall] = useState(false);
   const [failedInstall, setFailedInstall] = useState(false);
-  const [failedKeyImport, setFailedKeyImport] = useState(false);
+  // const [failedKeyImport, setFailedKeyImport] = useState(false);
   const [failedPostInstall, setFailedPostInstall] = useState(false);
 
   const [successPreInstall, setSuccessPreInstall] = useState(false);
   const [successInstall, setSuccessInstall] = useState(false);
-  const [successKeyImport, setSuccessKeyImport] = useState(false);
+  // const [successKeyImport, setSuccessKeyImport] = useState(false);
   const [successPostInstall, setSuccessPostInstall] = useState(false);
+
+  const [percentagePreInstall, setPercentagePreInstall] = useState(0);
+  const [percentageInstall, setPercentageInstall] = useState(0);
+  const [percentagePostInstall, setPercentagePostInstall] = useState(0);
+
   // const resolveModal = useRef<(arg: () => Promise<boolean> => void)>(Promise.resolve);
   const resolveModal = useRef<(arg: () => Promise<boolean>) => void>();
 
@@ -66,14 +71,14 @@ const Install: FC<InstallProps> = (props): ReactElement => {
   const buttonPreInstallSx = {
     ...(failedPreInstall
       ? {
-          bgcolor: '#ffc107',
-          '&:hover': {
-            bgcolor: '#ffc107',
+          bgcolor: "#ffc107",
+          "&:hover": {
+            bgcolor: "#ffc107",
           },
         }
       : successPreInstall && {
           bgcolor: green[500],
-          '&:hover': {
+          "&:hover": {
             bgcolor: green[700],
           },
         }),
@@ -82,54 +87,54 @@ const Install: FC<InstallProps> = (props): ReactElement => {
   const buttonInstallSx = {
     ...(failedInstall
       ? {
-          bgcolor: '#ffc107',
-          '&:hover': {
-            bgcolor: '#ffc107',
+          bgcolor: "#ffc107",
+          "&:hover": {
+            bgcolor: "#ffc107",
           },
         }
       : successInstall && {
           bgcolor: green[500],
-          '&:hover': {
+          "&:hover": {
             bgcolor: green[700],
           },
         }),
   };
 
-  const buttonKeyImportSx = {
-    ...(failedKeyImport
-      ? {
-          bgcolor: '#ffc107',
-          '&:hover': {
-            bgcolor: '#ffc107',
-          },
-        }
-      : successKeyImport && {
-          bgcolor: green[500],
-          '&:hover': {
-            bgcolor: green[700],
-          },
-        }),
-  };
+  // const buttonKeyImportSx = {
+  // 	...(failedKeyImport
+  // 		? {
+  // 				bgcolor: "#ffc107",
+  // 				"&:hover": {
+  // 					bgcolor: "#ffc107",
+  // 				},
+  // 		  }
+  // 		: successKeyImport && {
+  // 				bgcolor: green[500],
+  // 				"&:hover": {
+  // 					bgcolor: green[700],
+  // 				},
+  // 		  }),
+  // };
 
   const buttonPostInstallSx = {
     ...(failedPostInstall
       ? {
-          bgcolor: '#ffc107',
-          '&:hover': {
-            bgcolor: '#ffc107',
+          bgcolor: "#ffc107",
+          "&:hover": {
+            bgcolor: "#ffc107",
           },
         }
       : successPostInstall && {
           bgcolor: green[500],
-          '&:hover': {
+          "&:hover": {
             bgcolor: green[700],
           },
         }),
   };
 
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
-  const [keyStorePath, setKeystorePath] = useState<string>('');
-  const [keystorePassword, setKeystorePassword] = useState<string>('');
+  const [keyStorePath, setKeystorePath] = useState<string>("");
+  const [keystorePassword, setKeystorePassword] = useState<string>("");
 
   const bufferLoad: () => Promise<boolean> = () => {
     return new Promise((resolve) => {
@@ -154,7 +159,14 @@ const Install: FC<InstallProps> = (props): ReactElement => {
         setSuccessPreInstall(false);
         setLoadingPreInstall(true);
 
-        Promise.all([window.ethDocker.preInstall(), bufferLoad()]).then(
+        const consoleLog: OutputLogs = (message: string, progress?: number) => {
+          console.log(message);
+          if (progress) {
+            setPercentagePreInstall(progress);
+          }
+        };
+
+        Promise.all([window.ethDocker.preInstall(consoleLog), bufferLoad()]).then(
           (res) => {
             setSuccessPreInstall(true);
             setLoadingPreInstall(false);
@@ -177,13 +189,22 @@ const Install: FC<InstallProps> = (props): ReactElement => {
         }, 1500);
       });
     }
+
     return new Promise((resolve) => {
       if (!loadingInstall) {
         setSuccessInstall(false);
         setLoadingInstall(true);
 
+        const installConsole: OutputLogs = (message: string, progress?: number) => {
+          console.log("UPDATING LOG:", message, progress);
+          console.log(message);
+          if (progress) {
+            setPercentageInstall(progress);
+          }
+        };
+        console.log("STARTING INSTALL");
         Promise.all([
-          window.ethDocker.install(props.installationDetails),
+          window.ethDocker.install(props.installationDetails, installConsole),
           bufferLoad(),
         ]).then((res) => {
           setSuccessInstall(true);
@@ -194,45 +215,45 @@ const Install: FC<InstallProps> = (props): ReactElement => {
     });
   };
 
-  const handleKeyImportModal: () => Promise<boolean> = () => {
-    if (props.installationDetails.debug === true) {
-      return new Promise((resolve) => {
-        setSuccessKeyImport(false);
-        setLoadingKeyImport(true);
-        setTimeout(() => {
-          setSuccessKeyImport(true);
-          setLoadingKeyImport(false);
-          resolve(true);
-        }, 1500);
-      });
-    }
-    return new Promise((resolve: (arg: () => Promise<boolean>) => void) => {
-      setSuccessKeyImport(false);
-      setLoadingKeyImport(true);
-      setModalOpen(true);
-      resolveModal.current = resolve;
-    })
-      .then((keyImp: () => Promise<boolean>) => {
-        return new Promise((resolve: (arg: boolean) => void) => {
-          Promise.all([keyImp(), bufferLoad()])
-            .then((res) => {
-              setSuccessKeyImport(true);
-              setLoadingKeyImport(false);
-              resolve(res[0]);
-            })
-            .catch((err) => {
-              console.error('error importing key: ', err);
-              setLoadingKeyImport(false);
-              resolve(false);
-            });
-        });
-      })
-      .catch((err) => {
-        console.error('error filling out key import modal: ', err);
-        setLoadingKeyImport(false);
-        return false;
-      });
-  };
+  // const handleKeyImportModal: () => Promise<boolean> = () => {
+  // 	if (props.installationDetails.debug === true) {
+  // 		return new Promise((resolve) => {
+  // 			setSuccessKeyImport(false);
+  // 			setLoadingKeyImport(true);
+  // 			setTimeout(() => {
+  // 				setSuccessKeyImport(true);
+  // 				setLoadingKeyImport(false);
+  // 				resolve(true);
+  // 			}, 1500);
+  // 		});
+  // 	}
+  // 	return new Promise((resolve: (arg: () => Promise<boolean>) => void) => {
+  // 		setSuccessKeyImport(false);
+  // 		setLoadingKeyImport(true);
+  // 		setModalOpen(true);
+  // 		resolveModal.current = resolve;
+  // 	})
+  // 		.then((keyImp: () => Promise<boolean>) => {
+  // 			return new Promise((resolve: (arg: boolean) => void) => {
+  // 				Promise.all([keyImp(), bufferLoad()])
+  // 					.then((res) => {
+  // 						setSuccessKeyImport(true);
+  // 						setLoadingKeyImport(false);
+  // 						resolve(res[0]);
+  // 					})
+  // 					.catch((err) => {
+  // 						console.error("error importing key: ", err);
+  // 						setLoadingKeyImport(false);
+  // 						resolve(false);
+  // 					});
+  // 			});
+  // 		})
+  // 		.catch((err) => {
+  // 			console.error("error filling out key import modal: ", err);
+  // 			setLoadingKeyImport(false);
+  // 			return false;
+  // 		});
+  // };
 
   const handlePostInstall: () => Promise<boolean> = () => {
     if (props.installationDetails.debug === true) {
@@ -251,8 +272,18 @@ const Install: FC<InstallProps> = (props): ReactElement => {
         setSuccessPostInstall(false);
         setLoadingPostInstall(true);
 
+        const postInstallConsole: OutputLogs = (message: string, progress?: number) => {
+          console.log(message);
+          if (progress) {
+            setPercentagePostInstall(progress);
+          }
+        };
+
         Promise.all([
-          window.ethDocker.postInstall(props.installationDetails.network),
+          window.ethDocker.postInstall(
+            props.installationDetails.network,
+            postInstallConsole,
+          ),
           bufferLoad(),
         ]).then((res) => {
           setSuccessPostInstall(true);
@@ -286,17 +317,17 @@ const Install: FC<InstallProps> = (props): ReactElement => {
           setDisableBack(false);
           return;
         }
-        step += 1;
+        step += 2;
 
-      case 2:
-        setFailedKeyImport(false);
-        let keyImportResult = await handleKeyImportModal();
-        if (!keyImportResult) {
-          setFailedKeyImport(true);
-          setDisableBack(false);
-          return;
-        }
-        step += 1;
+      // case 2:
+      // 	setFailedKeyImport(false);
+      // 	let keyImportResult = await handleKeyImportModal();
+      // 	if (!keyImportResult) {
+      // 		setFailedKeyImport(true);
+      // 		setDisableBack(false);
+      // 		return;
+      // 	}
+      // 	step += 1;
 
       case 3:
         setFailedPostInstall(false);
@@ -326,14 +357,8 @@ const Install: FC<InstallProps> = (props): ReactElement => {
       <ContentGrid item container>
         <Grid item container>
           <Grid item xs={3}></Grid>
-          <Grid
-            item
-            container
-            justifyContent="center"
-            alignItems="center"
-            xs={2}
-          >
-            <Box sx={{ m: 1, position: 'relative' }}>
+          <Grid item container justifyContent="center" alignItems="center" xs={2}>
+            <Box sx={{ m: 1, position: "relative" }}>
               <Fab
                 aria-label="save"
                 color="primary"
@@ -360,7 +385,7 @@ const Install: FC<InstallProps> = (props): ReactElement => {
                   size={68}
                   sx={{
                     color: green[500],
-                    position: 'absolute',
+                    position: "absolute",
                     top: -6,
                     left: -6,
                     zIndex: 1,
@@ -370,27 +395,15 @@ const Install: FC<InstallProps> = (props): ReactElement => {
             </Box>
           </Grid>
           <Grid item xs={1}></Grid>
-          <Grid
-            item
-            container
-            justifyContent="flex-start"
-            alignItems="center"
-            xs={3}
-          >
-            <span>Downloading dependencies</span>
+          <Grid item container justifyContent="flex-start" alignItems="center" xs={3}>
+            <span>Downloading dependencies ({percentagePreInstall}%)</span>
           </Grid>
           <Grid item xs={3}></Grid>
         </Grid>
         <Grid item container>
           <Grid item xs={3}></Grid>
-          <Grid
-            item
-            container
-            justifyContent="center"
-            alignItems="center"
-            xs={2}
-          >
-            <Box sx={{ m: 1, position: 'relative' }}>
+          <Grid item container justifyContent="center" alignItems="center" xs={2}>
+            <Box sx={{ m: 1, position: "relative" }}>
               <Fab
                 aria-label="save"
                 color="primary"
@@ -417,7 +430,7 @@ const Install: FC<InstallProps> = (props): ReactElement => {
                   size={68}
                   sx={{
                     color: green[500],
-                    position: 'absolute',
+                    position: "absolute",
                     top: -6,
                     left: -6,
                     zIndex: 1,
@@ -427,84 +440,54 @@ const Install: FC<InstallProps> = (props): ReactElement => {
             </Box>
           </Grid>
           <Grid item xs={1}></Grid>
-          <Grid
-            item
-            container
-            justifyContent="flex-start"
-            alignItems="center"
-            xs={4}
-          >
-            <span>Installing services</span>
+          <Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
+            <span>Installing services ({percentageInstall}%)</span>
           </Grid>
           <Grid item xs={3}></Grid>
         </Grid>
+        {/* <Grid item container>
+					<Grid item xs={3}></Grid>
+					<Grid item container justifyContent="center" alignItems="center" xs={2}>
+						<Box sx={{ m: 1, position: "relative" }}>
+							<Fab aria-label="save" color="primary" sx={buttonKeyImportSx} disabled={!failedKeyImport} onClick={failedKeyImport ? () => install(2) : () => {}}>
+								{!failedKeyImport ? (
+									successKeyImport ? (
+										<DoneOutline
+											sx={{
+												color: green[500],
+											}}
+										/>
+									) : (
+										<KeyOutlined />
+									)
+								) : (
+									<ErrorOutline sx={{ color: red[500] }} />
+								)}
+							</Fab>
+							{loadingKeyImport && (
+								<CircularProgress
+									size={68}
+									sx={{
+										color: green[500],
+										position: "absolute",
+										top: -6,
+										left: -6,
+										zIndex: 1,
+									}}
+								/>
+							)}
+						</Box>
+					</Grid>
+					<Grid item xs={1}></Grid>
+					<Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
+						<span>Key Import</span>
+					</Grid>
+					<Grid item xs={3}></Grid>
+				</Grid> */}
         <Grid item container>
           <Grid item xs={3}></Grid>
-          <Grid
-            item
-            container
-            justifyContent="center"
-            alignItems="center"
-            xs={2}
-          >
-            <Box sx={{ m: 1, position: 'relative' }}>
-              <Fab
-                aria-label="save"
-                color="primary"
-                sx={buttonKeyImportSx}
-                disabled={!failedKeyImport}
-                onClick={failedKeyImport ? () => install(2) : () => {}}
-              >
-                {!failedKeyImport ? (
-                  successKeyImport ? (
-                    <DoneOutline
-                      sx={{
-                        color: green[500],
-                      }}
-                    />
-                  ) : (
-                    <KeyOutlined />
-                  )
-                ) : (
-                  <ErrorOutline sx={{ color: red[500] }} />
-                )}
-              </Fab>
-              {loadingKeyImport && (
-                <CircularProgress
-                  size={68}
-                  sx={{
-                    color: green[500],
-                    position: 'absolute',
-                    top: -6,
-                    left: -6,
-                    zIndex: 1,
-                  }}
-                />
-              )}
-            </Box>
-          </Grid>
-          <Grid item xs={1}></Grid>
-          <Grid
-            item
-            container
-            justifyContent="flex-start"
-            alignItems="center"
-            xs={4}
-          >
-            <span>Key Import</span>
-          </Grid>
-          <Grid item xs={3}></Grid>
-        </Grid>
-        <Grid item container>
-          <Grid item xs={3}></Grid>
-          <Grid
-            item
-            container
-            justifyContent="center"
-            alignItems="center"
-            xs={2}
-          >
-            <Box sx={{ m: 1, position: 'relative' }}>
+          <Grid item container justifyContent="center" alignItems="center" xs={2}>
+            <Box sx={{ m: 1, position: "relative" }}>
               <Fab
                 aria-label="save"
                 color="primary"
@@ -531,7 +514,7 @@ const Install: FC<InstallProps> = (props): ReactElement => {
                   size={68}
                   sx={{
                     color: green[500],
-                    position: 'absolute',
+                    position: "absolute",
                     top: -6,
                     left: -6,
                     zIndex: 1,
@@ -541,14 +524,8 @@ const Install: FC<InstallProps> = (props): ReactElement => {
             </Box>
           </Grid>
           <Grid item xs={1}></Grid>
-          <Grid
-            item
-            container
-            justifyContent="flex-start"
-            alignItems="center"
-            xs={4}
-          >
-            <span>Configuring and launching</span>
+          <Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
+            <span>Configuring and launching ({percentagePostInstall}%)</span>
           </Grid>
           <Grid item xs={3}></Grid>
         </Grid>
@@ -558,21 +535,21 @@ const Install: FC<InstallProps> = (props): ReactElement => {
       <StepNavigation
         onPrev={props.onStepBack}
         onNext={props.onStepForward}
-        backLabel={'Back'}
-        nextLabel={'Finish'}
+        backLabel={"Back"}
+        nextLabel={"Finish"}
         disableBack={disableBack}
         disableNext={disableForward}
       />
-      <ImportKeystore
-        setModalOpen={setModalOpen}
-        isModalOpen={isModalOpen}
-        setKeystorePassword={setKeystorePassword}
-        setKeystorePath={setKeystorePath}
-        keyStorePath={keyStorePath}
-        keystorePassword={keystorePassword}
-        closing={resolveModal}
-        installationDetails={props.installationDetails}
-      />
+      {/* <ImportKeystore
+				setModalOpen={setModalOpen}
+				isModalOpen={isModalOpen}
+				setKeystorePassword={setKeystorePassword}
+				setKeystorePath={setKeystorePath}
+				keyStorePath={keyStorePath}
+				keystorePassword={keystorePassword}
+				closing={resolveModal}
+				installationDetails={props.installationDetails}
+			/> */}
     </Grid>
   );
 };

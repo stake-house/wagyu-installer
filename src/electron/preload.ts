@@ -9,66 +9,81 @@ import {
   clipboard,
   ipcRenderer,
   OpenDialogOptions,
-  OpenDialogReturnValue
+  OpenDialogReturnValue,
 } from "electron";
 import { Network } from "../react/types";
 
-import { doesDirectoryExist, findFirstFile } from './BashUtils';
+import { doesDirectoryExist, findFirstFile } from "./BashUtils";
 
-import { EthDockerInstaller } from './EthDockerInstaller';
+import { EthDockerInstaller } from "./EthDockerInstaller";
 import { InstallDetails, OutputLogs } from "./IMultiClientInstaller";
 
-import { Writable } from 'stream';
+import { Writable } from "stream";
 
 const ethDockerInstaller = new EthDockerInstaller();
 const ethDockerPreInstall = async (outputLogs?: OutputLogs): Promise<boolean> => {
   return ethDockerInstaller.preInstall(outputLogs);
 };
-const ethDockerInstall = async (details: InstallDetails): Promise<boolean> => {
-  return ethDockerInstaller.install(details);
+const ethDockerInstall = async (
+  details: InstallDetails,
+  outputLogs?: OutputLogs,
+): Promise<boolean> => {
+  return ethDockerInstaller.install(details, outputLogs);
 };
 const ethDockerImportKeys = async (
   network: Network,
   keyStoreDirectoryPath: string,
-  keyStorePassword: string): Promise<boolean> => {
+  keyStorePassword: string,
+): Promise<boolean> => {
   return ethDockerInstaller.importKeys(network, keyStoreDirectoryPath, keyStorePassword);
 };
-const ethDockerPostInstall = async (network: Network): Promise<boolean> => {
-  return ethDockerInstaller.postInstall(network);
+const ethDockerPostInstall = async (
+  network: Network,
+  outputLogs?: OutputLogs,
+): Promise<boolean> => {
+  return ethDockerInstaller.postInstall(network, outputLogs);
 };
-const ethDockerStartNodes = async (network: Network): Promise<boolean> => {
-  return ethDockerInstaller.startNodes(network);
+const ethDockerStartNodes = async (
+  network: Network,
+  outputLogs?: OutputLogs,
+): Promise<boolean> => {
+  return ethDockerInstaller.startNodes(network, outputLogs);
 };
-const ethDockerStopNodes = async (network: Network): Promise<boolean> => {
-  return ethDockerInstaller.stopNodes(network);
+const ethDockerStopNodes = async (
+  network: Network,
+  outputLogs?: OutputLogs,
+): Promise<boolean> => {
+  return ethDockerInstaller.stopNodes(network, outputLogs);
 };
 
 const ipcRendererSendClose = () => {
-  ipcRenderer.send('close');
+  ipcRenderer.send("close");
 };
 
-const invokeShowOpenDialog = (options: OpenDialogOptions): Promise<OpenDialogReturnValue> => {
-  return ipcRenderer.invoke('showOpenDialog', options);
+const invokeShowOpenDialog = (
+  options: OpenDialogOptions,
+): Promise<OpenDialogReturnValue> => {
+  return ipcRenderer.invoke("showOpenDialog", options);
 };
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  'shellOpenExternal': shell.openExternal,
-  'shellShowItemInFolder': shell.showItemInFolder,
-  'clipboardWriteText': clipboard.writeText,
-  'ipcRendererSendClose': ipcRendererSendClose,
-  'invokeShowOpenDialog': invokeShowOpenDialog
+contextBridge.exposeInMainWorld("electronAPI", {
+  shellOpenExternal: shell.openExternal,
+  shellShowItemInFolder: shell.showItemInFolder,
+  clipboardWriteText: clipboard.writeText,
+  ipcRendererSendClose: ipcRendererSendClose,
+  invokeShowOpenDialog: invokeShowOpenDialog,
 });
 
-contextBridge.exposeInMainWorld('bashUtils', {
-  'doesDirectoryExist': doesDirectoryExist,
-  'findFirstFile': findFirstFile
+contextBridge.exposeInMainWorld("bashUtils", {
+  doesDirectoryExist: doesDirectoryExist,
+  findFirstFile: findFirstFile,
 });
 
-contextBridge.exposeInMainWorld('ethDocker', {
-  'preInstall': ethDockerPreInstall,
-  'install': ethDockerInstall,
-  'importKeys': ethDockerImportKeys,
-  'postInstall': ethDockerPostInstall,
-  'startNodes': ethDockerStartNodes,
-  'stopNodes': ethDockerStopNodes
+contextBridge.exposeInMainWorld("ethDocker", {
+  preInstall: ethDockerPreInstall,
+  install: ethDockerInstall,
+  importKeys: ethDockerImportKeys,
+  postInstall: ethDockerPostInstall,
+  startNodes: ethDockerStartNodes,
+  stopNodes: ethDockerStopNodes,
 });
